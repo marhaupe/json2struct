@@ -305,32 +305,6 @@ func TestJSONArray_String(t *testing.T) {
 		})
 	}
 }
-
-func TestJSONRoot_String(t *testing.T) {
-	type fields struct {
-		JSONElement JSONElement
-		Children    []JSONElement
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			jp := &JSONRoot{
-				JSONElement: tt.fields.JSONElement,
-				Children:    tt.fields.Children,
-			}
-			if got := jp.String(); got != tt.want {
-				t.Errorf("JSONRoot.String() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func Test_appendOmitEmptyToRootElement(t *testing.T) {
 	type args struct {
 		s string
