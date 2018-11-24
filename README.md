@@ -9,6 +9,11 @@ Example:
 curl https://pokeapi.co/api/v2/pokemon/1/ |json-to-struct
 ```
 
-The program will generate a new .go file holding the generated struct. Please check whether the file has been correctly generated, and if not, I'd greatly appreciate you opening an issue!
+The program will output a valid go struct to stdout. Please check whether it has been correctly generated, and if not, I'd greatly appreciate you opening an issue!
+
+Example: 
+```bash
+curl https://pokeapi.co/api/v2/pokemon/1/ |json-to-struct >> generated.go
+```
 
 Credits to Matt Holt (https://github.com/mholt/json-to-go), who inspired me to write a solution without relying on a web-application
