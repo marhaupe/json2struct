@@ -3,32 +3,32 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/marhaupe/json-to-struct/internal"
+	"github.com/marhaupe/json-to-struct/internal/json"
 )
 
 func Start() {
 
-	e := internal.JSONObject{
+	e := json.JSONObject{
 		Root: true,
-		Children: []internal.JSONElement{
-			&internal.JSONObject{
+		Children: []json.JSONElement{
+			&json.JSONObject{
 				Key: "Intstringobj",
-				Children: []internal.JSONElement{
-					&internal.JSONPrimitive{
-						Ptype: internal.Int,
+				Children: []json.JSONElement{
+					&json.JSONPrimitive{
+						Ptype: json.Int,
 						Key:   "testint",
 					},
-					&internal.JSONPrimitive{
-						Ptype: internal.String,
+					&json.JSONPrimitive{
+						Ptype: json.String,
 						Key:   "teststring",
 					},
 				},
 			},
-			&internal.JSONObject{
+			&json.JSONObject{
 				Key: "Boolobj",
-				Children: []internal.JSONElement{
-					&internal.JSONPrimitive{
-						Ptype: internal.Bool,
+				Children: []json.JSONElement{
+					&json.JSONPrimitive{
+						Ptype: json.Bool,
 						Key:   "testbool",
 					},
 				},
