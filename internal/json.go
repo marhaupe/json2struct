@@ -25,24 +25,6 @@ type JSONPrimitive struct {
 	Key   string
 }
 
-type JSONObject struct {
-	JSONElement
-	Root     bool
-	Key      string
-	Children []JSONElement
-}
-
-type JSONArray struct {
-	JSONElement
-	Root     bool
-	Key      string
-	Children []JSONElement
-}
-
-func capitalizeKey(k string) string {
-	return strings.Title(k)
-}
-
 func (jp *JSONPrimitive) Datatype() string {
 	switch jp.Ptype {
 	case String:
@@ -55,8 +37,16 @@ func (jp *JSONPrimitive) Datatype() string {
 		return "string"
 	}
 }
+
 func (jp *JSONPrimitive) String() string {
 	return fmt.Sprintf("%s %s `json:\"%s\"`", capitalizeKey(jp.Key), jp.Datatype(), jp.Key)
+}
+
+type JSONObject struct {
+	JSONElement
+	Root     bool
+	Key      string
+	Children []JSONElement
 }
 
 func (jp *JSONObject) Datatype() string {
@@ -72,6 +62,13 @@ func (jp *JSONObject) String() string {
 		return fmt.Sprintf("type JSONToStruct struct{ %s }`", b.String())
 	}
 	return fmt.Sprintf("%s struct{ %s } `json:\"%s\"`", capitalizeKey(jp.Key), b.String(), jp.Key)
+}
+
+type JSONArray struct {
+	JSONElement
+	Root     bool
+	Key      string
+	Children []JSONElement
 }
 
 func (jp *JSONArray) Datatype() string {
@@ -99,25 +96,6 @@ func (jp *JSONArray) String() string {
 	return toString
 }
 
-func listChildrenTypes(c []JSONElement) []string {
-	foundChildrenTypes := make(map[string]bool)
-	var foundChildren []string
-	for _, entry := range c {
-		foundChildrenTypes[entry.Datatype()] = true
-	}
-	for k := range foundChildrenTypes {
-		foundChildren = append(foundChildren, k)
-	}
-	return foundChildren
-}
-
-func (jp *JSONArray) stringMultipleTypes() string {
-	if jp.Root {
-		return "type JSONToStruct []interface{}"
-	}
-	return fmt.Sprintf("%s []interface{} `json:\"%s\"`", capitalizeKey(jp.Key), jp.Key)
-}
-
 func (jp *JSONArray) stringObject() string {
 	var b strings.Builder
 	for _, child := range jp.Children {
@@ -129,11 +107,6 @@ func (jp *JSONArray) stringObject() string {
 		return fmt.Sprintf("type JSONToStruct []struct{ %s }", b.String())
 	}
 	return fmt.Sprintf("%s []struct{ %s } `json:\"%s\"`", capitalizeKey(jp.Key), b.String(), jp.Key)
-}
-
-func appendOmitEmptyToRootElement(s string) string {
-	re := regexp.MustCompile("`json:\"(.*)\"`$")
-	return re.ReplaceAllString(s, "`json:\"$1,omitempty\"`")
 }
 
 func (jp *JSONArray) stringArray() string {
@@ -148,4 +121,32 @@ func (jp *JSONArray) stringPrimitive(dataType string) string {
 		return fmt.Sprintf("type JSONToStruct []%s", dataType)
 	}
 	return fmt.Sprintf("%s []%s `json:\"%s\"`", capitalizeKey(jp.Key), dataType, jp.Key)
+}
+
+func (jp *JSONArray) stringMultipleTypes() string {
+	if jp.Root {
+		return "type JSONToStruct []interface{}"
+	}
+	return fmt.Sprintf("%s []interface{} `json:\"%s\"`", capitalizeKey(jp.Key), jp.Key)
+}
+
+func listChildrenTypes(c []JSONElement) []string {
+	foundChildrenTypes := make(map[string]bool)
+	var foundChildren []string
+	for _, entry := range c {
+		foundChildrenTypes[entry.Datatype()] = true
+	}
+	for k := range foundChildrenTypes {
+		foundChildren = append(foundChildren, k)
+	}
+	return foundChildren
+}
+
+func appendOmitEmptyToRootElement(s string) string {
+	re := regexp.MustCompile("`json:\"(.*)\"`$")
+	return re.ReplaceAllString(s, "`json:\"$1,omitempty\"`")
+}
+
+func capitalizeKey(k string) string {
+	return strings.Title(k)
 }
