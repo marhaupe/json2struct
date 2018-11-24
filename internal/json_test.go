@@ -19,14 +19,14 @@ func TestJSONPrimitiveInt_String(t *testing.T) {
 			fields: fields{
 				Key: "key",
 			},
-			want: "Key int `json:\"key\"`",
+			want: "Key int `json:\"key\"`\n",
 		},
 		{
 			name: "Basic Int Two",
 			fields: fields{
 				Key: "anotherKey",
 			},
-			want: "AnotherKey int `json:\"anotherKey\"`",
+			want: "AnotherKey int `json:\"anotherKey\"`\n",
 		},
 	}
 	for _, tt := range tests {
@@ -58,14 +58,14 @@ func TestJSONPrimitiveString_String(t *testing.T) {
 			fields: fields{
 				Key: "key",
 			},
-			want: "Key string `json:\"key\"`",
+			want: "Key string `json:\"key\"`\n",
 		},
 		{
 			name: "Basic String Two",
 			fields: fields{
 				Key: "anotherKey",
 			},
-			want: "AnotherKey string `json:\"anotherKey\"`",
+			want: "AnotherKey string `json:\"anotherKey\"`\n",
 		},
 	}
 	for _, tt := range tests {
@@ -107,7 +107,7 @@ func TestJSONObject_String(t *testing.T) {
 					},
 				},
 			},
-			want: "Testobject struct{ Testint int `json:\"testint\"`Teststring string `json:\"teststring\"` } `json:\"testobject\"`",
+			want: "Testobject struct{\nTestint int `json:\"testint\"`\nTeststring string `json:\"teststring\"`\n} `json:\"testobject\"`\n",
 		},
 	}
 	for _, tt := range tests {
@@ -148,7 +148,7 @@ func TestJSONArray_String(t *testing.T) {
 					},
 				},
 			},
-			want: "Testarray []bool `json:\"testarray\"`",
+			want: "Testarray []bool `json:\"testarray\"`\n",
 		},
 		{
 			name: "Array Test Only Strings",
@@ -165,7 +165,7 @@ func TestJSONArray_String(t *testing.T) {
 					},
 				},
 			},
-			want: "Testarray []string `json:\"testarray\"`",
+			want: "Testarray []string `json:\"testarray\"`\n",
 		},
 		{
 			name: "Array Test Only Ints",
@@ -182,7 +182,7 @@ func TestJSONArray_String(t *testing.T) {
 					},
 				},
 			},
-			want: "Testarray []int `json:\"testarray\"`",
+			want: "Testarray []int `json:\"testarray\"`\n",
 		},
 		{
 			name: "Array Test Arrays",
@@ -216,7 +216,7 @@ func TestJSONArray_String(t *testing.T) {
 					},
 				},
 			},
-			want: "Testarray [][]interface{} `json:\"testarray\"`",
+			want: "Testarray [][]interface{} `json:\"testarray\"`\n",
 		},
 		{
 			name: "Array Test Different Objects",
@@ -247,7 +247,7 @@ func TestJSONArray_String(t *testing.T) {
 					},
 				},
 			},
-			want: "Testarray []struct{ Intstringobj struct{ Testint int `json:\"testint\"`Teststring string `json:\"teststring\"` } `json:\"Intstringobj,omitempty\"`Boolobj struct{ Testbool bool `json:\"testbool\"` } `json:\"Boolobj,omitempty\"` } `json:\"testarray\"`",
+			want: "Testarray []struct{\nIntstringobj struct{\nTestint int `json:\"testint\"`\nTeststring string `json:\"teststring\"`\n} `json:\"Intstringobj,omitempty\"`\nBoolobj struct{\nTestbool bool `json:\"testbool\"`\n} `json:\"Boolobj,omitempty\"`\n} `json:\"testarray\"`\n",
 		},
 		{
 			name: "Array Test Different Types Primitive",
@@ -264,7 +264,7 @@ func TestJSONArray_String(t *testing.T) {
 					},
 				},
 			},
-			want: "Testarray []interface{} `json:\"testarray\"`",
+			want: "Testarray []interface{} `json:\"testarray\"`\n",
 		},
 		{
 			name: "Array Test Different Types Mixed",
@@ -290,7 +290,7 @@ func TestJSONArray_String(t *testing.T) {
 					},
 				},
 			},
-			want: "Testarray []interface{} `json:\"testarray\"`",
+			want: "Testarray []interface{} `json:\"testarray\"`\n",
 		},
 	}
 	for _, tt := range tests {
@@ -317,23 +317,23 @@ func Test_appendOmitEmptyToRootElement(t *testing.T) {
 		{
 			name: "Simple",
 			args: args{
-				"Test []struct{} `json:\"test\"`",
+				"Test []struct{} `json:\"test\"`\n",
 			},
-			want: "Test []struct{} `json:\"test,omitempty\"`",
+			want: "Test []struct{} `json:\"test,omitempty\"`\n",
 		},
 		{
 			name: "Nested",
 			args: args{
-				"Intstringobj struct{ Testint int `json:\"testint\"`Teststring string `json:\"teststring\"` } `json:\"Intstringobj\"`",
+				"Intstringobj struct{\nTestint int `json:\"testint\"`\nTeststring string `json:\"teststring\"`\n} `json:\"Intstringobj\"`\n",
 			},
-			want: "Intstringobj struct{ Testint int `json:\"testint\"`Teststring string `json:\"teststring\"` } `json:\"Intstringobj,omitempty\"`",
+			want: "Intstringobj struct{\nTestint int `json:\"testint\"`\nTeststring string `json:\"teststring\"`\n} `json:\"Intstringobj,omitempty\"`\n",
 		},
 		{
 			name: "Nested 2",
 			args: args{
-				"Test []struct{ Testint int `json:\"testint\"`} `json:\"test\"`",
+				"Test []struct{\nTestint int `json:\"testint\"`\n} `json:\"test\"`\n",
 			},
-			want: "Test []struct{ Testint int `json:\"testint\"`} `json:\"test,omitempty\"`",
+			want: "Test []struct{\nTestint int `json:\"testint\"`\n} `json:\"test,omitempty\"`\n",
 		},
 	}
 	for _, tt := range tests {

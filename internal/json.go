@@ -39,7 +39,7 @@ func (jp *JSONPrimitive) Datatype() string {
 }
 
 func (jp *JSONPrimitive) String() string {
-	return fmt.Sprintf("%s %s `json:\"%s\"`", capitalizeKey(jp.Key), jp.Datatype(), jp.Key)
+	return fmt.Sprintf("%s %s `json:\"%s\"`\n", capitalizeKey(jp.Key), jp.Datatype(), jp.Key)
 }
 
 type JSONObject struct {
@@ -59,9 +59,9 @@ func (jp *JSONObject) String() string {
 		fmt.Fprintf(&b, entry.String())
 	}
 	if jp.Root {
-		return fmt.Sprintf("type JSONToStruct struct{ %s }`", b.String())
+		return fmt.Sprintf("type JSONToStruct struct{\n%s}`\n", b.String())
 	}
-	return fmt.Sprintf("%s struct{ %s } `json:\"%s\"`", capitalizeKey(jp.Key), b.String(), jp.Key)
+	return fmt.Sprintf("%s struct{\n%s} `json:\"%s\"`\n", capitalizeKey(jp.Key), b.String(), jp.Key)
 }
 
 type JSONArray struct {
@@ -104,30 +104,30 @@ func (jp *JSONArray) stringObject() string {
 		fmt.Fprintf(&b, childString)
 	}
 	if jp.Root {
-		return fmt.Sprintf("type JSONToStruct []struct{ %s }", b.String())
+		return fmt.Sprintf("type JSONToStruct []struct{\n%s}\n", b.String())
 	}
-	return fmt.Sprintf("%s []struct{ %s } `json:\"%s\"`", capitalizeKey(jp.Key), b.String(), jp.Key)
+	return fmt.Sprintf("%s []struct{\n%s} `json:\"%s\"`\n", capitalizeKey(jp.Key), b.String(), jp.Key)
 }
 
 func (jp *JSONArray) stringArray() string {
 	if jp.Root {
 		return "type JSONToStruct [][]interface{}"
 	}
-	return fmt.Sprintf("%s [][]interface{} `json:\"%s\"`", capitalizeKey(jp.Key), jp.Key)
+	return fmt.Sprintf("%s [][]interface{} `json:\"%s\"`\n", capitalizeKey(jp.Key), jp.Key)
 }
 
 func (jp *JSONArray) stringPrimitive(dataType string) string {
 	if jp.Root {
 		return fmt.Sprintf("type JSONToStruct []%s", dataType)
 	}
-	return fmt.Sprintf("%s []%s `json:\"%s\"`", capitalizeKey(jp.Key), dataType, jp.Key)
+	return fmt.Sprintf("%s []%s `json:\"%s\"`\n", capitalizeKey(jp.Key), dataType, jp.Key)
 }
 
 func (jp *JSONArray) stringMultipleTypes() string {
 	if jp.Root {
 		return "type JSONToStruct []interface{}"
 	}
-	return fmt.Sprintf("%s []interface{} `json:\"%s\"`", capitalizeKey(jp.Key), jp.Key)
+	return fmt.Sprintf("%s []interface{} `json:\"%s\"`\n", capitalizeKey(jp.Key), jp.Key)
 }
 
 func listChildrenTypes(c []JSONElement) []string {
@@ -143,8 +143,8 @@ func listChildrenTypes(c []JSONElement) []string {
 }
 
 func appendOmitEmptyToRootElement(s string) string {
-	re := regexp.MustCompile("`json:\"(.*)\"`$")
-	return re.ReplaceAllString(s, "`json:\"$1,omitempty\"`")
+	re := regexp.MustCompile("(?s)`json:\"(.*)\"`\n$")
+	return re.ReplaceAllString(s, "`json:\"$1,omitempty\"`\n")
 }
 
 func capitalizeKey(k string) string {
