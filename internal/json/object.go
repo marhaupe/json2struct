@@ -16,6 +16,10 @@ func (jp *JSONObject) Datatype() string {
 	return "object"
 }
 
+func (jp *JSONObject) AddChild(c JSONElement) {
+	jp.Children = append(jp.Children, c)
+}
+
 func (jp *JSONObject) String() string {
 	var b strings.Builder
 	for _, entry := range jp.Children {

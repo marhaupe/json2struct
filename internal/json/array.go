@@ -12,6 +12,10 @@ type JSONArray struct {
 	Children []JSONElement
 }
 
+func (jp *JSONArray) AddChild(c JSONElement) {
+	jp.Children = append(jp.Children, c)
+}
+
 func (jp *JSONArray) Datatype() string {
 	return "array"
 }
