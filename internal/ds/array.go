@@ -7,6 +7,7 @@ import (
 
 type JSONArray struct {
 	JSONElement
+	JSONNode
 	Root     bool
 	Key      string
 	Children []JSONElement

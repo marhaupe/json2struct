@@ -10,6 +10,10 @@ type JSONElement interface {
 	Datatype() string
 }
 
+type JSONNode interface {
+	AddChild(c JSONElement)
+}
+
 func listChildrenTypes(c []JSONElement) []string {
 	foundChildrenTypes := make(map[string]bool)
 	var foundChildren []string

@@ -7,6 +7,7 @@ import (
 
 type JSONObject struct {
 	JSONElement
+	JSONNode
 	Root     bool
 	Key      string
 	Children []JSONElement

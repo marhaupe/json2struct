@@ -12,9 +12,9 @@ func Start() {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go internal.Lex(`{ 
-		"Hallo": "Hey", 
-		"DasisteinTest": { 
-			"Schoen": true
+		"Key": "Value", 
+		"Key": { 
+			"Key": true
 			 } 
 		}`, c, &wg)
 	go internal.Parse(c, &wg)
