@@ -1,39 +1,22 @@
 package cmd
 
 import (
-	"fmt"
+	"encoding/json"
+	"sync"
 
-	"github.com/marhaupe/json-to-struct/internal/json"
+	"github.com/marhaupe/json-to-struct/internal"
 )
 
 func Start() {
-
-	e := json.JSONObject{
-		Root: true,
-		Children: []json.JSONElement{
-			&json.JSONObject{
-				Key: "Intstringobj",
-				Children: []json.JSONElement{
-					&json.JSONPrimitive{
-						Ptype: json.Int,
-						Key:   "testint",
-					},
-					&json.JSONPrimitive{
-						Ptype: json.String,
-						Key:   "teststring",
-					},
-				},
-			},
-			&json.JSONObject{
-				Key: "Boolobj",
-				Children: []json.JSONElement{
-					&json.JSONPrimitive{
-						Ptype: json.Bool,
-						Key:   "testbool",
-					},
-				},
-			},
-		},
-	}
-	fmt.Print(e.String())
+	c := make(chan json.Token)
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go internal.Lex(`{ 
+		"Hallo": "Hey", 
+		"DasisteinTest": { 
+			"Schoen": true
+			 } 
+		}`, c, &wg)
+	go internal.Parse(c, &wg)
+	wg.Wait()
 }
