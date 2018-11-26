@@ -13,6 +13,24 @@ func TestJSONObject_String(t *testing.T) {
 		want   string
 	}{
 		{
+			name: "Nested Object Test One",
+			fields: fields{
+				Key: "testobject",
+				Children: []JSONElement{
+					&JSONObject{
+						Key: "nested_object",
+						Children: []JSONElement{
+							&JSONPrimitive{
+								Ptype: Int,
+								Key:   "testint",
+							},
+						},
+					},
+				},
+			},
+			want: "Testobject struct{\nNested_object struct{\nTestint int `json:\"testint\"`\n} `json:\"nested_object\"`\n} `json:\"testobject\"`\n",
+		},
+		{
 			name: "Basic Object Test One",
 			fields: fields{
 				Key: "testobject",
