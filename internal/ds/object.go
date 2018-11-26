@@ -5,14 +5,6 @@ import (
 	"strings"
 )
 
-type JSONObject struct {
-	JSONElement
-	JSONNode
-	Root     bool
-	Key      string
-	Children []JSONElement
-}
-
 func (jp *JSONObject) Datatype() string {
 	return "object"
 }

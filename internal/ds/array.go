@@ -5,14 +5,6 @@ import (
 	"strings"
 )
 
-type JSONArray struct {
-	JSONElement
-	JSONNode
-	Root     bool
-	Key      string
-	Children []JSONElement
-}
-
 func (jp *JSONArray) AddChild(c JSONElement) {
 	jp.Children = append(jp.Children, c)
 }

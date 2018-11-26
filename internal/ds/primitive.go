@@ -2,20 +2,6 @@ package ds
 
 import "fmt"
 
-type PrimitiveType int
-
-const (
-	String PrimitiveType = iota
-	Int
-	Bool
-)
-
-type JSONPrimitive struct {
-	JSONElement
-	Ptype PrimitiveType
-	Key   string
-}
-
 func (jp *JSONPrimitive) Datatype() string {
 	switch jp.Ptype {
 	case String:

@@ -5,16 +5,6 @@ import (
 	"strings"
 )
 
-type JSONElement interface {
-	String() string
-	Datatype() string
-}
-
-type JSONNode interface {
-	JSONElement
-	AddChild(c JSONElement)
-}
-
 func listChildrenTypes(c []JSONElement) []string {
 	foundChildrenTypes := make(map[string]bool)
 	var foundChildren []string
