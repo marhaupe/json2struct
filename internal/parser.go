@@ -8,16 +8,7 @@ import (
 	"github.com/marhaupe/json-to-struct/internal/ds"
 )
 
-// type Node struct {
-// 	done bool
-// 	el   ds.JSONNode
-// 	prev *Node
-// 	next *Node
-// }
-
 type Parser struct {
-	// rootNode    *Node
-	// currentNode *Node
 	rootEl ds.JSONNode
 	c      chan json.Token
 	wg     *sync.WaitGroup
@@ -30,9 +21,6 @@ func Parse(n chan ds.JSONNode, c chan json.Token, wg *sync.WaitGroup) {
 	n <- p.rootEl
 }
 
-// This might help: https://play.golang.org/p/K0cb7hzc6P6
-// I could also recursively call parseObject and parseArray in here,
-// that might make some things easier (e.g detecting keys)
 func (p *Parser) parse() {
 	defer p.wg.Done()
 
@@ -54,19 +42,23 @@ func (p *Parser) parse() {
 	var key string
 	for t := range p.c {
 		if key == "" {
-			// fmt.Printf("Key | Type %T | Value %v\n", t, t)
 			key = fmt.Sprint(t)
+
+			// When determining keys this way, the closing tag will be falsely recognized
+			// as key instead of the value
+			if key == "}" || key == "]" {
+				break
+			}
 		} else {
-			// fmt.Printf("Value | Type %T | Value %v\n", t, t)
 			switch t {
 			case json.Delim('{'):
 				p.rootEl.AddChild(p.parseObject(key))
 			case json.Delim('['):
 				p.rootEl.AddChild(p.parseArray(key))
 			case json.Delim(']'):
-				break
+				return
 			case json.Delim('}'):
-				break
+				return
 			default:
 				p.rootEl.AddChild(p.parsePrimitive(key, t))
 			}
@@ -80,17 +72,18 @@ func (p *Parser) parseObject(objKey string) *ds.JSONObject {
 	var key string
 	for t := range p.c {
 		if key == "" {
-			// fmt.Printf("Key | Type %T | Value %v\n", t, t)
 			key = fmt.Sprint(t)
+			if key == "}" || key == "]" {
+				return obj
+			}
 		} else {
-			// fmt.Printf("Value | Type %T | Value %v\n", t, t)
 			switch t {
 			case json.Delim('{'):
 				obj.AddChild(p.parseObject(key))
 			case json.Delim('['):
 				obj.AddChild(p.parseArray(key))
 			case json.Delim('}'):
-				break
+				return obj
 			default:
 				obj.AddChild(p.parsePrimitive(key, t))
 			}
@@ -106,14 +99,14 @@ func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
 	// Contents of array do not need a key; filling value with filler key
 	key := "in_array"
 	for t := range p.c {
-		// fmt.Printf("Value | Type %T | Value %v\n", t, t)
+		fmt.Printf("Value | Type %T | Value %v\n", t, t)
 		switch t {
 		case json.Delim('{'):
 			arr.AddChild(p.parseObject(key))
 		case json.Delim('['):
 			arr.AddChild(p.parseArray(key))
 		case json.Delim(']'):
-			break
+			return arr
 		default:
 			arr.AddChild(p.parsePrimitive(key, t))
 		}
@@ -131,7 +124,7 @@ func (p *Parser) parsePrimitive(key string, value json.Token) *ds.JSONPrimitive 
 	case bool:
 		prim.Ptype = ds.Bool
 	default:
-		fmt.Printf("Could not determine datatype of field with key %v\n", key)
+		fmt.Printf("Could not determine datatype of field with key %v and value %v\n", key, value)
 		prim.Ptype = ds.String
 	}
 	return prim
