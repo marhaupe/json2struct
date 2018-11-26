@@ -54,10 +54,10 @@ func (p *Parser) parse() {
 	var key string
 	for t := range p.c {
 		if key == "" {
-			fmt.Printf("Key | Type %T | Value %v\n", t, t)
+			// fmt.Printf("Key | Type %T | Value %v\n", t, t)
 			key = fmt.Sprint(t)
 		} else {
-			fmt.Printf("Value | Type %T | Value %v\n", t, t)
+			// fmt.Printf("Value | Type %T | Value %v\n", t, t)
 			switch t {
 			case json.Delim('{'):
 				p.rootEl.AddChild(p.parseObject(key))
@@ -75,13 +75,49 @@ func (p *Parser) parse() {
 	}
 }
 
-func (p *Parser) parseObject(key string) *ds.JSONObject {
-	obj := &ds.JSONObject{}
+func (p *Parser) parseObject(objKey string) *ds.JSONObject {
+	obj := &ds.JSONObject{Key: objKey}
+	var key string
+	for t := range p.c {
+		if key == "" {
+			// fmt.Printf("Key | Type %T | Value %v\n", t, t)
+			key = fmt.Sprint(t)
+		} else {
+			// fmt.Printf("Value | Type %T | Value %v\n", t, t)
+			switch t {
+			case json.Delim('{'):
+				obj.AddChild(p.parseObject(key))
+			case json.Delim('['):
+				obj.AddChild(p.parseArray(key))
+			case json.Delim('}'):
+				break
+			default:
+				obj.AddChild(p.parsePrimitive(key, t))
+			}
+			key = ""
+		}
+	}
 	return obj
 }
 
-func (p *Parser) parseArray(key string) *ds.JSONArray {
-	arr := &ds.JSONArray{}
+func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
+	arr := &ds.JSONArray{Key: arrKey}
+
+	// Contents of array do not need a key; filling value with filler key
+	key := "in_array"
+	for t := range p.c {
+		// fmt.Printf("Value | Type %T | Value %v\n", t, t)
+		switch t {
+		case json.Delim('{'):
+			arr.AddChild(p.parseObject(key))
+		case json.Delim('['):
+			arr.AddChild(p.parseArray(key))
+		case json.Delim(']'):
+			break
+		default:
+			arr.AddChild(p.parsePrimitive(key, t))
+		}
+	}
 	return arr
 }
 

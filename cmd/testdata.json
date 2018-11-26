@@ -1,0 +1,19 @@
+{
+  "Hello": "Hey",
+  "Nice": true,
+  "Number": 5999,
+  "Testobj": {
+    "ObjInt": 5000,
+    "ObjString": "5000"
+  },
+  "Testarr": [
+    "500",
+    "500"
+  ],
+  "Testarr": [
+    "500",
+    {
+      "thisisnested": true
+    }
+  ]
+}
