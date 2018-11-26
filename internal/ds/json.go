@@ -11,6 +11,7 @@ type JSONElement interface {
 }
 
 type JSONNode interface {
+	JSONElement
 	AddChild(c JSONElement)
 }
 
