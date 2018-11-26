@@ -8,6 +8,8 @@ import (
 	"github.com/marhaupe/json-to-struct/internal/ds"
 )
 
+const FILLER_KEY string = "FILLER_KEY"
+
 type Parser struct {
 	rootEl ds.JSONNode
 	c      chan json.Token
@@ -30,41 +32,22 @@ func (p *Parser) parse() {
 	// Parsing root delim accordingly
 	switch t {
 	case json.Delim('{'):
-		p.rootEl = &ds.JSONObject{
-			Root: true,
-		}
+		p.buildRootObject()
 	case json.Delim('['):
-		p.rootEl = &ds.JSONArray{
-			Root: true,
-		}
+		p.buildRootArray()
 	}
+}
 
-	var key string
-	for t := range p.c {
-		if key == "" {
-			key = fmt.Sprint(t)
+func (p *Parser) buildRootObject() {
+	obj := p.parseObject(FILLER_KEY)
+	obj.Root = true
+	p.rootEl = obj
+}
 
-			// When determining keys this way, the closing tag will be falsely recognized
-			// as key instead of the value
-			if key == "}" || key == "]" {
-				break
-			}
-		} else {
-			switch t {
-			case json.Delim('{'):
-				p.rootEl.AddChild(p.parseObject(key))
-			case json.Delim('['):
-				p.rootEl.AddChild(p.parseArray(key))
-			case json.Delim(']'):
-				return
-			case json.Delim('}'):
-				return
-			default:
-				p.rootEl.AddChild(p.parsePrimitive(key, t))
-			}
-			key = ""
-		}
-	}
+func (p *Parser) buildRootArray() {
+	arr := p.parseArray(FILLER_KEY)
+	arr.Root = true
+	p.rootEl = arr
 }
 
 func (p *Parser) parseObject(objKey string) *ds.JSONObject {
@@ -73,6 +56,9 @@ func (p *Parser) parseObject(objKey string) *ds.JSONObject {
 	for t := range p.c {
 		if key == "" {
 			key = fmt.Sprint(t)
+
+			// By making every second token the key, } and ] will falsely be recognized
+			// as keys instead of values
 			if key == "}" || key == "]" {
 				return obj
 			}
@@ -99,7 +85,6 @@ func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
 	// Contents of array do not need a key; filling value with filler key
 	key := "in_array"
 	for t := range p.c {
-		fmt.Printf("Value | Type %T | Value %v\n", t, t)
 		switch t {
 		case json.Delim('{'):
 			arr.AddChild(p.parseObject(key))
