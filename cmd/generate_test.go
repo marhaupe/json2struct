@@ -8,7 +8,7 @@ import (
 func setupCases() map[string]string {
 	cases := make(map[string]string)
 
-	want1 := `{
+	param1 := `{
 					"src": "Images/Sun.png",
 					"name": "sun1", 
 					"hOffset": 250, 
@@ -16,19 +16,19 @@ func setupCases() map[string]string {
 					"alignment": "center",
 					"visible": true
 				}`
-	var have1 bytes.Buffer
-	have1.WriteString("type JSONToStruct struct{\n")
-	have1.WriteString("Src string `json:\"src\"`\n")
-	have1.WriteString("Name string `json:\"name\"`\n")
-	have1.WriteString("HOffset int `json:\"hOffset\"`\n")
-	have1.WriteString("VOffset int `json:\"vOffset\"`\n")
-	have1.WriteString("Alignment string `json:\"alignment\"`\n")
-	have1.WriteString("Visible bool `json:\"visible\"`\n")
-	have1.WriteString("}\n")
-	cases["want1"] = want1
-	cases["have1"] = have1.String()
+	var expect1 bytes.Buffer
+	expect1.WriteString("type JSONToStruct struct{\n")
+	expect1.WriteString("Src string `json:\"src\"`\n")
+	expect1.WriteString("Name string `json:\"name\"`\n")
+	expect1.WriteString("HOffset int `json:\"hOffset\"`\n")
+	expect1.WriteString("VOffset int `json:\"vOffset\"`\n")
+	expect1.WriteString("Alignment string `json:\"alignment\"`\n")
+	expect1.WriteString("Visible bool `json:\"visible\"`\n")
+	expect1.WriteString("}\n")
+	cases["expect1"] = param1
+	cases["param1"] = expect1.String()
 
-	want2 := `{
+	param2 := `{
     "glossary": {
         "title": "example glossary",
 				"GlossDiv": {
@@ -50,33 +50,33 @@ func setupCases() map[string]string {
         }
     }
 	}`
-	var have2 bytes.Buffer
-	have2.WriteString("type JSONToStruct struct{\n")
-	have2.WriteString("Glossary struct{\n")
-	have2.WriteString("Title string `json:\"title\"`\n")
-	have2.WriteString("GlossDiv struct{\n")
-	have2.WriteString("Title string `json:\"title\"`\n")
-	have2.WriteString("GlossList struct{\n")
-	have2.WriteString("GlossEntry struct{\n")
-	have2.WriteString("ID string `json:\"ID\"`\n")
-	have2.WriteString("SortAs string `json:\"SortAs\"`\n")
-	have2.WriteString("GlossTerm string `json:\"GlossTerm\"`\n")
-	have2.WriteString("Acronym string `json:\"Acronym\"`\n")
-	have2.WriteString("Abbrev string `json:\"Abbrev\"`\n")
-	have2.WriteString("GlossDef struct{\n")
-	have2.WriteString("Para string `json:\"para\"`\n")
-	have2.WriteString("GlossSeeAlso []string `json:\"GlossSeeAlso\"`\n")
-	have2.WriteString("} `json:\"GlossDef\"`\n")
-	have2.WriteString("GlossSee string `json:\"GlossSee\"`\n")
-	have2.WriteString("} `json:\"GlossEntry\"`\n")
-	have2.WriteString("} `json:\"GlossList\"`\n")
-	have2.WriteString("} `json:\"GlossDiv\"`\n")
-	have2.WriteString("} `json:\"glossary\"`\n")
-	have2.WriteString("}\n")
-	cases["want2"] = want2
-	cases["have2"] = have2.String()
+	var expect2 bytes.Buffer
+	expect2.WriteString("type JSONToStruct struct{\n")
+	expect2.WriteString("Glossary struct{\n")
+	expect2.WriteString("Title string `json:\"title\"`\n")
+	expect2.WriteString("GlossDiv struct{\n")
+	expect2.WriteString("Title string `json:\"title\"`\n")
+	expect2.WriteString("GlossList struct{\n")
+	expect2.WriteString("GlossEntry struct{\n")
+	expect2.WriteString("ID string `json:\"ID\"`\n")
+	expect2.WriteString("SortAs string `json:\"SortAs\"`\n")
+	expect2.WriteString("GlossTerm string `json:\"GlossTerm\"`\n")
+	expect2.WriteString("Acronym string `json:\"Acronym\"`\n")
+	expect2.WriteString("Abbrev string `json:\"Abbrev\"`\n")
+	expect2.WriteString("GlossDef struct{\n")
+	expect2.WriteString("Para string `json:\"para\"`\n")
+	expect2.WriteString("GlossSeeAlso []string `json:\"GlossSeeAlso\"`\n")
+	expect2.WriteString("} `json:\"GlossDef\"`\n")
+	expect2.WriteString("GlossSee string `json:\"GlossSee\"`\n")
+	expect2.WriteString("} `json:\"GlossEntry\"`\n")
+	expect2.WriteString("} `json:\"GlossList\"`\n")
+	expect2.WriteString("} `json:\"GlossDiv\"`\n")
+	expect2.WriteString("} `json:\"glossary\"`\n")
+	expect2.WriteString("}\n")
+	cases["expect2"] = param2
+	cases["param2"] = expect2.String()
 
-	want3 := `{
+	param3 := `{
 		"Testobj": {
 			"Teststring": "Hey"
 		},
@@ -84,17 +84,18 @@ func setupCases() map[string]string {
 			"Testbool": true
 		}
 	}`
-	var have3 bytes.Buffer
-	have3.WriteString("type JSONToStruct struct{\n")
-	have3.WriteString("Testobj struct{\n")
-	have3.WriteString("Teststring string `json:\"Teststring\"`\n")
-	have3.WriteString("} `json:\"Testobj\"`\n")
-	have3.WriteString("}\n")
 
-	cases["want3"] = want3
-	cases["have3"] = have3.String()
+	var expect3 bytes.Buffer
+	expect3.WriteString("type JSONToStruct struct{\n")
+	expect3.WriteString("Testobj struct{\n")
+	expect3.WriteString("Teststring string `json:\"Teststring\"`\n")
+	expect3.WriteString("} `json:\"Testobj\"`\n")
+	expect3.WriteString("}\n")
 
-	want4 := `[
+	cases["expect3"] = param3
+	cases["param3"] = expect3.String()
+
+	param4 := `[
 		{
 			"teststring": "Hey"
 		},
@@ -102,16 +103,16 @@ func setupCases() map[string]string {
 			"testbool": true
 		}
 	]`
-	var have4 bytes.Buffer
-	have4.WriteString("type JSONToStruct []struct{\n")
-	have4.WriteString("Teststring string `json:\"teststring,omitempty\"`\n")
-	have4.WriteString("Testbool bool `json:\"testbool,omitempty\"`\n")
-	have4.WriteString("}\n")
+	var expect4 bytes.Buffer
+	expect4.WriteString("type JSONToStruct []struct{\n")
+	expect4.WriteString("Teststring string `json:\"teststring,omitempty\"`\n")
+	expect4.WriteString("Testbool bool `json:\"testbool,omitempty\"`\n")
+	expect4.WriteString("}\n")
 
-	cases["want4"] = want4
-	cases["have4"] = have4.String()
+	cases["expect4"] = param4
+	cases["param4"] = expect4.String()
 
-	want5 := `[
+	param5 := `[
   {
     "thissucks": true
   },
@@ -122,16 +123,16 @@ func setupCases() map[string]string {
   }
 	]`
 
-	var have5 bytes.Buffer
-	have5.WriteString("type JsonToStruct []struct{\n")
-	have5.WriteString("Thissucks bool `json:\"thissucks,omitempty\"`\n")
-	have5.WriteString("Thisdoesntsuck struct{\n")
-	have5.WriteString("Value bool `json:\"value\"`\n")
-	have5.WriteString("} `json:\"thisdoesntsuck,omitempty\"`\n")
-	have5.WriteString("}\n")
+	var expect5 bytes.Buffer
+	expect5.WriteString("type JsonToStruct []struct{\n")
+	expect5.WriteString("Thissucks bool `json:\"thissucks,omitempty\"`\n")
+	expect5.WriteString("Thisdoesntsuck struct{\n")
+	expect5.WriteString("Value bool `json:\"value\"`\n")
+	expect5.WriteString("} `json:\"thisdoesntsuck,omitempty\"`\n")
+	expect5.WriteString("}\n")
 
-	cases["want5"] = want5
-	cases["have5"] = have5.String()
+	cases["expect5"] = param5
+	cases["param5"] = expect5.String()
 
 	return cases
 }
@@ -147,37 +148,37 @@ func TestGenerate(t *testing.T) {
 	}{
 		{
 			name: "Case One",
-			want: cases["have1"],
+			want: cases["param1"],
 			args: args{
-				s: cases["want1"],
+				s: cases["expect1"],
 			},
 		},
 		{
 			name: "Case Two",
-			want: cases["have2"],
+			want: cases["param2"],
 			args: args{
-				s: cases["want2"],
+				s: cases["expect2"],
 			},
 		},
 		{
 			name: "Case Three",
-			want: cases["have3"],
+			want: cases["param3"],
 			args: args{
-				s: cases["want3"],
+				s: cases["expect3"],
 			},
 		},
 		{
 			name: "Case Four",
-			want: cases["have4"],
+			want: cases["param4"],
 			args: args{
-				s: cases["want4"],
+				s: cases["expect4"],
 			},
 		},
 		{
 			name: "Case Five",
-			want: cases["have5"],
+			want: cases["param5"],
 			args: args{
-				s: cases["want5"],
+				s: cases["expect5"],
 			},
 		},
 	}
