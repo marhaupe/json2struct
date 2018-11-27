@@ -76,6 +76,41 @@ func setupCases() map[string]string {
 	cases["want2"] = want2
 	cases["have2"] = have2.String()
 
+	want3 := `{
+		"Testobj": {
+			"Teststring": "Hey"
+		},
+		"Testobj": {
+			"Testbool": true
+		}
+	}`
+	var have3 bytes.Buffer
+	have3.WriteString("type JSONToStruct struct{\n")
+	have3.WriteString("Testobj struct{\n")
+	have3.WriteString("Teststring string `json:\"Teststring\"`\n")
+	have3.WriteString("} `json:\"Testobj\"`\n")
+	have3.WriteString("}\n")
+
+	cases["want3"] = want3
+	cases["have3"] = have3.String()
+
+	want4 := `[
+		{
+			"teststring": "Hey"
+		},
+		{
+			"testbool": true
+		}
+	]`
+	var have4 bytes.Buffer
+	have4.WriteString("type JSONToStruct []struct{\n")
+	have4.WriteString("Teststring string `json:\"teststring,omitempty\"`\n")
+	have4.WriteString("Testbool bool `json:\"testbool,omitempty\"`\n")
+	have4.WriteString("}\n")
+
+	cases["want4"] = want4
+	cases["have4"] = have4.String()
+
 	return cases
 }
 func TestGenerate(t *testing.T) {
@@ -89,17 +124,31 @@ func TestGenerate(t *testing.T) {
 		want string
 	}{
 		{
-			name: "Basic",
+			name: "Case One",
 			want: cases["have1"],
 			args: args{
 				s: cases["want1"],
 			},
 		},
 		{
-			name: "Basic",
+			name: "Case Two",
 			want: cases["have2"],
 			args: args{
 				s: cases["want2"],
+			},
+		},
+		{
+			name: "Case Three",
+			want: cases["have3"],
+			args: args{
+				s: cases["want3"],
+			},
+		},
+		{
+			name: "Case Four",
+			want: cases["have4"],
+			args: args{
+				s: cases["want4"],
 			},
 		},
 	}
