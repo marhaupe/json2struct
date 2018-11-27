@@ -1,5 +1,7 @@
 # JSON-to-struct
 
+[![Build Status](https://travis-ci.org/marhaupe/json-to-struct.svg?branch=master)](https://travis-ci.org/marhaupe/json-to-struct)
+
 -- WORK IN PROGRESS -
 
 This projects aims to make your life a lot easier by automatically generating structs for a given json. Just call `json-to-struct` with your json as first argument. 
