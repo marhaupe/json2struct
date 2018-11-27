@@ -111,6 +111,28 @@ func setupCases() map[string]string {
 	cases["want4"] = want4
 	cases["have4"] = have4.String()
 
+	want5 := `[
+  {
+    "thissucks": true
+  },
+  {
+    "thisdoesntsuck": {
+          "value": false
+    }
+  }
+	]`
+
+	var have5 bytes.Buffer
+	have5.WriteString("type JsonToStruct []struct{\n")
+	have5.WriteString("Thissucks bool `json:\"thissucks,omitempty\"`\n")
+	have5.WriteString("Thisdoesntsuck struct{\n")
+	have5.WriteString("Value bool `json:\"value\"`\n")
+	have5.WriteString("} `json:\"thisdoesntsuck,omitempty\"`\n")
+	have5.WriteString("}\n")
+
+	cases["want5"] = want5
+	cases["have5"] = have5.String()
+
 	return cases
 }
 func TestGenerate(t *testing.T) {
@@ -149,6 +171,13 @@ func TestGenerate(t *testing.T) {
 			want: cases["have4"],
 			args: args{
 				s: cases["want4"],
+			},
+		},
+		{
+			name: "Case Five",
+			want: cases["have5"],
+			args: args{
+				s: cases["want5"],
 			},
 		},
 	}
