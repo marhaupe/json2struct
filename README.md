@@ -13,4 +13,4 @@ Generating a new file `generated.go` based on a received json:
 curl https://pokeapi.co/api/v2/pokemon/1/ |json-to-struct >> generated.go
 ```
 
-Credits to Matt Holt (https://github.com/mholt/json-to-go), who inspired me to write a solution without relying on a web-application
+Credits to Matt Holt (https://github.com/mholt/json-to-go)
