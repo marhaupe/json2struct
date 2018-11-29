@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/marhaupe/json-to-struct/internal/ds"
+	"github.com/marhaupe/json2struct/internal/ds"
 )
 
 const FILLER_KEY string = "FILLER_KEY"

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/marhaupe/json-to-struct/internal/ds"
+	"github.com/marhaupe/json2struct/internal/ds"
 
-	"github.com/marhaupe/json-to-struct/internal"
+	"github.com/marhaupe/json2struct/internal"
 )
 
 func Generate(s string) string {
