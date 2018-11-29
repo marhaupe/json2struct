@@ -3,27 +3,25 @@ package ds
 type JSONElement interface {
 	String() string
 	Datatype() string
+	GetKey() string
 }
 
 type JSONNode interface {
-	JSONElement
 	AddChild(c JSONElement)
 }
 
 type JSONObject struct {
-	JSONElement
-	JSONNode
 	Root     bool
 	Key      string
 	Children []JSONElement
+	Keys     map[string]bool
 }
 
 type JSONArray struct {
-	JSONElement
-	JSONNode
 	Root     bool
 	Key      string
 	Children []JSONElement
+	Keys     map[string]bool
 }
 
 type PrimitiveType int

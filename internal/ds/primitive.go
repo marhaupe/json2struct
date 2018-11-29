@@ -2,6 +2,10 @@ package ds
 
 import "fmt"
 
+func (jp *JSONPrimitive) GetKey() string {
+	return jp.Key
+}
+
 func (jp *JSONPrimitive) Datatype() string {
 	switch jp.Ptype {
 	case String:
