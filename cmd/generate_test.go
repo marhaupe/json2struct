@@ -125,7 +125,7 @@ func setupCases() map[string]string {
 	]`
 
 	var expect5 bytes.Buffer
-	expect5.WriteString("type JsonToStruct []struct{\n")
+	expect5.WriteString("type JSONToStruct []struct{\n")
 	expect5.WriteString("Thissucks bool `json:\"thissucks,omitempty\"`\n")
 	expect5.WriteString("Thisdoesntsuck struct{\n")
 	expect5.WriteString("Value bool `json:\"value\"`\n")

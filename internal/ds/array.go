@@ -86,9 +86,15 @@ func (jp *JSONArray) String() string {
 func (jp *JSONArray) stringObject() string {
 	var b strings.Builder
 	for _, child := range jp.Children {
-		childString := child.String()
-		childString = appendOmitEmptyToRootElement(childString)
-		fmt.Fprintf(&b, childString)
+		childObject, ok := child.(*JSONObject)
+		if !ok {
+			panic(fmt.Sprintf("Error stringifying object %v", child.GetKey()))
+		}
+		for _, grandchild := range childObject.Children {
+			grandchildString := grandchild.String()
+			grandchildString = appendOmitEmptyToRootElement(grandchildString)
+			fmt.Fprintf(&b, grandchildString)
+		}
 	}
 	if jp.Root {
 		return fmt.Sprintf("type JSONToStruct []struct{\n%s}\n", b.String())
