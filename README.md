@@ -10,7 +10,7 @@ The program will output a valid go struct to stdout. Please check whether it has
 
 Generating a new file `generated.go` based on a received json: 
 ```bash
- json2struct "$(curl https://pokeapi.co/api/v2/pokemon/1/)" >> generated.go
+ json2struct "$(curl "https://reqres.in/api/users?page=2")" >> generated.go
 ```
 
 Credits to Matt Holt (https://github.com/mholt/json-to-go)
