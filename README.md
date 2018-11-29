@@ -1,6 +1,6 @@
 # JSON-to-struct
 
-[![Build Status](https://travis-ci.org/marhaupe/json-to-struct.svg?branch=master)](https://travis-ci.org/marhaupe/json-to-struct)
+[![Build Status](https://travis-ci.com/marhaupe/json-to-struct.svg?branch=master)](https://travis-ci.com/marhaupe/json-to-struct)
 
 -- WORK IN PROGRESS -
 
