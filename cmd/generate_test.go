@@ -89,6 +89,7 @@ func setupCases() map[string]string {
 	expect3.WriteString("type JSONToStruct struct{\n")
 	expect3.WriteString("Testobj struct{\n")
 	expect3.WriteString("Teststring string `json:\"Teststring\"`\n")
+	expect3.WriteString("Testbool bool `json:\"Testbool\"`\n")
 	expect3.WriteString("} `json:\"Testobj\"`\n")
 	expect3.WriteString("}\n")
 
