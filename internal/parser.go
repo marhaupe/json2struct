@@ -83,16 +83,19 @@ func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
 	arr := &ds.JSONArray{Key: arrKey}
 
 	// Contents of array do not need a key; filling value with filler key
-	key := "in_array"
+	var key string
 	for t := range p.c {
 		switch t {
 		case json.Delim('{'):
+			key = "object_in_array"
 			arr.AddChild(p.parseObject(key))
 		case json.Delim('['):
+			key = "array_in_array"
 			arr.AddChild(p.parseArray(key))
 		case json.Delim(']'):
 			return arr
 		default:
+			key = "primitive_in_array"
 			arr.AddChild(p.parsePrimitive(key, t))
 		}
 	}
