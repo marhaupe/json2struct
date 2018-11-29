@@ -6,7 +6,56 @@ import (
 )
 
 func (jp *JSONArray) AddChild(c JSONElement) {
-	jp.Children = append(jp.Children, c)
+	if jp.Keys == nil {
+		jp.Keys = make(map[string]bool)
+	}
+	key := c.GetKey()
+	if jp.Keys[key] {
+		for _, child := range jp.Children {
+			if child.GetKey() == key && child.Datatype() == "object" {
+				casted, ok := c.(*JSONObject)
+				if !ok {
+					panic("Error parsing JSONElement to *JSONObject")
+				}
+				castedExistingChild, ok := child.(*JSONObject)
+				for _, child := range casted.Children {
+					castedExistingChild.AddChild(child)
+				}
+			}
+		}
+	} else {
+		jp.Children = append(jp.Children, c)
+		jp.Keys[key] = true
+	}
+
+	// if jp.Keys == nil {
+	// 	jp.Keys = make(map[string]bool)
+	// }
+	// key := c.GetKey()
+	// if jp.Keys[key] {
+	// 	switch key {
+	// 	case "object_in_array":
+	// 		// TODO: Joining attributes of objects
+	// 		casted, ok := c.(*JSONObject)
+	// 		if !ok {
+	// 			panic("Error parsing object_in_array to *JSONObject")
+	// 		}
+	// 		for _, child := range casted.Children {
+	// 			casted.AddChild(child)
+	// 		}
+	// 	case "array_in_array", "primitive_in_array":
+	// 		// Don't allow duplicate keys with these datatypes
+	// 	default:
+	// 		panic(fmt.Sprintf("Error adding child with key %v", key))
+	// 	}
+	// } else {
+	// 	jp.Children = append(jp.Children, c)
+	// 	jp.Keys[key] = true
+	// }
+}
+
+func (jp *JSONArray) GetKey() string {
+	return jp.Key
 }
 
 func (jp *JSONArray) Datatype() string {
