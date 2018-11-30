@@ -1,125 +1,79 @@
 package ds
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
-func TestJSONObject_String(t *testing.T) {
-	type fields struct {
-		Key      string
-		Children []JSONElement
+func TestAddChild(t *testing.T) {
+	obj := &JSONObject{
+		Key: "Testobj",
 	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   string
-	}{
-		{
-			name: "Nested Object Test One",
-			fields: fields{
-				Key: "testobject",
-				Children: []JSONElement{
-					&JSONObject{
-						Key: "nested_object",
-						Children: []JSONElement{
-							&JSONPrimitive{
-								Ptype: Int,
-								Key:   "testint",
-							},
-						},
-					},
-				},
-			},
-			want: "Testobject struct{\nNested_object struct{\nTestint int `json:\"testint\"`\n} `json:\"nested_object\"`\n} `json:\"testobject\"`\n",
-		},
-		{
-			name: "Basic Object Test One",
-			fields: fields{
-				Key: "testobject",
-				Children: []JSONElement{
-					&JSONPrimitive{
-						Ptype: Int,
-						Key:   "testint",
-					},
-					&JSONPrimitive{
-						Ptype: String,
-						Key:   "teststring",
-					},
-				},
-			},
-			want: "Testobject struct{\nTestint int `json:\"testint\"`\nTeststring string `json:\"teststring\"`\n} `json:\"testobject\"`\n",
-		},
+	objToAdd := &JSONObject{
+		Key: "ToAdd",
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			jp := &JSONObject{
-				Key:      tt.fields.Key,
-				Children: tt.fields.Children,
-			}
-			if got := jp.String(); got != tt.want {
-				t.Errorf("JSONObject.String() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
-func TestJSONObjectRoot_String(t *testing.T) {
-	type fields struct {
-		Key      string
-		Children []JSONElement
-		Root     bool
+	// Looks like this:
+	// {
+	// 		"Testobj" : {
+	// 			"ToAdd": {}
+	// 		}
+	// }
+	obj.AddChild(objToAdd)
+	if !reflect.DeepEqual(obj.Children[0], objToAdd) {
+		t.Errorf("Added object to object the wrong way")
 	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   string
-	}{
-		{
-			name: "Nested Object Test One",
-			fields: fields{
-				Key:  "testobject",
-				Root: true,
-				Children: []JSONElement{
-					&JSONObject{
-						Key: "nested_object",
-						Children: []JSONElement{
-							&JSONPrimitive{
-								Ptype: Int,
-								Key:   "testint",
-							},
-						},
-					},
-				},
-			},
-			want: "type JSONToStruct struct{\nNested_object struct{\nTestint int `json:\"testint\"`\n} `json:\"nested_object\"`\n}\n",
-		},
-		{
-			name: "Basic Object Test One",
-			fields: fields{
-				Key:  "testobject",
-				Root: true,
-				Children: []JSONElement{
-					&JSONPrimitive{
-						Ptype: Int,
-						Key:   "testint",
-					},
-					&JSONPrimitive{
-						Ptype: String,
-						Key:   "teststring",
-					},
-				},
-			},
-			want: "type JSONToStruct struct{\nTestint int `json:\"testint\"`\nTeststring string `json:\"teststring\"`\n}\n",
-		},
+
+	// Looks like this:
+	// {
+	// 		"Testobj" : {
+	// 			"ToAdd": {
+	// 					"Testint": 0,
+	//      }
+	// 		}
+	// }
+	objToAdd.AddChild(&JSONPrimitive{
+		Key:   "Testint",
+		Ptype: Int,
+	})
+	if !reflect.DeepEqual(obj.Children[0], objToAdd) {
+		t.Errorf("Added primitive to nested object the wrong way")
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			jp := &JSONObject{
-				Root:     tt.fields.Root,
-				Key:      tt.fields.Key,
-				Children: tt.fields.Children,
-			}
-			if got := jp.String(); got != tt.want {
-				t.Errorf("JSONObject.String() = \n%vwant\n%v", got, tt.want)
-			}
-		})
+
+	// Looks like this:
+	// {
+	// 		"Testobj" : {
+	// 			"ToAdd": {
+	// 					"Testint": 0,
+	//      },
+	//			"ToAdd": {
+	//			    "Testbool": false,
+	//		  }
+	// 		}
+	// }
+	secondObjToAdd := &JSONObject{
+		Key: "ToAdd",
+	}
+	secondObjToAdd.AddChild(&JSONPrimitive{
+		Key:   "Testbool",
+		Ptype: Bool,
+	})
+
+	obj.AddChild(secondObjToAdd)
+
+	mergedObj := &JSONObject{
+		Key: "ToAdd",
+	}
+	mergedObj.AddChild(&JSONPrimitive{
+		Key:   "Testint",
+		Ptype: Int,
+	})
+	mergedObj.AddChild(&JSONPrimitive{
+		Key:   "Testbool",
+		Ptype: Bool,
+	})
+
+	if !reflect.DeepEqual(obj.Children[0], mergedObj) {
+		t.Errorf("Failed to correctly merge objects\ngot:\n%v\nwanted:\n%v\n", mergedObj, obj.Children[0])
 	}
 }
