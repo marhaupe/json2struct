@@ -84,7 +84,6 @@ func setupCases() map[string]string {
 			"Testbool": true
 		}
 	}`
-
 	var expect3 bytes.Buffer
 	expect3.WriteString("type JSONToStruct struct{\n")
 	expect3.WriteString("Testobj struct{\n")
@@ -92,7 +91,6 @@ func setupCases() map[string]string {
 	expect3.WriteString("Testbool bool `json:\"Testbool\"`\n")
 	expect3.WriteString("} `json:\"Testobj\"`\n")
 	expect3.WriteString("}\n")
-
 	cases["expect3"] = param3
 	cases["param3"] = expect3.String()
 
@@ -109,7 +107,6 @@ func setupCases() map[string]string {
 	expect4.WriteString("Teststring string `json:\"teststring,omitempty\"`\n")
 	expect4.WriteString("Testbool bool `json:\"testbool,omitempty\"`\n")
 	expect4.WriteString("}\n")
-
 	cases["expect4"] = param4
 	cases["param4"] = expect4.String()
 
@@ -123,7 +120,6 @@ func setupCases() map[string]string {
     }
   }
 	]`
-
 	var expect5 bytes.Buffer
 	expect5.WriteString("type JSONToStruct []struct{\n")
 	expect5.WriteString("Thissucks bool `json:\"thissucks,omitempty\"`\n")
@@ -131,9 +127,22 @@ func setupCases() map[string]string {
 	expect5.WriteString("Value bool `json:\"value\"`\n")
 	expect5.WriteString("} `json:\"thisdoesntsuck,omitempty\"`\n")
 	expect5.WriteString("}\n")
-
 	cases["expect5"] = param5
 	cases["param5"] = expect5.String()
+
+	param6 := `{
+		"NestedObj": {
+			"Testbool": true
+		}
+	}`
+	var expect6 bytes.Buffer
+	expect6.WriteString("type JSONToStruct struct{\n")
+	expect6.WriteString("NestedObj struct{\n")
+	expect6.WriteString("Testbool bool `json:\"Testbool\"`\n")
+	expect6.WriteString("} `json:\"NestedObj\"`\n")
+	expect6.WriteString("}\n")
+	cases["expect6"] = param6
+	cases["param6"] = expect6.String()
 
 	return cases
 }
@@ -180,6 +189,13 @@ func TestGenerate(t *testing.T) {
 			want: cases["param5"],
 			args: args{
 				s: cases["expect5"],
+			},
+		},
+		{
+			name: "Case Six",
+			want: cases["param6"],
+			args: args{
+				s: cases["expect6"],
 			},
 		},
 	}
