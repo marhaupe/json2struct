@@ -105,6 +105,7 @@ func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
 func (p *Parser) parsePrimitive(key string, value json.Token) *ds.JSONPrimitive {
 	prim := &ds.JSONPrimitive{Key: key}
 	switch value.(type) {
+	//TODO: I need to support floats aswell
 	case float64:
 		prim.Ptype = ds.Int
 	case string:
