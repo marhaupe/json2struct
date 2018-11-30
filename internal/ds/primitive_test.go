@@ -4,8 +4,7 @@ import "testing"
 
 func TestJSONPrimitiveInt_String(t *testing.T) {
 	type fields struct {
-		JSONElement JSONElement
-		Key         string
+		Key string
 	}
 	tests := []struct {
 		name   string
@@ -30,9 +29,8 @@ func TestJSONPrimitiveInt_String(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			jp := &JSONPrimitive{
-				Ptype:       Int,
-				JSONElement: tt.fields.JSONElement,
-				Key:         tt.fields.Key,
+				Ptype: Int,
+				Key:   tt.fields.Key,
 			}
 			if got := jp.String(); got != tt.want {
 				t.Errorf("JSONPrimitive.String() = %v, want %v", got, tt.want)
@@ -69,9 +67,8 @@ func TestJSONPrimitiveString_String(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			jp := &JSONPrimitive{
-				Ptype:       String,
-				JSONElement: tt.fields.JSONElement,
-				Key:         tt.fields.Key,
+				Ptype: String,
+				Key:   tt.fields.Key,
 			}
 			if got := jp.String(); got != tt.want {
 				t.Errorf("JSONPrimitive.String() = %v, want %v", got, tt.want)
