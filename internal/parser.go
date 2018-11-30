@@ -3,6 +3,7 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"sync"
 
 	"github.com/marhaupe/json2struct/internal/ds"
@@ -105,9 +106,12 @@ func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
 func (p *Parser) parsePrimitive(key string, value json.Token) *ds.JSONPrimitive {
 	prim := &ds.JSONPrimitive{Key: key}
 	switch value.(type) {
-	//TODO: I need to support floats aswell
 	case float64:
-		prim.Ptype = ds.Int
+		if value == math.Trunc(value.(float64)) {
+			prim.Ptype = ds.Int
+		} else {
+			prim.Ptype = ds.Float
+		}
 	case string:
 		prim.Ptype = ds.String
 	case bool:

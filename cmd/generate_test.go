@@ -144,6 +144,17 @@ func setupCases() map[string]string {
 	cases["expect6"] = param6
 	cases["param6"] = expect6.String()
 
+	param7 := `{
+		"Testfloat": 56.7,
+		"Testint": 56
+	}`
+	var expect7 bytes.Buffer
+	expect7.WriteString("type JSONToStruct struct{\n")
+	expect7.WriteString("Testfloat float64 `json:\"Testfloat\"`\n")
+	expect7.WriteString("Testint int `json:\"Testint\"`\n")
+	expect7.WriteString("}\n")
+	cases["expect7"] = param7
+	cases["param7"] = expect7.String()
 	return cases
 }
 func TestGenerate(t *testing.T) {
@@ -196,6 +207,13 @@ func TestGenerate(t *testing.T) {
 			want: cases["param6"],
 			args: args{
 				s: cases["expect6"],
+			},
+		},
+		{
+			name: "Case Seven",
+			want: cases["param7"],
+			args: args{
+				s: cases["expect7"],
 			},
 		},
 	}

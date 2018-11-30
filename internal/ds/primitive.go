@@ -12,6 +12,8 @@ func (jp *JSONPrimitive) Datatype() string {
 		return "string"
 	case Int:
 		return "int"
+	case Float:
+		return "float64"
 	case Bool:
 		return "bool"
 	default:

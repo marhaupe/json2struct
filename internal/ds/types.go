@@ -29,6 +29,7 @@ type PrimitiveType int
 const (
 	String PrimitiveType = iota
 	Int
+	Float
 	Bool
 )
 
