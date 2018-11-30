@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bytes"
 	"testing"
 )
 
@@ -16,17 +15,16 @@ func setupCases() map[string]string {
 					"alignment": "center",
 					"visible": true
 				}`
-	var expect1 bytes.Buffer
-	expect1.WriteString("type JSONToStruct struct{\n")
-	expect1.WriteString("Src string `json:\"src\"`\n")
-	expect1.WriteString("Name string `json:\"name\"`\n")
-	expect1.WriteString("HOffset int `json:\"hOffset\"`\n")
-	expect1.WriteString("VOffset int `json:\"vOffset\"`\n")
-	expect1.WriteString("Alignment string `json:\"alignment\"`\n")
-	expect1.WriteString("Visible bool `json:\"visible\"`\n")
-	expect1.WriteString("}\n")
+	expect1 := "type JSONToStruct struct{\n" +
+		"Src string `json:\"src\"`\n" +
+		"Name string `json:\"name\"`\n" +
+		"HOffset int `json:\"hOffset\"`\n" +
+		"VOffset int `json:\"vOffset\"`\n" +
+		"Alignment string `json:\"alignment\"`\n" +
+		"Visible bool `json:\"visible\"`\n" +
+		"}\n"
 	cases["expect1"] = param1
-	cases["param1"] = expect1.String()
+	cases["param1"] = expect1
 
 	param2 := `{
     "glossary": {
@@ -50,31 +48,30 @@ func setupCases() map[string]string {
         }
     }
 	}`
-	var expect2 bytes.Buffer
-	expect2.WriteString("type JSONToStruct struct{\n")
-	expect2.WriteString("Glossary struct{\n")
-	expect2.WriteString("Title string `json:\"title\"`\n")
-	expect2.WriteString("GlossDiv struct{\n")
-	expect2.WriteString("Title string `json:\"title\"`\n")
-	expect2.WriteString("GlossList struct{\n")
-	expect2.WriteString("GlossEntry struct{\n")
-	expect2.WriteString("ID string `json:\"ID\"`\n")
-	expect2.WriteString("SortAs string `json:\"SortAs\"`\n")
-	expect2.WriteString("GlossTerm string `json:\"GlossTerm\"`\n")
-	expect2.WriteString("Acronym string `json:\"Acronym\"`\n")
-	expect2.WriteString("Abbrev string `json:\"Abbrev\"`\n")
-	expect2.WriteString("GlossDef struct{\n")
-	expect2.WriteString("Para string `json:\"para\"`\n")
-	expect2.WriteString("GlossSeeAlso []string `json:\"GlossSeeAlso\"`\n")
-	expect2.WriteString("} `json:\"GlossDef\"`\n")
-	expect2.WriteString("GlossSee string `json:\"GlossSee\"`\n")
-	expect2.WriteString("} `json:\"GlossEntry\"`\n")
-	expect2.WriteString("} `json:\"GlossList\"`\n")
-	expect2.WriteString("} `json:\"GlossDiv\"`\n")
-	expect2.WriteString("} `json:\"glossary\"`\n")
-	expect2.WriteString("}\n")
+	expect2 := "type JSONToStruct struct{\n" +
+		"Glossary struct{\n" +
+		"Title string `json:\"title\"`\n" +
+		"GlossDiv struct{\n" +
+		"Title string `json:\"title\"`\n" +
+		"GlossList struct{\n" +
+		"GlossEntry struct{\n" +
+		"ID string `json:\"ID\"`\n" +
+		"SortAs string `json:\"SortAs\"`\n" +
+		"GlossTerm string `json:\"GlossTerm\"`\n" +
+		"Acronym string `json:\"Acronym\"`\n" +
+		"Abbrev string `json:\"Abbrev\"`\n" +
+		"GlossDef struct{\n" +
+		"Para string `json:\"para\"`\n" +
+		"GlossSeeAlso []string `json:\"GlossSeeAlso\"`\n" +
+		"} `json:\"GlossDef\"`\n" +
+		"GlossSee string `json:\"GlossSee\"`\n" +
+		"} `json:\"GlossEntry\"`\n" +
+		"} `json:\"GlossList\"`\n" +
+		"} `json:\"GlossDiv\"`\n" +
+		"} `json:\"glossary\"`\n" +
+		"}\n"
 	cases["expect2"] = param2
-	cases["param2"] = expect2.String()
+	cases["param2"] = expect2
 
 	param3 := `{
 		"Testobj": {
@@ -84,15 +81,14 @@ func setupCases() map[string]string {
 			"Testbool": true
 		}
 	}`
-	var expect3 bytes.Buffer
-	expect3.WriteString("type JSONToStruct struct{\n")
-	expect3.WriteString("Testobj struct{\n")
-	expect3.WriteString("Teststring string `json:\"Teststring\"`\n")
-	expect3.WriteString("Testbool bool `json:\"Testbool\"`\n")
-	expect3.WriteString("} `json:\"Testobj\"`\n")
-	expect3.WriteString("}\n")
+	expect3 := "type JSONToStruct struct{\n" +
+		"Testobj struct{\n" +
+		"Teststring string `json:\"Teststring\"`\n" +
+		"Testbool bool `json:\"Testbool\"`\n" +
+		"} `json:\"Testobj\"`\n" +
+		"}\n"
 	cases["expect3"] = param3
-	cases["param3"] = expect3.String()
+	cases["param3"] = expect3
 
 	param4 := `[
 		{
@@ -102,13 +98,12 @@ func setupCases() map[string]string {
 			"testbool": true
 		}
 	]`
-	var expect4 bytes.Buffer
-	expect4.WriteString("type JSONToStruct []struct{\n")
-	expect4.WriteString("Teststring string `json:\"teststring,omitempty\"`\n")
-	expect4.WriteString("Testbool bool `json:\"testbool,omitempty\"`\n")
-	expect4.WriteString("}\n")
+	expect4 := "type JSONToStruct []struct{\n" +
+		"Teststring string `json:\"teststring,omitempty\"`\n" +
+		"Testbool bool `json:\"testbool,omitempty\"`\n" +
+		"}\n"
 	cases["expect4"] = param4
-	cases["param4"] = expect4.String()
+	cases["param4"] = expect4
 
 	param5 := `[
   {
@@ -120,44 +115,41 @@ func setupCases() map[string]string {
     }
   }
 	]`
-	var expect5 bytes.Buffer
-	expect5.WriteString("type JSONToStruct []struct{\n")
-	expect5.WriteString("Thissucks bool `json:\"thissucks,omitempty\"`\n")
-	expect5.WriteString("Thisdoesntsuck struct{\n")
-	expect5.WriteString("Value bool `json:\"value\"`\n")
-	expect5.WriteString("} `json:\"thisdoesntsuck,omitempty\"`\n")
-	expect5.WriteString("}\n")
+	expect5 := "type JSONToStruct []struct{\n" +
+		"Thissucks bool `json:\"thissucks,omitempty\"`\n" +
+		"Thisdoesntsuck struct{\n" +
+		"Value bool `json:\"value\"`\n" +
+		"} `json:\"thisdoesntsuck,omitempty\"`\n" +
+		"}\n"
 	cases["expect5"] = param5
-	cases["param5"] = expect5.String()
+	cases["param5"] = expect5
 
 	param6 := `{
 		"NestedObj": {
 			"Testbool": true
 		}
 	}`
-	var expect6 bytes.Buffer
-	expect6.WriteString("type JSONToStruct struct{\n")
-	expect6.WriteString("NestedObj struct{\n")
-	expect6.WriteString("Testbool bool `json:\"Testbool\"`\n")
-	expect6.WriteString("} `json:\"NestedObj\"`\n")
-	expect6.WriteString("}\n")
+	expect6 := "type JSONToStruct struct{\n" +
+		"NestedObj struct{\n" +
+		"Testbool bool `json:\"Testbool\"`\n" +
+		"} `json:\"NestedObj\"`\n" +
+		"}\n"
 	cases["expect6"] = param6
-	cases["param6"] = expect6.String()
+	cases["param6"] = expect6
 
 	param7 := `{
 		"Testfloat": 56.7,
 		"Testint": 56
 	}`
-	var expect7 bytes.Buffer
-	expect7.WriteString("type JSONToStruct struct{\n")
-	expect7.WriteString("Testfloat float64 `json:\"Testfloat\"`\n")
-	expect7.WriteString("Testint int `json:\"Testint\"`\n")
-	expect7.WriteString("}\n")
+	expect7 := "type JSONToStruct struct{\n" +
+		"Testfloat float64 `json:\"Testfloat\"`\n" +
+		"Testint int `json:\"Testint\"`\n" +
+		"}\n"
 	cases["expect7"] = param7
-	cases["param7"] = expect7.String()
+	cases["param7"] = expect7
 	return cases
 }
-func TestGenerate(t *testing.T) {
+func TestVariousCombinations(t *testing.T) {
 	type args struct {
 		s string
 	}
@@ -215,6 +207,170 @@ func TestGenerate(t *testing.T) {
 			args: args{
 				s: cases["expect7"],
 			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Generate(tt.args.s); got != tt.want {
+				t.Errorf("Generate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestObjectRootWithPrimitives(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "With strings",
+			args: args{
+				`{
+				"Test": "Here"
+			 }`,
+			},
+			want: "type JSONToStruct struct{\n" +
+				"Test string `json:\"Test\"`\n" +
+				"}\n",
+		},
+		{
+			name: "With ints",
+			args: args{
+				`{
+				"Test": 500
+			 }`,
+			},
+			want: "type JSONToStruct struct{\n" +
+				"Test int `json:\"Test\"`\n" +
+				"}\n",
+		},
+		{
+			name: "With floats",
+			args: args{
+				`{
+				"Test": 500.1
+			 }`,
+			},
+			want: "type JSONToStruct struct{\n" +
+				"Test float64 `json:\"Test\"`\n" +
+				"}\n",
+		},
+		{
+			name: "With bools",
+			args: args{
+				`{
+				"Test": true
+			 }`,
+			},
+			want: "type JSONToStruct struct{\n" +
+				"Test bool `json:\"Test\"`\n" +
+				"}\n",
+		},
+		{
+			name: "With every primitive",
+			args: args{
+				`{
+				"Testbool": true,
+				"Teststring": "here",
+				"Testfloat": 500.1,
+				"Testint": 500
+			 }`,
+			},
+			want: "type JSONToStruct struct{\n" +
+				"Testbool bool `json:\"Testbool\"`\n" +
+				"Teststring string `json:\"Teststring\"`\n" +
+				"Testfloat float64 `json:\"Testfloat\"`\n" +
+				"Testint int `json:\"Testint\"`\n" +
+				"}\n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Generate(tt.args.s); got != tt.want {
+				t.Errorf("Generate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestObjectRootWithObjects(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "With one object",
+			args: args{
+				`{
+					"Testobj": {
+						"Teststring": "Here",
+						"Testbool": true,
+						"Testint": 500,
+						"Testfloat": 500.1
+					}
+				}`,
+			},
+			want: "type JSONToStruct struct{\n" +
+				"Testobj struct{\n" +
+				"Teststring string `json:\"Teststring\"`\n" +
+				"Testbool bool `json:\"Testbool\"`\n" +
+				"Testint int `json:\"Testint\"`\n" +
+				"Testfloat float64 `json:\"Testfloat\"`\n" +
+				"} `json:\"Testobj\"`\n" +
+				"}\n",
+		},
+		{
+			name: "With two objects",
+			args: args{
+				`{
+					"Testobj": {
+						"Teststring": "Here",
+						"Testbool": true
+					},
+					"Testobj": {
+						"Testint": 500,
+						"Testfloat": 500.1
+					}
+				}`,
+			},
+			want: "type JSONToStruct struct{\n" +
+				"Testobj struct{\n" +
+				"Teststring string `json:\"Teststring\"`\n" +
+				"Testbool bool `json:\"Testbool\"`\n" +
+				"Testint int `json:\"Testint\"`\n" +
+				"Testfloat float64 `json:\"Testfloat\"`\n" +
+				"} `json:\"Testobj\"`\n" +
+				"}\n",
+		},
+		{
+			name: "With two objects with the same key",
+			args: args{
+				`{
+					"Testobj": {
+						"Teststring": "Here",
+						"Testbool": true,
+						"Testint": 500,
+						"Testfloat": 500.1
+					}
+				}`,
+			},
+			want: "type JSONToStruct struct{\n" +
+				"Testobj struct{\n" +
+				"Teststring string `json:\"Teststring\"`\n" +
+				"Testbool bool `json:\"Testbool\"`\n" +
+				"Testint int `json:\"Testint\"`\n" +
+				"Testfloat float64 `json:\"Testfloat\"`\n" +
+				"} `json:\"Testobj\"`\n" +
+				"}\n",
 		},
 	}
 	for _, tt := range tests {
