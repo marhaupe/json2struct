@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"os"
 	"sync"
 
 	"github.com/marhaupe/json2struct/internal/ds"
@@ -19,6 +20,14 @@ type Parser struct {
 
 // Parse parsed JSON Tokens received from chan c
 func Parse(n chan ds.JSONNode, c chan json.Token, wg *sync.WaitGroup) {
+	defer func() {
+		if r := recover(); r != nil {
+			if err := fmt.Errorf("Error: %v, exiting", r); err != nil {
+				fmt.Println(err)
+				os.Exit(2)
+			}
+		}
+	}()
 	p := Parser{c: c, wg: wg}
 	p.parse()
 	n <- p.rootEl
