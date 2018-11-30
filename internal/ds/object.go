@@ -21,12 +21,15 @@ func (jp *JSONObject) AddChild(c JSONElement) {
 	if jp.Keys[key] {
 		for _, child := range jp.Children {
 			if child.GetKey() == key && child.Datatype() == "object" {
-				casted, ok := c.(*JSONObject)
+				castedToAdd, ok := c.(*JSONObject)
 				if !ok {
 					panic("Error parsing JSONElement to *JSONObject")
 				}
 				castedExistingChild, ok := child.(*JSONObject)
-				for _, child := range casted.Children {
+				if !ok {
+					panic("Error parsing JSONElement to *JSONObject")
+				}
+				for _, child := range castedToAdd.Children {
 					castedExistingChild.AddChild(child)
 				}
 			}

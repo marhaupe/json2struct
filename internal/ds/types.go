@@ -33,7 +33,6 @@ const (
 )
 
 type JSONPrimitive struct {
-	JSONElement
 	Ptype PrimitiveType
 	Key   string
 }
