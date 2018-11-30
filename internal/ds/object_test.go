@@ -5,6 +5,28 @@ import (
 	"testing"
 )
 
+func TestString(t *testing.T) {
+	obj := &JSONObject{
+		Key:  "RootObj",
+		Root: true,
+	}
+	wanted := "type JSONToStruct struct{\n" +
+		"}\n"
+	got := obj.String()
+	if got != wanted {
+		t.Errorf("Failed Test %v\ngot:\n%v\nwanted:\n%v", t.Name(), got, wanted)
+	}
+
+	obj = &JSONObject{
+		Key: "testobj",
+	}
+	wanted = "Testobj struct{\n" +
+		"} `json:\"testobj\"`\n"
+	got = obj.String()
+	if got != wanted {
+		t.Errorf("Failed Test %v\ngot:\n%v\nwanted:\n%v", t.Name(), got, wanted)
+	}
+}
 func TestAddChild(t *testing.T) {
 	obj := &JSONObject{
 		Key: "Testobj",
