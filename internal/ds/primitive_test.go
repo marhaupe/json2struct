@@ -2,9 +2,11 @@ package ds
 
 import "testing"
 
-func TestJSONPrimitiveInt_String(t *testing.T) {
+func TestJSONPrimitive_Panic(t *testing.T) {
+
 	type fields struct {
-		Key string
+		Key   string
+		Ptype PrimitiveType
 	}
 	tests := []struct {
 		name   string
@@ -12,62 +14,77 @@ func TestJSONPrimitiveInt_String(t *testing.T) {
 		want   string
 	}{
 		{
-			name: "Basic Int One",
+			name: "Basic Int",
 			fields: fields{
-				Key: "key",
+				Key:   "key",
+				Ptype: -1,
+			},
+			want: "Key int `json:\"key\"`\n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			jp := &JSONPrimitive{
+				Ptype: tt.fields.Ptype,
+				Key:   tt.fields.Key,
+			}
+			defer func() {
+				r := recover()
+				if r == nil {
+					t.Error("Program should have panicked because of invalid Ptype")
+				}
+			}()
+			jp.String()
+		})
+	}
+}
+func TestJSONPrimitive(t *testing.T) {
+	type fields struct {
+		Key   string
+		Ptype PrimitiveType
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name: "Basic Int",
+			fields: fields{
+				Key:   "key",
+				Ptype: Int,
 			},
 			want: "Key int `json:\"key\"`\n",
 		},
 		{
-			name: "Basic Int Two",
+			name: "Basic Bool",
 			fields: fields{
-				Key: "anotherKey",
+				Key:   "key",
+				Ptype: Bool,
 			},
-			want: "AnotherKey int `json:\"anotherKey\"`\n",
+			want: "Key bool `json:\"key\"`\n",
 		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			jp := &JSONPrimitive{
-				Ptype: Int,
-				Key:   tt.fields.Key,
-			}
-			if got := jp.String(); got != tt.want {
-				t.Errorf("JSONPrimitive.String() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestJSONPrimitiveString_String(t *testing.T) {
-	type fields struct {
-		JSONElement JSONElement
-		Key         string
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   string
-	}{
 		{
-			name: "Basic String One",
+			name: "Basic String",
 			fields: fields{
-				Key: "key",
+				Key:   "key",
+				Ptype: String,
 			},
 			want: "Key string `json:\"key\"`\n",
 		},
 		{
-			name: "Basic String Two",
+			name: "Basic Float",
 			fields: fields{
-				Key: "anotherKey",
+				Key:   "key",
+				Ptype: Float,
 			},
-			want: "AnotherKey string `json:\"anotherKey\"`\n",
+			want: "Key float64 `json:\"key\"`\n",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			jp := &JSONPrimitive{
-				Ptype: String,
+				Ptype: tt.fields.Ptype,
 				Key:   tt.fields.Key,
 			}
 			if got := jp.String(); got != tt.want {

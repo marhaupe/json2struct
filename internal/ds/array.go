@@ -43,14 +43,14 @@ func (jp *JSONArray) String() string {
 	if len(foundChildrenTypes) == 1 {
 		dataType := foundChildrenTypes[0]
 		switch dataType {
-		case "string", "int", "bool":
+		case "string", "int", "bool", "float64":
 			toString = jp.stringPrimitive(dataType)
 		case "object":
 			toString = jp.stringObject()
 		case "array":
 			toString = jp.stringArray()
 		default:
-			toString = "error parsing"
+			panic("Error stringifying array")
 		}
 	} else {
 		toString = jp.stringMultipleTypes()
@@ -67,7 +67,7 @@ func (jp *JSONArray) stringObject() string {
 		}
 		for _, grandchild := range childObject.Children {
 			grandchildString := grandchild.String()
-			grandchildString = appendOmitEmptyToRootElement(grandchildString)
+			// grandchildString = appendOmitEmptyToRootElement(grandchildString)
 			fmt.Fprintf(&b, grandchildString)
 		}
 	}

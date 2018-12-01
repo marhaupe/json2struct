@@ -26,6 +26,21 @@ func TestString(t *testing.T) {
 	if got != wanted {
 		t.Errorf("Failed Test %v\ngot:\n%v\nwanted:\n%v", t.Name(), got, wanted)
 	}
+
+	obj = &JSONObject{
+		Key: "testobj",
+	}
+	obj.AddChild(&JSONPrimitive{
+		Key:   "teststring",
+		Ptype: String,
+	})
+	wanted = "Testobj struct{\n" +
+		"Teststring string `json:\"teststring\"`\n" +
+		"} `json:\"testobj\"`\n"
+	got = obj.String()
+	if got != wanted {
+		t.Errorf("Failed Test %v\ngot:\n%v\nwanted:\n%v", t.Name(), got, wanted)
+	}
 }
 func TestAddChild(t *testing.T) {
 	obj := &JSONObject{

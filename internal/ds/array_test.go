@@ -126,7 +126,11 @@ func TestJSONArray_String(t *testing.T) {
 					},
 				},
 			},
-			want: "Testarray []struct{\nTestint int `json:\"testint,omitempty\"`\nTeststring string `json:\"teststring,omitempty\"`\nTestbool bool `json:\"testbool,omitempty\"`\n} `json:\"testarray\"`\n",
+			want: "Testarray []struct{\n" +
+				"Testint int `json:\"testint\"`\n" +
+				"Teststring string `json:\"teststring\"`\n" +
+				"Testbool bool `json:\"testbool\"`\n" +
+				"} `json:\"testarray\"`\n",
 		},
 		{
 			name: "Array Test Different Types Primitive",

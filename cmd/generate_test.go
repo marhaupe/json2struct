@@ -99,8 +99,8 @@ func setupCases() map[string]string {
 		}
 	]`
 	expect4 := "type JSONToStruct []struct{\n" +
-		"Teststring string `json:\"teststring,omitempty\"`\n" +
-		"Testbool bool `json:\"testbool,omitempty\"`\n" +
+		"Teststring string `json:\"teststring\"`\n" +
+		"Testbool bool `json:\"testbool\"`\n" +
 		"}\n"
 	cases["expect4"] = param4
 	cases["param4"] = expect4
@@ -116,10 +116,10 @@ func setupCases() map[string]string {
   }
 	]`
 	expect5 := "type JSONToStruct []struct{\n" +
-		"Thissucks bool `json:\"thissucks,omitempty\"`\n" +
+		"Thissucks bool `json:\"thissucks\"`\n" +
 		"Thisdoesntsuck struct{\n" +
 		"Value bool `json:\"value\"`\n" +
-		"} `json:\"thisdoesntsuck,omitempty\"`\n" +
+		"} `json:\"thisdoesntsuck\"`\n" +
 		"}\n"
 	cases["expect5"] = param5
 	cases["param5"] = expect5
@@ -371,6 +371,139 @@ func TestObjectRootWithObjects(t *testing.T) {
 				"Testfloat float64 `json:\"Testfloat\"`\n" +
 				"} `json:\"Testobj\"`\n" +
 				"}\n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Generate(tt.args.s); got != tt.want {
+				t.Errorf("Generate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestArrayRootWithObjects(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "With Similar Objects",
+			args: args{
+				`[
+					{
+						"Testbool": true,
+						"Testint": 500
+					},
+					{
+						"Testbool": true,
+						"Testint": 500
+					}
+				 ]`,
+			},
+			want: "type JSONToStruct []struct{\n" +
+				"Testbool bool `json:\"Testbool\"`\n" +
+				"Testint int `json:\"Testint\"`\n" +
+				"}\n",
+		},
+		{
+			name: "With Floats",
+			args: args{
+				`[
+					500.1,
+					600.1,
+					300.0
+				 ]`,
+			},
+			want: "type JSONToStruct []float64",
+		},
+		{
+			name: "With Bools",
+			args: args{
+				`[
+					true,
+					false,
+					true
+				 ]`,
+			},
+			want: "type JSONToStruct []bool",
+		},
+		{
+			name: "With Ints",
+			args: args{
+				`[
+					500,
+					600,
+					300
+				 ]`,
+			},
+			want: "type JSONToStruct []int",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Generate(tt.args.s); got != tt.want {
+				t.Errorf("Generate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+func TestArrayRootWithPrimitives(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "With Strings",
+			args: args{
+				`[
+					"500",
+					"600",
+					"300"
+				 ]`,
+			},
+			want: "type JSONToStruct []string",
+		},
+		{
+			name: "With Floats",
+			args: args{
+				`[
+					500.1,
+					600.1,
+					300.0
+				 ]`,
+			},
+			want: "type JSONToStruct []float64",
+		},
+		{
+			name: "With Bools",
+			args: args{
+				`[
+					true,
+					false,
+					true
+				 ]`,
+			},
+			want: "type JSONToStruct []bool",
+		},
+		{
+			name: "With Ints",
+			args: args{
+				`[
+					500,
+					600,
+					300
+				 ]`,
+			},
+			want: "type JSONToStruct []int",
 		},
 	}
 	for _, tt := range tests {
