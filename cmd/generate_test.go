@@ -416,7 +416,7 @@ func TestArrayRootWithObjects(t *testing.T) {
 				`[
 					500.1,
 					600.1,
-					300.0
+					300.1
 				 ]`,
 			},
 			want: "type JSONToStruct []float64",
@@ -517,7 +517,7 @@ func TestArrayRootWithPrimitives(t *testing.T) {
 				`[
 					500.1,
 					600.1,
-					300.0
+					300.1
 				 ]`,
 			},
 			want: "type JSONToStruct []float64",

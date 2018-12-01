@@ -105,8 +105,20 @@ func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
 		case json.Delim(']'):
 			return arr
 		default:
-			key = "primitive_in_array"
+			switch t.(type) {
+			case string:
+				key = "string_in_array"
+			case bool:
+				key = "bool_in_array"
+			case float64:
+				if t == math.Trunc(t.(float64)) {
+					key = "int_in_array"
+				} else {
+					key = "float_in_array"
+				}
+			}
 			arr.AddChild(p.parsePrimitive(key, t))
+
 		}
 	}
 	return arr
