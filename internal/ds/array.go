@@ -97,3 +97,15 @@ func (jp *JSONArray) stringMultipleTypes() string {
 	}
 	return fmt.Sprintf("%s []interface{} `json:\"%s\"`\n", capitalizeKey(jp.Key), jp.Key)
 }
+
+func listChildrenTypes(c []JSONElement) []string {
+	foundChildrenTypes := make(map[string]bool)
+	var foundChildren []string
+	for _, entry := range c {
+		foundChildrenTypes[entry.Datatype()] = true
+	}
+	for k := range foundChildrenTypes {
+		foundChildren = append(foundChildren, k)
+	}
+	return foundChildren
+}
