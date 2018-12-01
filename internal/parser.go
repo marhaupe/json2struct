@@ -71,9 +71,9 @@ func (p *Parser) parseObject(objKey string) *ds.JSONObject {
 				return obj
 			}
 		} else {
-			obj, done := p.addElementToChildren(obj, key, t, json.Delim('}'))
+			done := p.buildUpElement(obj, key, t, json.Delim('}'))
 			if done {
-				return obj.(*ds.JSONObject)
+				return obj
 			}
 			key = ""
 		}
@@ -86,18 +86,18 @@ func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
 
 	for t := range p.c {
 		key := generateArrayKeyForToken(t)
-		arr, done := p.addElementToChildren(arr, key, t, json.Delim(']'))
+		done := p.buildUpElement(arr, key, t, json.Delim(']'))
 		if done {
-			return arr.(*ds.JSONArray)
+			return arr
 		}
 	}
 	return arr
 }
 
-func (p *Parser) addElementToChildren(node ds.JSONNode, key string, t json.Token, closing json.Delim) (ds.JSONNode, bool) {
+func (p *Parser) buildUpElement(node ds.JSONNode, key string, t json.Token, closing json.Delim) bool {
 	switch t {
 	case closing:
-		return node, true
+		return true
 	case json.Delim('{'):
 		node.AddChild(p.parseObject(key))
 	case json.Delim('['):
@@ -105,7 +105,7 @@ func (p *Parser) addElementToChildren(node ds.JSONNode, key string, t json.Token
 	default:
 		node.AddChild(p.parsePrimitive(key, t))
 	}
-	return node, false
+	return false
 }
 
 func generateArrayKeyForToken(t json.Token) string {
