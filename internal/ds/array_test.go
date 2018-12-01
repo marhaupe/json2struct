@@ -1,6 +1,9 @@
 package ds
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestJSONArray_String(t *testing.T) {
 	type fields struct {
@@ -184,6 +187,41 @@ func TestJSONArray_String(t *testing.T) {
 			}
 			if got := jp.String(); got != tt.want {
 				t.Errorf("JSONArray.String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_listChildrenTypes(t *testing.T) {
+	type args struct {
+		c []JSONElement
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		{
+			name: "Different Primitives",
+			args: args{
+				[]JSONElement{
+					&JSONPrimitive{
+						Ptype: Float,
+						Key:   "Testfloat",
+					},
+					&JSONPrimitive{
+						Ptype: Int,
+						Key:   "Testint",
+					},
+				},
+			},
+			want: []string{"float64", "int"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := listChildrenTypes(tt.args.c); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("listChildrenTypes() = %v, want %v", got, tt.want)
 			}
 		})
 	}
