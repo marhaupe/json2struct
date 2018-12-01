@@ -433,6 +433,17 @@ func TestArrayRootWithObjects(t *testing.T) {
 			want: "type JSONToStruct []bool",
 		},
 		{
+			name: "With Strings",
+			args: args{
+				`[
+					"500",
+					"600",
+					"300"
+				 ]`,
+			},
+			want: "type JSONToStruct []string",
+		},
+		{
 			name: "With Ints",
 			args: args{
 				`[
@@ -442,6 +453,34 @@ func TestArrayRootWithObjects(t *testing.T) {
 				 ]`,
 			},
 			want: "type JSONToStruct []int",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Generate(tt.args.s); got != tt.want {
+				t.Errorf("Generate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+func TestArrayRootWithMultipleTypes(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "With Multiples",
+			args: args{
+				`[
+					"500",
+					600
+				 ]`,
+			},
+			want: "type JSONToStruct []interface{}",
 		},
 	}
 	for _, tt := range tests {
