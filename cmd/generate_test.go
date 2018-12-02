@@ -261,6 +261,17 @@ func TestObjectRootWithPrimitives(t *testing.T) {
 				"}\n",
 		},
 		{
+			name: "With Nulls",
+			args: args{
+				`{
+				"Test": null
+			 }`,
+			},
+			want: "type JSONToStruct struct{\n" +
+				"Test interface{} `json:\"Test\"`\n" +
+				"}\n",
+		},
+		{
 			name: "With bools",
 			args: args{
 				`{
@@ -442,6 +453,16 @@ func TestArrayRootWithObjects(t *testing.T) {
 				 ]`,
 			},
 			want: "type JSONToStruct []string",
+		},
+		{
+			name: "With Nulls",
+			args: args{
+				`[
+					null,
+					null
+				 ]`,
+			},
+			want: "type JSONToStruct []interface{}",
 		},
 		{
 			name: "With Ints",
