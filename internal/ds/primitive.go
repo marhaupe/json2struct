@@ -16,6 +16,8 @@ func (jp *JSONPrimitive) Datatype() string {
 		return "float64"
 	case Bool:
 		return "bool"
+	case Null:
+		return "interface{}"
 	default:
 		panic(fmt.Sprintf("Datatype of primitive with key %v could not be determined", jp.Key))
 	}

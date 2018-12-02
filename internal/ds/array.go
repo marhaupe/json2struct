@@ -43,7 +43,7 @@ func (jp *JSONArray) String() string {
 	if len(foundChildrenTypes) == 1 {
 		dataType := foundChildrenTypes[0]
 		switch dataType {
-		case "string", "int", "bool", "float64":
+		case "string", "int", "bool", "float64", "interface{}":
 			toString = jp.stringPrimitive(dataType)
 		case "object":
 			toString = jp.stringObject()

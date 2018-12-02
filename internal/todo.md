@@ -1,3 +1,2 @@
-- Support null values
 - Float and Int in Array --> []float64
 - Refactoring

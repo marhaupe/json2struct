@@ -31,6 +31,7 @@ const (
 	Int
 	Float
 	Bool
+	Null
 )
 
 type JSONPrimitive struct {

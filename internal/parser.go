@@ -127,6 +127,8 @@ func generateArrayKeyForToken(t json.Token) string {
 			return "float_in_array"
 		case ds.Int:
 			return "int_in_array"
+		case ds.Null:
+			return "null_in_array"
 		}
 	}
 	panic(fmt.Sprintf("Error generating key for token %v", t))
@@ -149,6 +151,8 @@ func detectPrimitiveType(t json.Token) ds.PrimitiveType {
 		return ds.String
 	case bool:
 		return ds.Bool
+	case nil:
+		return ds.Null
 	default:
 		fmt.Printf("Could not determine datatype of field with value %v\n", t)
 		return ds.String
