@@ -1,12 +1,11 @@
 language: go
 
-script:
-  - go get golang.org/x/tools/cmd/cover
+before_install:
   - go get github.com/mattn/goveralls
-  - go test -v -covermode=count -coverprofile=coverage.out
-  - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+
+script:
+  - $GOPATH/bin/goveralls -service=travis-ci
   - make test
-  - make build
 
 go:
  - "1.11.1"
