@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/marhaupe/json2struct/internal"
 	"github.com/spf13/cobra"
 )
 
