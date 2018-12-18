@@ -2,6 +2,7 @@ package ds
 
 import (
 	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -206,6 +207,14 @@ func Test_listChildrenTypes(t *testing.T) {
 			args: args{
 				[]JSONElement{
 					&JSONPrimitive{
+						Ptype: Bool,
+						Key:   "Testbool",
+					},
+					&JSONPrimitive{
+						Ptype: String,
+						Key:   "Teststring",
+					},
+					&JSONPrimitive{
 						Ptype: Float,
 						Key:   "Testfloat",
 					},
@@ -215,12 +224,20 @@ func Test_listChildrenTypes(t *testing.T) {
 					},
 				},
 			},
-			want: []string{"float64", "int"},
+			want: []string{"bool", "int", "float64", "string"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := listChildrenTypes(tt.args.c); !reflect.DeepEqual(got, tt.want) {
+			got := listChildrenTypes(tt.args.c)
+			want := tt.want
+			sort.Slice(want, func(i, j int) bool {
+				return want[i] < want[j]
+			})
+			sort.Slice(got, func(i, j int) bool {
+				return got[i] < got[j]
+			})
+			if !reflect.DeepEqual(got, want) {
 				t.Errorf("listChildrenTypes() = %v, want %v", got, tt.want)
 			}
 		})
