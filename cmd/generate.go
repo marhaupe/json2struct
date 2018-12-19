@@ -21,7 +21,6 @@ func Generate(s string) string {
 	res := <-n
 	if res != nil {
 		return fmt.Sprint(res)
-	} else {
-		return ""
 	}
+	return ""
 }
