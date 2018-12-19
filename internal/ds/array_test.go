@@ -243,3 +243,85 @@ func Test_listChildrenTypes(t *testing.T) {
 		})
 	}
 }
+
+func TestAddObjects(t *testing.T) {
+	arr := &JSONArray{
+		Key: "Testarr",
+	}
+	obj := &JSONObject{
+		Key: "Testobj",
+	}
+	bprim := &JSONPrimitive{
+		Key:   "Testbool",
+		Ptype: Bool,
+	}
+	obj.AddChild(bprim)
+
+	arr.AddChild(obj)
+	if len(arr.Children) != 1 {
+		t.Error("obj has not been added")
+	}
+	if !reflect.DeepEqual(arr.Children[0], obj) {
+		t.Error("obj has not been added the right way")
+	}
+
+	obj2 := &JSONObject{
+		Key: "Testobj",
+	}
+	sprim := &JSONPrimitive{
+		Key:   "Teststring",
+		Ptype: String,
+	}
+	obj2.AddChild(sprim)
+
+	// This should result in the obj being merged. More specifically, every child of
+	// obj2 should be added to obj
+	arr.AddChild(obj2)
+	if len(arr.Children) != 1 {
+		t.Error("obj2 has been added but should have been merged")
+	}
+	// The first child of obj should remain bprim
+	if !reflect.DeepEqual(obj.Children[0], bprim) {
+		t.Error("bprim was removed from obj.Children")
+	}
+	// The second child of obj should be sprim, which was added to obj2
+	if !reflect.DeepEqual(obj.Children[1], sprim) {
+		t.Error("sprim was not added to obj.Children")
+	}
+
+}
+func TestAddPrimitives(t *testing.T) {
+	arr := &JSONArray{
+		Key: "Testarr",
+	}
+	sprim := &JSONPrimitive{
+		Key:   "Teststring",
+		Ptype: String,
+	}
+	arr.AddChild(sprim)
+
+	if len(arr.Children) != 1 {
+		t.Error("sprim has not been added")
+	}
+	if !reflect.DeepEqual(arr.Children[0], sprim) {
+		t.Error("sprim has not been added the right way")
+	}
+
+	// Adding same datatype again. The child should not be added
+	arr.AddChild(sprim)
+	if len(arr.Children) != 1 {
+		t.Error("sprim was added again but should not have been")
+	}
+
+	bprim := &JSONPrimitive{
+		Key:   "Testbool",
+		Ptype: Bool,
+	}
+	arr.AddChild(bprim)
+	if len(arr.Children) != 2 {
+		t.Error("brim has not been added")
+	}
+	if !reflect.DeepEqual(arr.Children[1], bprim) {
+		t.Error("brim has not been added the right way")
+	}
+}
