@@ -48,5 +48,5 @@ func (jp *JSONObject) String() string {
 	if jp.Root {
 		return fmt.Sprintf("type JSONToStruct struct{\n%s}\n", b.String())
 	}
-	return fmt.Sprintf("%s struct{\n%s} `json:\"%s\"`\n", capitalizeKey(jp.Key), b.String(), jp.Key)
+	return fmt.Sprintf("%s struct{\n%s} `json:\"%s\"`\n", strings.Title(jp.Key), b.String(), jp.Key)
 }

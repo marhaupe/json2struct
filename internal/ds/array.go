@@ -74,28 +74,28 @@ func (jp *JSONArray) stringObject() string {
 	if jp.Root {
 		return fmt.Sprintf("type JSONToStruct []struct{\n%s}\n", b.String())
 	}
-	return fmt.Sprintf("%s []struct{\n%s} `json:\"%s\"`\n", capitalizeKey(jp.Key), b.String(), jp.Key)
+	return fmt.Sprintf("%s []struct{\n%s} `json:\"%s\"`\n", strings.Title(jp.Key), b.String(), jp.Key)
 }
 
 func (jp *JSONArray) stringArray() string {
 	if jp.Root {
 		return "type JSONToStruct [][]interface{}"
 	}
-	return fmt.Sprintf("%s [][]interface{} `json:\"%s\"`\n", capitalizeKey(jp.Key), jp.Key)
+	return fmt.Sprintf("%s [][]interface{} `json:\"%s\"`\n", strings.Title(jp.Key), jp.Key)
 }
 
 func (jp *JSONArray) stringPrimitive(dataType string) string {
 	if jp.Root {
 		return fmt.Sprintf("type JSONToStruct []%s", dataType)
 	}
-	return fmt.Sprintf("%s []%s `json:\"%s\"`\n", capitalizeKey(jp.Key), dataType, jp.Key)
+	return fmt.Sprintf("%s []%s `json:\"%s\"`\n", strings.Title(jp.Key), dataType, jp.Key)
 }
 
 func (jp *JSONArray) stringMultipleTypes() string {
 	if jp.Root {
 		return "type JSONToStruct []interface{}"
 	}
-	return fmt.Sprintf("%s []interface{} `json:\"%s\"`\n", capitalizeKey(jp.Key), jp.Key)
+	return fmt.Sprintf("%s []interface{} `json:\"%s\"`\n", strings.Title(jp.Key), jp.Key)
 }
 
 func listChildrenTypes(c []JSONElement) []string {

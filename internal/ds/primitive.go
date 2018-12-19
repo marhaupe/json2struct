@@ -1,6 +1,9 @@
 package ds
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func (jp *JSONPrimitive) GetKey() string {
 	return jp.Key
@@ -24,5 +27,5 @@ func (jp *JSONPrimitive) Datatype() string {
 }
 
 func (jp *JSONPrimitive) String() string {
-	return fmt.Sprintf("%s %s `json:\"%s\"`\n", capitalizeKey(jp.Key), jp.Datatype(), jp.Key)
+	return fmt.Sprintf("%s %s `json:\"%s\"`\n", strings.Title(jp.Key), jp.Datatype(), jp.Key)
 }
