@@ -1,6 +1,7 @@
 package ds
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -9,24 +10,32 @@ func (jp *JSONArray) AddChild(c JSONElement) {
 	if jp.Keys == nil {
 		jp.Keys = make(map[string]bool)
 	}
-	key := c.GetKey()
-	if jp.Keys[key] {
+	ckey := c.GetKey()
+	if jp.Keys[ckey] {
 		for _, child := range jp.Children {
-			if child.GetKey() == key && child.Datatype() == "object" {
-				casted, ok := c.(*JSONObject)
-				if !ok {
-					panic("Error parsing JSONElement to *JSONObject")
-				}
-				castedExistingChild, ok := child.(*JSONObject)
-				for _, child := range casted.Children {
-					castedExistingChild.AddChild(child)
+			if child.Datatype() == "object" && child.GetKey() == ckey {
+				err := mergeObjects(c, child)
+				if err != nil {
+					panic(err)
 				}
 			}
 		}
 	} else {
 		jp.Children = append(jp.Children, c)
-		jp.Keys[key] = true
+		jp.Keys[ckey] = true
 	}
+}
+
+func mergeObjects(source JSONElement, target JSONElement) error {
+	objToAdd, ok := source.(*JSONObject)
+	if !ok {
+		return errors.New("Error parsing JSONElement to *JSONObject")
+	}
+	childObj, ok := target.(*JSONObject)
+	for _, child := range objToAdd.Children {
+		childObj.AddChild(child)
+	}
+	return nil
 }
 
 func (jp *JSONArray) GetKey() string {
