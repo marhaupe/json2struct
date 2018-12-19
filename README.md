@@ -17,12 +17,12 @@ go get github.com/marhaupe/json2struct
 Call `json2struct` with the JSON string as an argument. 
 
 ```bash
- json2struct "$(curl "https://reqres.in/api/users?page=2")" >> generated.go
+ json2struct "$(curl "https://reqres.in/api/users?page=2")"
 ```
 ![Showcase](.github/showcase.gif)
 
 
-This option lets you pipe JSONs as input, but does not handle inputting JSONs directly very vell since you need to escape quotes and stuff like that.
+This option lets you pipe JSONs as input, but does not handle inputting JSONs directly very well since you need to escape quotes and stuff like that.
 
 ### Command `create`:
 Calling `json2struct create` opens the superior text editor for unix systems, vim 🤖. Write the JSON you want to parse in there and save and exit - just in case you get stuck: `:wq!`. 
