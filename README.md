@@ -5,6 +5,12 @@
 
 This projects aims to make your life a lot easier by automatically generating structs for a given JSON. 
 
+## Installing
+
+```bash
+go get github.com/marhaupe/json2struct
+```
+
 ## Usage
 
 ### No additional commands:
