@@ -41,11 +41,11 @@ func (arr *JSONArray) String() string {
 		dataType := foundChildrenTypes[0]
 		switch dataType {
 		case "string", "int", "bool", "float64", "interface{}":
-			toString = arr.stringPrimitive(dataType)
+			toString = arr.stringPrimitives(dataType)
 		case "object":
-			toString = arr.stringObject()
+			toString = arr.stringObjects()
 		case "array":
-			toString = arr.stringArray()
+			toString = arr.stringArrays()
 		default:
 			panic("Error stringifying array")
 		}
@@ -55,7 +55,7 @@ func (arr *JSONArray) String() string {
 	return toString
 }
 
-func (arr *JSONArray) stringObject() string {
+func (arr *JSONArray) stringObjects() string {
 	var b strings.Builder
 	for _, child := range arr.Children {
 		childObject, ok := child.(*JSONObject)
@@ -73,14 +73,14 @@ func (arr *JSONArray) stringObject() string {
 	return fmt.Sprintf("%s []struct{\n%s} `json:\"%s\"`\n", strings.Title(arr.Key), b.String(), arr.Key)
 }
 
-func (arr *JSONArray) stringArray() string {
+func (arr *JSONArray) stringArrays() string {
 	if arr.Root {
 		return "type JSONToStruct [][]interface{}"
 	}
 	return fmt.Sprintf("%s [][]interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
 }
 
-func (arr *JSONArray) stringPrimitive(dataType string) string {
+func (arr *JSONArray) stringPrimitives(dataType string) string {
 	if arr.Root {
 		return fmt.Sprintf("type JSONToStruct []%s", dataType)
 	}

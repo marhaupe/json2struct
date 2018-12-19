@@ -5,48 +5,41 @@ import (
 	"strings"
 )
 
-func (jp *JSONObject) GetKey() string {
-	return jp.Key
+func (obj *JSONObject) GetKey() string {
+	return obj.Key
 }
 
-func (jp *JSONObject) Datatype() string {
+func (obj *JSONObject) Datatype() string {
 	return "object"
 }
 
-func (jp *JSONObject) AddChild(c JSONElement) {
-	if jp.Keys == nil {
-		jp.Keys = make(map[string]bool)
+func (obj *JSONObject) AddChild(c JSONElement) {
+	if obj.Keys == nil {
+		obj.Keys = make(map[string]bool)
 	}
-	key := c.GetKey()
-	if jp.Keys[key] {
-		for _, child := range jp.Children {
-			if child.GetKey() == key && child.Datatype() == "object" {
-				castedToAdd, ok := c.(*JSONObject)
-				if !ok {
-					panic("Error parsing JSONElement to *JSONObject")
-				}
-				castedExistingChild, ok := child.(*JSONObject)
-				if !ok {
-					panic("Error parsing JSONElement to *JSONObject")
-				}
-				for _, child := range castedToAdd.Children {
-					castedExistingChild.AddChild(child)
+	ckey := c.GetKey()
+	if obj.Keys[ckey] {
+		for _, child := range obj.Children {
+			if child.Datatype() == "object" && child.GetKey() == ckey {
+				err := mergeObjects(c, child)
+				if err != nil {
+					panic(err)
 				}
 			}
 		}
 	} else {
-		jp.Children = append(jp.Children, c)
-		jp.Keys[key] = true
+		obj.Children = append(obj.Children, c)
+		obj.Keys[ckey] = true
 	}
 }
 
-func (jp *JSONObject) String() string {
+func (obj *JSONObject) String() string {
 	var b strings.Builder
-	for _, entry := range jp.Children {
+	for _, entry := range obj.Children {
 		fmt.Fprintf(&b, entry.String())
 	}
-	if jp.Root {
+	if obj.Root {
 		return fmt.Sprintf("type JSONToStruct struct{\n%s}\n", b.String())
 	}
-	return fmt.Sprintf("%s struct{\n%s} `json:\"%s\"`\n", strings.Title(jp.Key), b.String(), jp.Key)
+	return fmt.Sprintf("%s struct{\n%s} `json:\"%s\"`\n", strings.Title(obj.Key), b.String(), obj.Key)
 }
