@@ -26,7 +26,7 @@ This option lets you pipe JSONs as input, but does not handle inputting JSONs di
 
 ### Command `create`:
 Calling `json2struct create` opens the superior text editor for unix systems, vim 🤖. Write the JSON you want to parse in there and save and exit - just in case you get stuck: `:wq!`. 
-
+![Showcase](.github/showcase_create.gif)
 ## Lastly
 
 Please feel free to open pull requests for features you miss, stuff that doesn't work, the usual.
