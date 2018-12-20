@@ -9,38 +9,43 @@ import (
 	"github.com/marhaupe/json2struct/internal/ds"
 )
 
+// Parser contains fields to enable parsing of JSON tokens to
+// JSONElements
 type Parser struct {
 	rootEl ds.JSONNode
-	c      chan LexResult
+	lr     chan LexResult
 	wg     *sync.WaitGroup
 }
 
+// ParseResult is meant to be used as a chan struct to enable sharing
+// error messages between goroutines
 type ParseResult struct {
 	Node  ds.JSONNode
 	Error error
 }
 
-// Parse parsed JSON Tokens received from chan c
-func Parse(r chan ParseResult, c chan LexResult, wg *sync.WaitGroup) {
+// Parse parses JSON tokens received from chan lr and writes either the resulting
+// error or the parsed JSONNode to chan pr
+func Parse(pr chan ParseResult, lr chan LexResult, wg *sync.WaitGroup) {
 	defer func() {
-		if rec := recover(); rec != nil {
-			err := fmt.Errorf("%v", rec)
-			r <- ParseResult{Node: nil, Error: err}
-			close(r)
+		if r := recover(); r != nil {
+			err := fmt.Errorf("%v", r)
+			pr <- ParseResult{Node: nil, Error: err}
+			close(pr)
 		}
 	}()
 
-	p := Parser{c: c, wg: wg}
+	p := Parser{lr: lr, wg: wg}
 	p.parse()
-	r <- ParseResult{Node: p.rootEl, Error: nil}
-	close(r)
+	pr <- ParseResult{Node: p.rootEl, Error: nil}
+	close(pr)
 }
 
 func (p *Parser) parse() {
 	defer p.wg.Done()
 
 	// Consuming first Token, { or [
-	r := <-p.c
+	r := <-p.lr
 	if r.Error != nil {
 		panic(r.Error)
 	}
@@ -68,7 +73,7 @@ func (p *Parser) buildRootArray() {
 func (p *Parser) parseObject(objKey string) *ds.JSONObject {
 	obj := &ds.JSONObject{Key: objKey}
 	var key string
-	for r := range p.c {
+	for r := range p.lr {
 		if r.Error != nil {
 			panic(r.Error)
 		}
@@ -94,7 +99,7 @@ func (p *Parser) parseObject(objKey string) *ds.JSONObject {
 func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
 	arr := &ds.JSONArray{Key: arrKey}
 
-	for t := range p.c {
+	for t := range p.lr {
 		if t.Error != nil {
 			panic(t.Error)
 		}

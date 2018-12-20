@@ -6,6 +6,9 @@ import (
 	"os/exec"
 )
 
+// VimToString creates a file with the supplied filename, and lets the user input
+// what he wants. Once the user saves the file and quits VIM, VimToString reads the
+// file's content, returns the content as a string and deletes the file
 func VimToString(filename string) (string, error) {
 	file, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
