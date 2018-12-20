@@ -4,25 +4,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
-	"os"
 	"strings"
 	"sync"
 )
 
+type LexResult struct {
+	Token json.Token
+	Error error
+}
+
 // Lex consumes a string s containing the JSON object and writes each
-// JSON Token to c
-func Lex(s string, c chan json.Token, wg *sync.WaitGroup) {
+// result containing either the token or the error to c
+func Lex(s string, c chan LexResult, wg *sync.WaitGroup) {
 	defer func() {
 		if r := recover(); r != nil {
-			if err := fmt.Errorf("Error: %v, exiting", r); err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
+			err := fmt.Errorf("%v", r)
+			c <- LexResult{Error: err, Token: nil}
+			close(c)
 		}
 	}()
 	defer wg.Done()
-	defer close(c)
 	ok := json.Valid([]byte(s))
 	if !ok {
 		panic("Invalid json")
@@ -35,8 +36,9 @@ func Lex(s string, c chan json.Token, wg *sync.WaitGroup) {
 			break
 		}
 		if err != nil {
-			log.Fatal(err)
+			c <- LexResult{Token: nil, Error: err}
 		}
-		c <- t
+		c <- LexResult{Token: t, Error: nil}
 	}
+	close(c)
 }

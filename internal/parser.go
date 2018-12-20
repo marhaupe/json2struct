@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
-	"os"
 	"sync"
 
 	"github.com/marhaupe/json2struct/internal/ds"
@@ -12,33 +11,41 @@ import (
 
 type Parser struct {
 	rootEl ds.JSONNode
-	c      chan json.Token
+	c      chan LexResult
 	wg     *sync.WaitGroup
 }
 
+type ParseResult struct {
+	Node  ds.JSONNode
+	Error error
+}
+
 // Parse parsed JSON Tokens received from chan c
-func Parse(n chan ds.JSONNode, c chan json.Token, wg *sync.WaitGroup) {
+func Parse(r chan ParseResult, c chan LexResult, wg *sync.WaitGroup) {
 	defer func() {
-		if r := recover(); r != nil {
-			if err := fmt.Errorf("Error: %v, exiting", r); err != nil {
-				fmt.Println(err)
-				os.Exit(2)
-			}
+		if rec := recover(); rec != nil {
+			err := fmt.Errorf("%v", rec)
+			r <- ParseResult{Node: nil, Error: err}
+			close(r)
 		}
 	}()
+
 	p := Parser{c: c, wg: wg}
 	p.parse()
-	n <- p.rootEl
+	r <- ParseResult{Node: p.rootEl, Error: nil}
+	close(r)
 }
 
 func (p *Parser) parse() {
 	defer p.wg.Done()
 
 	// Consuming first Token, { or [
-	t := <-p.c
-
+	r := <-p.c
+	if r.Error != nil {
+		panic(r.Error)
+	}
 	// Parsing root delim accordingly
-	switch t {
+	switch r.Token {
 	case json.Delim('{'):
 		p.buildRootObject()
 	case json.Delim('['):
@@ -61,9 +68,12 @@ func (p *Parser) buildRootArray() {
 func (p *Parser) parseObject(objKey string) *ds.JSONObject {
 	obj := &ds.JSONObject{Key: objKey}
 	var key string
-	for t := range p.c {
+	for r := range p.c {
+		if r.Error != nil {
+			panic(r.Error)
+		}
 		if key == "" {
-			key = fmt.Sprint(t)
+			key = fmt.Sprint(r.Token)
 
 			// By making every second token the key, } and ] will falsely be recognized
 			// as keys instead of values
@@ -71,7 +81,7 @@ func (p *Parser) parseObject(objKey string) *ds.JSONObject {
 				return obj
 			}
 		} else {
-			done := p.buildUpElement(obj, key, t, json.Delim('}'))
+			done := p.buildUpElement(obj, key, r.Token, json.Delim('}'))
 			if done {
 				return obj
 			}
@@ -85,8 +95,11 @@ func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
 	arr := &ds.JSONArray{Key: arrKey}
 
 	for t := range p.c {
-		key := generateArrayKeyForToken(t)
-		done := p.buildUpElement(arr, key, t, json.Delim(']'))
+		if t.Error != nil {
+			panic(t.Error)
+		}
+		key := generateArrayKeyForToken(t.Token)
+		done := p.buildUpElement(arr, key, t.Token, json.Delim(']'))
 		if done {
 			return arr
 		}

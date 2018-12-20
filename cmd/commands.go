@@ -23,7 +23,11 @@ var rootCmd = &cobra.Command{
 
 func rootFunc(cmd *cobra.Command, args []string) {
 	jsonstr := args[0]
-	gen := Generate(jsonstr)
+	gen, err := internal.Generate(jsonstr)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	fmt.Println(gen)
 }
 
@@ -40,8 +44,12 @@ func createFunc(cmd *cobra.Command, args []string) {
 	jsonstr, err := internal.VimToString("json2struct.temp")
 	if err != nil {
 		fmt.Println("Error while reading from VIM", err)
-		os.Exit(1)
+		os.Exit(2)
 	}
-	gen := Generate(jsonstr)
+	gen, err := internal.Generate(jsonstr)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(3)
+	}
 	fmt.Println(gen)
 }
