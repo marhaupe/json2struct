@@ -35,16 +35,16 @@ func (arr *JSONArray) Datatype() Datatype {
 }
 
 func (arr *JSONArray) String() string {
-	foundChildrenTypes := listChildrenTypes(arr.Children)
+	childrenTypeCount := countChildrenTypes(arr.Children)
 	var toString string
-	if len(foundChildrenTypes) == 1 {
-		dataType := foundChildrenTypes[0]
-		switch dataType {
-		case String, Int, Bool, Float, Null:
-			toString = arr.stringPrimitives(dataType)
-		case Object:
+	if childrenTypeCount == 1 {
+		firstChild := arr.Children[0]
+		switch firstChild.(type) {
+		case *JSONPrimitive:
+			toString = arr.stringPrimitives(firstChild.(*JSONPrimitive).TypeAsString())
+		case *JSONObject:
 			toString = arr.stringObjects()
-		case Array:
+		case *JSONArray:
 			toString = arr.stringArrays()
 		default:
 			panic("Error stringifying array")
@@ -80,12 +80,11 @@ func (arr *JSONArray) stringArrays() string {
 	return fmt.Sprintf("%s [][]interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
 }
 
-func (arr *JSONArray) stringPrimitives(dataType Datatype) string {
-	typeAsString := arr.Children[0].(*JSONPrimitive).TypeAsString()
+func (arr *JSONArray) stringPrimitives(dataType string) string {
 	if arr.Root {
-		return fmt.Sprintf("type JSONToStruct []%s", typeAsString)
+		return fmt.Sprintf("type JSONToStruct []%s", dataType)
 	}
-	return fmt.Sprintf("%s []%s `json:\"%s\"`\n", strings.Title(arr.Key), typeAsString, arr.Key)
+	return fmt.Sprintf("%s []%s `json:\"%s\"`\n", strings.Title(arr.Key), dataType, arr.Key)
 }
 
 func (arr *JSONArray) stringMultipleTypes() string {
@@ -95,7 +94,7 @@ func (arr *JSONArray) stringMultipleTypes() string {
 	return fmt.Sprintf("%s []interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
 }
 
-func listChildrenTypes(c []JSONElement) []Datatype {
+func countChildrenTypes(c []JSONElement) int {
 	foundChildrenTypes := make(map[Datatype]bool)
 	var foundChildren []Datatype
 	for _, entry := range c {
@@ -104,7 +103,7 @@ func listChildrenTypes(c []JSONElement) []Datatype {
 	for k := range foundChildrenTypes {
 		foundChildren = append(foundChildren, k)
 	}
-	return foundChildren
+	return len(foundChildren)
 }
 
 func mergeObjects(source JSONElement, target JSONElement) error {

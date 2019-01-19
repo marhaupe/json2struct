@@ -2,7 +2,6 @@ package ds
 
 import (
 	"reflect"
-	"sort"
 	"testing"
 )
 
@@ -200,7 +199,7 @@ func Test_listChildrenTypes(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []Datatype
+		want int
 	}{
 		{
 			name: "Different Primitives",
@@ -224,19 +223,13 @@ func Test_listChildrenTypes(t *testing.T) {
 					},
 				},
 			},
-			want: []Datatype{Bool, Int, Float, String},
+			want: 4,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := listChildrenTypes(tt.args.c)
+			got := countChildrenTypes(tt.args.c)
 			want := tt.want
-			sort.Slice(want, func(i, j int) bool {
-				return want[i] < want[j]
-			})
-			sort.Slice(got, func(i, j int) bool {
-				return got[i] < got[j]
-			})
 			if !reflect.DeepEqual(got, want) {
 				t.Errorf("listChildrenTypes() = %v, want %v", got, tt.want)
 			}
