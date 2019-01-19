@@ -84,9 +84,9 @@ func (arr *JSONArray) stringObjects() string {
 
 func (arr *JSONArray) stringArrays() string {
 	if arr.Parent == nil {
-		return "type JSONToStruct [][]interface{}"
+		return "type JSONToStruct []interface{}"
 	}
-	return fmt.Sprintf("%s [][]interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
+	return fmt.Sprintf("%s []interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
 }
 
 func (arr *JSONArray) stringPrimitives(dataType string) string {
