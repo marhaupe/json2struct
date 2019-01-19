@@ -9,8 +9,8 @@ func (obj *JSONObject) GetKey() string {
 	return obj.Key
 }
 
-func (obj *JSONObject) Datatype() string {
-	return "object"
+func (obj *JSONObject) Datatype() Datatype {
+	return Object
 }
 
 func (obj *JSONObject) AddChild(c JSONElement) {
@@ -20,7 +20,7 @@ func (obj *JSONObject) AddChild(c JSONElement) {
 	ckey := c.GetKey()
 	if obj.Keys[ckey] {
 		for _, child := range obj.Children {
-			if child.Datatype() == "object" && child.GetKey() == ckey {
+			if child.Datatype() == Object && child.GetKey() == ckey {
 				err := mergeObjects(c, child)
 				if err != nil {
 					panic(err)

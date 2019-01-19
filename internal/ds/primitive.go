@@ -9,23 +9,27 @@ func (jp *JSONPrimitive) GetKey() string {
 	return jp.Key
 }
 
-func (jp *JSONPrimitive) Datatype() string {
-	switch jp.Ptype {
+func (jp *JSONPrimitive) Datatype() Datatype {
+	return jp.Type
+}
+
+func (jp *JSONPrimitive) TypeAsString() string {
+	switch jp.Type {
 	case String:
 		return "string"
 	case Int:
 		return "int"
-	case Float:
-		return "float64"
 	case Bool:
 		return "bool"
+	case Float:
+		return "float64"
 	case Null:
 		return "interface{}"
 	default:
-		panic(fmt.Sprintf("Datatype of primitive with key %v could not be determined", jp.Key))
+		panic("TypeAsString could not detect Type properly")
 	}
 }
 
 func (jp *JSONPrimitive) String() string {
-	return fmt.Sprintf("%s %s `json:\"%s\"`\n", strings.Title(jp.Key), jp.Datatype(), jp.Key)
+	return fmt.Sprintf("%s %s `json:\"%s\"`\n", strings.Title(jp.Key), jp.TypeAsString(), jp.Key)
 }

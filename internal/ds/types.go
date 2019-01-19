@@ -1,8 +1,20 @@
 package ds
 
+type Datatype int
+
+const (
+	Object Datatype = iota
+	Array
+	String
+	Int
+	Float
+	Bool
+	Null
+)
+
 type JSONElement interface {
 	String() string
-	Datatype() string
+	Datatype() Datatype
 	GetKey() string
 }
 
@@ -24,17 +36,7 @@ type JSONArray struct {
 	Keys     map[string]bool
 }
 
-type PrimitiveType int
-
-const (
-	String PrimitiveType = iota
-	Int
-	Float
-	Bool
-	Null
-)
-
 type JSONPrimitive struct {
-	Ptype PrimitiveType
-	Key   string
+	Type Datatype
+	Key  string
 }

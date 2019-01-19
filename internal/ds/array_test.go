@@ -22,12 +22,12 @@ func TestJSONArray_String(t *testing.T) {
 				Key: "testarray",
 				Children: []JSONElement{
 					&JSONPrimitive{
-						Ptype: Bool,
-						Key:   "testbool",
+						Type: Bool,
+						Key:  "testbool",
 					},
 					&JSONPrimitive{
-						Ptype: Bool,
-						Key:   "testbool2",
+						Type: Bool,
+						Key:  "testbool2",
 					},
 				},
 			},
@@ -39,12 +39,12 @@ func TestJSONArray_String(t *testing.T) {
 				Key: "testarray",
 				Children: []JSONElement{
 					&JSONPrimitive{
-						Ptype: String,
-						Key:   "teststring1",
+						Type: String,
+						Key:  "teststring1",
 					},
 					&JSONPrimitive{
-						Ptype: String,
-						Key:   "teststring2",
+						Type: String,
+						Key:  "teststring2",
 					},
 				},
 			},
@@ -56,12 +56,12 @@ func TestJSONArray_String(t *testing.T) {
 				Key: "testarray",
 				Children: []JSONElement{
 					&JSONPrimitive{
-						Ptype: Int,
-						Key:   "testint1",
+						Type: Int,
+						Key:  "testint1",
 					},
 					&JSONPrimitive{
-						Ptype: Int,
-						Key:   "testint2",
+						Type: Int,
+						Key:  "testint2",
 					},
 				},
 			},
@@ -76,24 +76,24 @@ func TestJSONArray_String(t *testing.T) {
 						Key: "Doesn't matter",
 						Children: []JSONElement{
 							&JSONPrimitive{
-								Ptype: Bool,
-								Key:   "testbool",
+								Type: Bool,
+								Key:  "testbool",
 							},
 							&JSONPrimitive{
-								Ptype: Int,
-								Key:   "testint",
+								Type: Int,
+								Key:  "testint",
 							},
 						}},
 					&JSONArray{
 						Key: "Doesn't matter aswell",
 						Children: []JSONElement{
 							&JSONPrimitive{
-								Ptype: Bool,
-								Key:   "testbool",
+								Type: Bool,
+								Key:  "testbool",
 							},
 							&JSONPrimitive{
-								Ptype: Int,
-								Key:   "testint",
+								Type: Int,
+								Key:  "testint",
 							},
 						},
 					},
@@ -110,12 +110,12 @@ func TestJSONArray_String(t *testing.T) {
 						Key: "Intstringobj",
 						Children: []JSONElement{
 							&JSONPrimitive{
-								Ptype: Int,
-								Key:   "testint",
+								Type: Int,
+								Key:  "testint",
 							},
 							&JSONPrimitive{
-								Ptype: String,
-								Key:   "teststring",
+								Type: String,
+								Key:  "teststring",
 							},
 						},
 					},
@@ -123,8 +123,8 @@ func TestJSONArray_String(t *testing.T) {
 						Key: "Boolobj",
 						Children: []JSONElement{
 							&JSONPrimitive{
-								Ptype: Bool,
-								Key:   "testbool",
+								Type: Bool,
+								Key:  "testbool",
 							},
 						},
 					},
@@ -142,12 +142,12 @@ func TestJSONArray_String(t *testing.T) {
 				Key: "testarray",
 				Children: []JSONElement{
 					&JSONPrimitive{
-						Ptype: Bool,
-						Key:   "testbool",
+						Type: Bool,
+						Key:  "testbool",
 					},
 					&JSONPrimitive{
-						Ptype: Int,
-						Key:   "testint",
+						Type: Int,
+						Key:  "testint",
 					},
 				},
 			},
@@ -159,19 +159,19 @@ func TestJSONArray_String(t *testing.T) {
 				Key: "testarray",
 				Children: []JSONElement{
 					&JSONPrimitive{
-						Ptype: Bool,
-						Key:   "testbool",
+						Type: Bool,
+						Key:  "testbool",
 					},
 					&JSONObject{
 						Key: "Doesn't matter",
 						Children: []JSONElement{
 							&JSONPrimitive{
-								Ptype: Int,
-								Key:   "testint",
+								Type: Int,
+								Key:  "testint",
 							},
 							&JSONPrimitive{
-								Ptype: String,
-								Key:   "teststring",
+								Type: String,
+								Key:  "teststring",
 							},
 						},
 					},
@@ -200,31 +200,31 @@ func Test_listChildrenTypes(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []string
+		want []Datatype
 	}{
 		{
 			name: "Different Primitives",
 			args: args{
 				[]JSONElement{
 					&JSONPrimitive{
-						Ptype: Bool,
-						Key:   "Testbool",
+						Type: Bool,
+						Key:  "Testbool",
 					},
 					&JSONPrimitive{
-						Ptype: String,
-						Key:   "Teststring",
+						Type: String,
+						Key:  "Teststring",
 					},
 					&JSONPrimitive{
-						Ptype: Float,
-						Key:   "Testfloat",
+						Type: Float,
+						Key:  "Testfloat",
 					},
 					&JSONPrimitive{
-						Ptype: Int,
-						Key:   "Testint",
+						Type: Int,
+						Key:  "Testint",
 					},
 				},
 			},
-			want: []string{"bool", "int", "float64", "string"},
+			want: []Datatype{Bool, Int, Float, String},
 		},
 	}
 	for _, tt := range tests {
@@ -252,8 +252,8 @@ func TestAddObjects(t *testing.T) {
 		Key: "Testobj",
 	}
 	bprim := &JSONPrimitive{
-		Key:   "Testbool",
-		Ptype: Bool,
+		Key:  "Testbool",
+		Type: Bool,
 	}
 	obj.AddChild(bprim)
 
@@ -269,8 +269,8 @@ func TestAddObjects(t *testing.T) {
 		Key: "Testobj",
 	}
 	sprim := &JSONPrimitive{
-		Key:   "Teststring",
-		Ptype: String,
+		Key:  "Teststring",
+		Type: String,
 	}
 	obj2.AddChild(sprim)
 
@@ -295,8 +295,8 @@ func TestAddPrimitives(t *testing.T) {
 		Key: "Testarr",
 	}
 	sprim := &JSONPrimitive{
-		Key:   "Teststring",
-		Ptype: String,
+		Key:  "Teststring",
+		Type: String,
 	}
 	arr.AddChild(sprim)
 
@@ -314,8 +314,8 @@ func TestAddPrimitives(t *testing.T) {
 	}
 
 	bprim := &JSONPrimitive{
-		Key:   "Testbool",
-		Ptype: Bool,
+		Key:  "Testbool",
+		Type: Bool,
 	}
 	arr.AddChild(bprim)
 	if len(arr.Children) != 2 {

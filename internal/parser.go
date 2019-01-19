@@ -154,11 +154,11 @@ func generateArrayKeyForToken(t json.Token) string {
 
 func (p *Parser) parsePrimitive(key string, value json.Token) *ds.JSONPrimitive {
 	prim := &ds.JSONPrimitive{Key: key}
-	prim.Ptype = detectPrimitiveType(value)
+	prim.Type = detectPrimitiveType(value)
 	return prim
 }
 
-func detectPrimitiveType(t json.Token) ds.PrimitiveType {
+func detectPrimitiveType(t json.Token) ds.Datatype {
 	switch t.(type) {
 	case float64:
 		if t == math.Trunc(t.(float64)) {

@@ -13,7 +13,7 @@ func (arr *JSONArray) AddChild(c JSONElement) {
 	ckey := c.GetKey()
 	if arr.Keys[ckey] {
 		for _, child := range arr.Children {
-			if child.Datatype() == "object" && child.GetKey() == ckey {
+			if child.Datatype() == Object && child.GetKey() == ckey {
 				err := mergeObjects(c, child)
 				if err != nil {
 					panic(err)
@@ -30,8 +30,8 @@ func (arr *JSONArray) GetKey() string {
 	return arr.Key
 }
 
-func (arr *JSONArray) Datatype() string {
-	return "array"
+func (arr *JSONArray) Datatype() Datatype {
+	return Array
 }
 
 func (arr *JSONArray) String() string {
@@ -40,11 +40,11 @@ func (arr *JSONArray) String() string {
 	if len(foundChildrenTypes) == 1 {
 		dataType := foundChildrenTypes[0]
 		switch dataType {
-		case "string", "int", "bool", "float64", "interface{}":
+		case String, Int, Bool, Float, Null:
 			toString = arr.stringPrimitives(dataType)
-		case "object":
+		case Object:
 			toString = arr.stringObjects()
-		case "array":
+		case Array:
 			toString = arr.stringArrays()
 		default:
 			panic("Error stringifying array")
@@ -80,11 +80,12 @@ func (arr *JSONArray) stringArrays() string {
 	return fmt.Sprintf("%s [][]interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
 }
 
-func (arr *JSONArray) stringPrimitives(dataType string) string {
+func (arr *JSONArray) stringPrimitives(dataType Datatype) string {
+	typeAsString := arr.Children[0].(*JSONPrimitive).TypeAsString()
 	if arr.Root {
-		return fmt.Sprintf("type JSONToStruct []%s", dataType)
+		return fmt.Sprintf("type JSONToStruct []%s", typeAsString)
 	}
-	return fmt.Sprintf("%s []%s `json:\"%s\"`\n", strings.Title(arr.Key), dataType, arr.Key)
+	return fmt.Sprintf("%s []%s `json:\"%s\"`\n", strings.Title(arr.Key), typeAsString, arr.Key)
 }
 
 func (arr *JSONArray) stringMultipleTypes() string {
@@ -94,9 +95,9 @@ func (arr *JSONArray) stringMultipleTypes() string {
 	return fmt.Sprintf("%s []interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
 }
 
-func listChildrenTypes(c []JSONElement) []string {
-	foundChildrenTypes := make(map[string]bool)
-	var foundChildren []string
+func listChildrenTypes(c []JSONElement) []Datatype {
+	foundChildrenTypes := make(map[Datatype]bool)
+	var foundChildren []Datatype
 	for _, entry := range c {
 		foundChildrenTypes[entry.Datatype()] = true
 	}
