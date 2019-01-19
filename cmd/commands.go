@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/marhaupe/json2struct/internal"
+	"github.com/marhaupe/json2struct/internal/editor"
 	"github.com/spf13/cobra"
 )
 
@@ -41,7 +42,9 @@ var createCmd = &cobra.Command{
 }
 
 func createFunc(cmd *cobra.Command, args []string) {
-	jsonstr, err := internal.VimToString("json2struct.temp")
+	editor := editor.New()
+	editor.Display()
+	jsonstr, err := editor.Consume()
 	if err != nil {
 		fmt.Println("Error while reading from VIM", err)
 		os.Exit(2)
