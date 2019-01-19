@@ -6,14 +6,30 @@ import (
 	"strings"
 )
 
+func (arr *JSONArray) SetParent(p JSONNode) {
+	arr.Parent = p
+}
+
+func (arr *JSONArray) GetParent() JSONNode {
+	return arr.Parent
+}
+
+func (arr *JSONArray) GetKey() string {
+	return arr.Key
+}
+
+func (arr *JSONArray) GetDatatype() Datatype {
+	return Array
+}
+
 func (arr *JSONArray) AddChild(c JSONElement) {
-	if arr.Keys == nil {
-		arr.Keys = make(map[string]bool)
+	if arr.Types == nil {
+		arr.Types = make(map[Datatype]bool)
 	}
-	ckey := c.GetKey()
-	if arr.Keys[ckey] {
+	ctype := c.GetDatatype()
+	if arr.Types[ctype] {
 		for _, child := range arr.Children {
-			if child.Datatype() == "object" && child.GetKey() == ckey {
+			if child.GetDatatype() == Object && child.GetDatatype() == ctype {
 				err := mergeObjects(c, child)
 				if err != nil {
 					panic(err)
@@ -22,29 +38,22 @@ func (arr *JSONArray) AddChild(c JSONElement) {
 		}
 	} else {
 		arr.Children = append(arr.Children, c)
-		arr.Keys[ckey] = true
+		c.SetParent(arr)
+		arr.Types[ctype] = true
 	}
 }
 
-func (arr *JSONArray) GetKey() string {
-	return arr.Key
-}
-
-func (arr *JSONArray) Datatype() string {
-	return "array"
-}
-
 func (arr *JSONArray) String() string {
-	foundChildrenTypes := listChildrenTypes(arr.Children)
+	childrenTypeCount := countChildrenTypes(arr.Children)
 	var toString string
-	if len(foundChildrenTypes) == 1 {
-		dataType := foundChildrenTypes[0]
-		switch dataType {
-		case "string", "int", "bool", "float64", "interface{}":
-			toString = arr.stringPrimitives(dataType)
-		case "object":
+	if childrenTypeCount == 1 {
+		firstChild := arr.Children[0]
+		switch firstChild.(type) {
+		case *JSONPrimitive:
+			toString = arr.stringPrimitives(firstChild.(*JSONPrimitive).TypeAsString())
+		case *JSONObject:
 			toString = arr.stringObjects()
-		case "array":
+		case *JSONArray:
 			toString = arr.stringArrays()
 		default:
 			panic("Error stringifying array")
@@ -67,43 +76,39 @@ func (arr *JSONArray) stringObjects() string {
 			fmt.Fprintf(&b, grandchildString)
 		}
 	}
-	if arr.Root {
+	if arr.Parent == nil {
 		return fmt.Sprintf("type JSONToStruct []struct{\n%s}\n", b.String())
 	}
 	return fmt.Sprintf("%s []struct{\n%s} `json:\"%s\"`\n", strings.Title(arr.Key), b.String(), arr.Key)
 }
 
 func (arr *JSONArray) stringArrays() string {
-	if arr.Root {
-		return "type JSONToStruct [][]interface{}"
+	if arr.Parent == nil {
+		return "type JSONToStruct []interface{}"
 	}
-	return fmt.Sprintf("%s [][]interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
+	return fmt.Sprintf("%s []interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
 }
 
 func (arr *JSONArray) stringPrimitives(dataType string) string {
-	if arr.Root {
+	if arr.Parent == nil {
 		return fmt.Sprintf("type JSONToStruct []%s", dataType)
 	}
 	return fmt.Sprintf("%s []%s `json:\"%s\"`\n", strings.Title(arr.Key), dataType, arr.Key)
 }
 
 func (arr *JSONArray) stringMultipleTypes() string {
-	if arr.Root {
+	if arr.Parent == nil {
 		return "type JSONToStruct []interface{}"
 	}
 	return fmt.Sprintf("%s []interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
 }
 
-func listChildrenTypes(c []JSONElement) []string {
-	foundChildrenTypes := make(map[string]bool)
-	var foundChildren []string
+func countChildrenTypes(c []JSONElement) int {
+	foundChildrenTypes := make(map[Datatype]bool)
 	for _, entry := range c {
-		foundChildrenTypes[entry.Datatype()] = true
+		foundChildrenTypes[entry.GetDatatype()] = true
 	}
-	for k := range foundChildrenTypes {
-		foundChildren = append(foundChildren, k)
-	}
-	return foundChildren
+	return len(foundChildrenTypes)
 }
 
 func mergeObjects(source JSONElement, target JSONElement) error {

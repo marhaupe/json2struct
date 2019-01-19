@@ -6,10 +6,7 @@ import (
 )
 
 func TestString(t *testing.T) {
-	obj := &JSONObject{
-		Key:  "RootObj",
-		Root: true,
-	}
+	obj := &JSONObject{}
 	wanted := "type JSONToStruct struct{\n" +
 		"}\n"
 	got := obj.String()
@@ -18,7 +15,8 @@ func TestString(t *testing.T) {
 	}
 
 	obj = &JSONObject{
-		Key: "testobj",
+		Parent: &JSONObject{},
+		Key:    "testobj",
 	}
 	wanted = "Testobj struct{\n" +
 		"} `json:\"testobj\"`\n"
@@ -28,11 +26,12 @@ func TestString(t *testing.T) {
 	}
 
 	obj = &JSONObject{
-		Key: "testobj",
+		Parent: &JSONObject{},
+		Key:    "testobj",
 	}
 	obj.AddChild(&JSONPrimitive{
-		Key:   "teststring",
-		Ptype: String,
+		Key:      "teststring",
+		Datatype: String,
 	})
 	wanted = "Testobj struct{\n" +
 		"Teststring string `json:\"teststring\"`\n" +
@@ -70,8 +69,8 @@ func TestAddChild(t *testing.T) {
 	// 		}
 	// }
 	objToAdd.AddChild(&JSONPrimitive{
-		Key:   "Testint",
-		Ptype: Int,
+		Key:      "Testint",
+		Datatype: Int,
 	})
 	if !reflect.DeepEqual(obj.Children[0], objToAdd) {
 		t.Errorf("Added primitive to nested object the wrong way")
@@ -92,22 +91,23 @@ func TestAddChild(t *testing.T) {
 		Key: "ToAdd",
 	}
 	secondObjToAdd.AddChild(&JSONPrimitive{
-		Key:   "Testbool",
-		Ptype: Bool,
+		Key:      "Testbool",
+		Datatype: Bool,
 	})
 
 	obj.AddChild(secondObjToAdd)
 
 	mergedObj := &JSONObject{
-		Key: "ToAdd",
+		Parent: obj,
+		Key:    "ToAdd",
 	}
 	mergedObj.AddChild(&JSONPrimitive{
-		Key:   "Testint",
-		Ptype: Int,
+		Key:      "Testint",
+		Datatype: Int,
 	})
 	mergedObj.AddChild(&JSONPrimitive{
-		Key:   "Testbool",
-		Ptype: Bool,
+		Key:      "Testbool",
+		Datatype: Bool,
 	})
 
 	if !reflect.DeepEqual(obj.Children[0], mergedObj) {

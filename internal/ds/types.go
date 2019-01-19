@@ -1,8 +1,22 @@
 package ds
 
+type Datatype int
+
+const (
+	Object Datatype = iota
+	Array
+	String
+	Int
+	Float
+	Bool
+	Null
+)
+
 type JSONElement interface {
 	String() string
-	Datatype() string
+	GetDatatype() Datatype
+	GetParent() JSONNode
+	SetParent(p JSONNode)
 	GetKey() string
 }
 
@@ -11,30 +25,21 @@ type JSONNode interface {
 }
 
 type JSONObject struct {
-	Root     bool
 	Key      string
 	Children []JSONElement
+	Parent   JSONNode
 	Keys     map[string]bool
 }
 
 type JSONArray struct {
-	Root     bool
 	Key      string
 	Children []JSONElement
-	Keys     map[string]bool
+	Parent   JSONNode
+	Types    map[Datatype]bool
 }
 
-type PrimitiveType int
-
-const (
-	String PrimitiveType = iota
-	Int
-	Float
-	Bool
-	Null
-)
-
 type JSONPrimitive struct {
-	Ptype PrimitiveType
-	Key   string
+	Datatype Datatype
+	Parent   JSONNode
+	Key      string
 }
