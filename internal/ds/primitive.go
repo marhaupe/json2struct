@@ -9,12 +9,12 @@ func (jp *JSONPrimitive) GetKey() string {
 	return jp.Key
 }
 
-func (jp *JSONPrimitive) Datatype() Datatype {
-	return jp.Type
+func (jp *JSONPrimitive) GetDatatype() Datatype {
+	return jp.Datatype
 }
 
 func (jp *JSONPrimitive) TypeAsString() string {
-	switch jp.Type {
+	switch jp.Datatype {
 	case String:
 		return "string"
 	case Int:

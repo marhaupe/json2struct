@@ -13,7 +13,7 @@ func (arr *JSONArray) AddChild(c JSONElement) {
 	ckey := c.GetKey()
 	if arr.Keys[ckey] {
 		for _, child := range arr.Children {
-			if child.Datatype() == Object && child.GetKey() == ckey {
+			if child.GetDatatype() == Object && child.GetKey() == ckey {
 				err := mergeObjects(c, child)
 				if err != nil {
 					panic(err)
@@ -30,7 +30,7 @@ func (arr *JSONArray) GetKey() string {
 	return arr.Key
 }
 
-func (arr *JSONArray) Datatype() Datatype {
+func (arr *JSONArray) GetDatatype() Datatype {
 	return Array
 }
 
@@ -98,7 +98,7 @@ func countChildrenTypes(c []JSONElement) int {
 	foundChildrenTypes := make(map[Datatype]bool)
 	var foundChildren []Datatype
 	for _, entry := range c {
-		foundChildrenTypes[entry.Datatype()] = true
+		foundChildrenTypes[entry.GetDatatype()] = true
 	}
 	for k := range foundChildrenTypes {
 		foundChildren = append(foundChildren, k)

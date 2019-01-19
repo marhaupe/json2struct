@@ -154,7 +154,7 @@ func generateArrayKeyForToken(t json.Token) string {
 
 func (p *Parser) parsePrimitive(key string, value json.Token) *ds.JSONPrimitive {
 	prim := &ds.JSONPrimitive{Key: key}
-	prim.Type = detectPrimitiveType(value)
+	prim.Datatype = detectPrimitiveType(value)
 	return prim
 }
 

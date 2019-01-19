@@ -9,7 +9,7 @@ func (obj *JSONObject) GetKey() string {
 	return obj.Key
 }
 
-func (obj *JSONObject) Datatype() Datatype {
+func (obj *JSONObject) GetDatatype() Datatype {
 	return Object
 }
 
@@ -20,7 +20,7 @@ func (obj *JSONObject) AddChild(c JSONElement) {
 	ckey := c.GetKey()
 	if obj.Keys[ckey] {
 		for _, child := range obj.Children {
-			if child.Datatype() == Object && child.GetKey() == ckey {
+			if child.GetDatatype() == Object && child.GetKey() == ckey {
 				err := mergeObjects(c, child)
 				if err != nil {
 					panic(err)

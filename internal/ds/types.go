@@ -14,7 +14,7 @@ const (
 
 type JSONElement interface {
 	String() string
-	Datatype() Datatype
+	GetDatatype() Datatype
 	GetKey() string
 }
 
@@ -37,6 +37,6 @@ type JSONArray struct {
 }
 
 type JSONPrimitive struct {
-	Type Datatype
-	Key  string
+	Datatype Datatype
+	Key      string
 }
