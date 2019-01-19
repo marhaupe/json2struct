@@ -6,6 +6,22 @@ import (
 	"strings"
 )
 
+func (arr *JSONArray) SetParent(p JSONNode) {
+	arr.Parent = p
+}
+
+func (arr *JSONArray) GetParent() JSONNode {
+	return arr.Parent
+}
+
+func (arr *JSONArray) GetKey() string {
+	return arr.Key
+}
+
+func (arr *JSONArray) GetDatatype() Datatype {
+	return Array
+}
+
 func (arr *JSONArray) AddChild(c JSONElement) {
 	if arr.Keys == nil {
 		arr.Keys = make(map[string]bool)
@@ -22,20 +38,14 @@ func (arr *JSONArray) AddChild(c JSONElement) {
 		}
 	} else {
 		arr.Children = append(arr.Children, c)
+		c.SetParent(arr)
 		arr.Keys[ckey] = true
 	}
 }
 
-func (arr *JSONArray) GetKey() string {
-	return arr.Key
-}
-
-func (arr *JSONArray) GetDatatype() Datatype {
-	return Array
-}
-
 func (arr *JSONArray) String() string {
 	childrenTypeCount := countChildrenTypes(arr.Children)
+	fmt.Println("Children Count", childrenTypeCount)
 	var toString string
 	if childrenTypeCount == 1 {
 		firstChild := arr.Children[0]
@@ -67,28 +77,28 @@ func (arr *JSONArray) stringObjects() string {
 			fmt.Fprintf(&b, grandchildString)
 		}
 	}
-	if arr.Root {
+	if arr.Parent == nil {
 		return fmt.Sprintf("type JSONToStruct []struct{\n%s}\n", b.String())
 	}
 	return fmt.Sprintf("%s []struct{\n%s} `json:\"%s\"`\n", strings.Title(arr.Key), b.String(), arr.Key)
 }
 
 func (arr *JSONArray) stringArrays() string {
-	if arr.Root {
+	if arr.Parent == nil {
 		return "type JSONToStruct [][]interface{}"
 	}
 	return fmt.Sprintf("%s [][]interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
 }
 
 func (arr *JSONArray) stringPrimitives(dataType string) string {
-	if arr.Root {
+	if arr.Parent == nil {
 		return fmt.Sprintf("type JSONToStruct []%s", dataType)
 	}
 	return fmt.Sprintf("%s []%s `json:\"%s\"`\n", strings.Title(arr.Key), dataType, arr.Key)
 }
 
 func (arr *JSONArray) stringMultipleTypes() string {
-	if arr.Root {
+	if arr.Parent == nil {
 		return "type JSONToStruct []interface{}"
 	}
 	return fmt.Sprintf("%s []interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
@@ -103,7 +113,7 @@ func countChildrenTypes(c []JSONElement) int {
 	for k := range foundChildrenTypes {
 		foundChildren = append(foundChildren, k)
 	}
-	return len(foundChildren)
+	return len(foundChildrenTypes)
 }
 
 func mergeObjects(source JSONElement, target JSONElement) error {

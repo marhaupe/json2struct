@@ -15,6 +15,8 @@ const (
 type JSONElement interface {
 	String() string
 	GetDatatype() Datatype
+	GetParent() JSONNode
+	SetParent(p JSONNode)
 	GetKey() string
 }
 
@@ -23,20 +25,21 @@ type JSONNode interface {
 }
 
 type JSONObject struct {
-	Root     bool
 	Key      string
 	Children []JSONElement
+	Parent   JSONNode
 	Keys     map[string]bool
 }
 
 type JSONArray struct {
-	Root     bool
 	Key      string
 	Children []JSONElement
+	Parent   JSONNode
 	Keys     map[string]bool
 }
 
 type JSONPrimitive struct {
 	Datatype Datatype
+	Parent   JSONNode
 	Key      string
 }

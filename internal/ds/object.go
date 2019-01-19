@@ -9,6 +9,14 @@ func (obj *JSONObject) GetKey() string {
 	return obj.Key
 }
 
+func (obj *JSONObject) GetParent() JSONNode {
+	return obj.Parent
+}
+
+func (obj *JSONObject) SetParent(p JSONNode) {
+	obj.Parent = p
+}
+
 func (obj *JSONObject) GetDatatype() Datatype {
 	return Object
 }
@@ -29,6 +37,7 @@ func (obj *JSONObject) AddChild(c JSONElement) {
 		}
 	} else {
 		obj.Children = append(obj.Children, c)
+		c.SetParent(obj)
 		obj.Keys[ckey] = true
 	}
 }
@@ -38,7 +47,7 @@ func (obj *JSONObject) String() string {
 	for _, entry := range obj.Children {
 		fmt.Fprintf(&b, entry.String())
 	}
-	if obj.Root {
+	if obj.Parent == nil {
 		return fmt.Sprintf("type JSONToStruct struct{\n%s}\n", b.String())
 	}
 	return fmt.Sprintf("%s struct{\n%s} `json:\"%s\"`\n", strings.Title(obj.Key), b.String(), obj.Key)

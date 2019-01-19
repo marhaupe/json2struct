@@ -8,6 +8,7 @@ import (
 func TestJSONArray_String(t *testing.T) {
 	type fields struct {
 		Key      string
+		Parent   JSONNode
 		Children []JSONElement
 	}
 	tests := []struct {
@@ -18,13 +19,16 @@ func TestJSONArray_String(t *testing.T) {
 		{
 			name: "Array Test Only Bools",
 			fields: fields{
-				Key: "testarray",
+				Key:    "testarray",
+				Parent: &JSONObject{},
 				Children: []JSONElement{
 					&JSONPrimitive{
+						Parent:   &JSONArray{},
 						Datatype: Bool,
 						Key:      "testbool",
 					},
 					&JSONPrimitive{
+						Parent:   &JSONArray{},
 						Datatype: Bool,
 						Key:      "testbool2",
 					},
@@ -35,13 +39,16 @@ func TestJSONArray_String(t *testing.T) {
 		{
 			name: "Array Test Only Strings",
 			fields: fields{
-				Key: "testarray",
+				Key:    "testarray",
+				Parent: &JSONObject{},
 				Children: []JSONElement{
 					&JSONPrimitive{
+						Parent:   &JSONArray{},
 						Datatype: String,
 						Key:      "teststring1",
 					},
 					&JSONPrimitive{
+						Parent:   &JSONArray{},
 						Datatype: String,
 						Key:      "teststring2",
 					},
@@ -52,13 +59,16 @@ func TestJSONArray_String(t *testing.T) {
 		{
 			name: "Array Test Only Ints",
 			fields: fields{
-				Key: "testarray",
+				Key:    "testarray",
+				Parent: &JSONObject{},
 				Children: []JSONElement{
 					&JSONPrimitive{
+						Parent:   &JSONArray{},
 						Datatype: Int,
 						Key:      "testint1",
 					},
 					&JSONPrimitive{
+						Parent:   &JSONArray{},
 						Datatype: Int,
 						Key:      "testint2",
 					},
@@ -69,17 +79,20 @@ func TestJSONArray_String(t *testing.T) {
 		{
 			name: "Array Test Arrays",
 			fields: fields{
-				Key: "testarray",
+				Key:    "testarray",
+				Parent: &JSONObject{},
 				Children: []JSONElement{
 					&JSONArray{
 						Key: "Doesn't matter",
 						Children: []JSONElement{
 							&JSONPrimitive{
+								Parent:   &JSONArray{},
 								Datatype: Bool,
 								Key:      "testbool",
 							},
 							&JSONPrimitive{
 								Datatype: Int,
+								Parent:   &JSONArray{},
 								Key:      "testint",
 							},
 						}},
@@ -87,10 +100,12 @@ func TestJSONArray_String(t *testing.T) {
 						Key: "Doesn't matter aswell",
 						Children: []JSONElement{
 							&JSONPrimitive{
+								Parent:   &JSONArray{},
 								Datatype: Bool,
 								Key:      "testbool",
 							},
 							&JSONPrimitive{
+								Parent:   &JSONArray{},
 								Datatype: Int,
 								Key:      "testint",
 							},
@@ -103,16 +118,19 @@ func TestJSONArray_String(t *testing.T) {
 		{
 			name: "Array Test Different Objects",
 			fields: fields{
-				Key: "testarray",
+				Key:    "testarray",
+				Parent: &JSONObject{},
 				Children: []JSONElement{
 					&JSONObject{
 						Key: "Intstringobj",
 						Children: []JSONElement{
 							&JSONPrimitive{
+								Parent:   &JSONArray{},
 								Datatype: Int,
 								Key:      "testint",
 							},
 							&JSONPrimitive{
+								Parent:   &JSONArray{},
 								Datatype: String,
 								Key:      "teststring",
 							},
@@ -122,6 +140,7 @@ func TestJSONArray_String(t *testing.T) {
 						Key: "Boolobj",
 						Children: []JSONElement{
 							&JSONPrimitive{
+								Parent:   &JSONArray{},
 								Datatype: Bool,
 								Key:      "testbool",
 							},
@@ -138,13 +157,16 @@ func TestJSONArray_String(t *testing.T) {
 		{
 			name: "Array Test Different Types Primitive",
 			fields: fields{
-				Key: "testarray",
+				Key:    "testarray",
+				Parent: &JSONObject{},
 				Children: []JSONElement{
 					&JSONPrimitive{
+						Parent:   &JSONArray{},
 						Datatype: Bool,
 						Key:      "testbool",
 					},
 					&JSONPrimitive{
+						Parent:   &JSONArray{},
 						Datatype: Int,
 						Key:      "testint",
 					},
@@ -155,10 +177,12 @@ func TestJSONArray_String(t *testing.T) {
 		{
 			name: "Array Test Different Types Mixed",
 			fields: fields{
-				Key: "testarray",
+				Key:    "testarray",
+				Parent: &JSONObject{},
 				Children: []JSONElement{
 					&JSONPrimitive{
 						Datatype: Bool,
+						Parent:   &JSONArray{},
 						Key:      "testbool",
 					},
 					&JSONObject{
@@ -166,10 +190,12 @@ func TestJSONArray_String(t *testing.T) {
 						Children: []JSONElement{
 							&JSONPrimitive{
 								Datatype: Int,
+								Parent:   &JSONArray{},
 								Key:      "testint",
 							},
 							&JSONPrimitive{
 								Datatype: String,
+								Parent:   &JSONArray{},
 								Key:      "teststring",
 							},
 						},
@@ -183,6 +209,7 @@ func TestJSONArray_String(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			jp := &JSONArray{
 				Key:      tt.fields.Key,
+				Parent:   tt.fields.Parent,
 				Children: tt.fields.Children,
 			}
 			if got := jp.String(); got != tt.want {

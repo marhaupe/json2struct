@@ -6,10 +6,7 @@ import (
 )
 
 func TestString(t *testing.T) {
-	obj := &JSONObject{
-		Key:  "RootObj",
-		Root: true,
-	}
+	obj := &JSONObject{}
 	wanted := "type JSONToStruct struct{\n" +
 		"}\n"
 	got := obj.String()
@@ -18,7 +15,8 @@ func TestString(t *testing.T) {
 	}
 
 	obj = &JSONObject{
-		Key: "testobj",
+		Parent: &JSONObject{},
+		Key:    "testobj",
 	}
 	wanted = "Testobj struct{\n" +
 		"} `json:\"testobj\"`\n"
@@ -28,7 +26,8 @@ func TestString(t *testing.T) {
 	}
 
 	obj = &JSONObject{
-		Key: "testobj",
+		Parent: &JSONObject{},
+		Key:    "testobj",
 	}
 	obj.AddChild(&JSONPrimitive{
 		Key:      "teststring",
@@ -99,7 +98,8 @@ func TestAddChild(t *testing.T) {
 	obj.AddChild(secondObjToAdd)
 
 	mergedObj := &JSONObject{
-		Key: "ToAdd",
+		Parent: obj,
+		Key:    "ToAdd",
 	}
 	mergedObj.AddChild(&JSONPrimitive{
 		Key:      "Testint",

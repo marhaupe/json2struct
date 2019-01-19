@@ -9,6 +9,14 @@ func (jp *JSONPrimitive) GetKey() string {
 	return jp.Key
 }
 
+func (jp *JSONPrimitive) SetParent(p JSONNode) {
+	jp.Parent = p
+}
+
+func (jp *JSONPrimitive) GetParent() JSONNode {
+	return jp.Parent
+}
+
 func (jp *JSONPrimitive) GetDatatype() Datatype {
 	return jp.Datatype
 }

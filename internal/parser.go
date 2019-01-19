@@ -52,22 +52,10 @@ func (p *Parser) parse() {
 	// Parsing root delim accordingly
 	switch r.Token {
 	case json.Delim('{'):
-		p.buildRootObject()
+		p.rootEl = p.parseObject("")
 	case json.Delim('['):
-		p.buildRootArray()
+		p.rootEl = p.parseArray("")
 	}
-}
-
-func (p *Parser) buildRootObject() {
-	obj := p.parseObject("ROOT_OBJECT")
-	obj.Root = true
-	p.rootEl = obj
-}
-
-func (p *Parser) buildRootArray() {
-	arr := p.parseArray("ROOT_ARRAY")
-	arr.Root = true
-	p.rootEl = arr
 }
 
 func (p *Parser) parseObject(objKey string) *ds.JSONObject {
@@ -103,7 +91,8 @@ func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
 		if t.Error != nil {
 			panic(t.Error)
 		}
-		key := generateArrayKeyForToken(t.Token)
+		// key := generateArrayKeyForToken(t.Token)
+		key := ""
 		done := p.buildUpElement(arr, key, t.Token, json.Delim(']'))
 		if done {
 			return arr
