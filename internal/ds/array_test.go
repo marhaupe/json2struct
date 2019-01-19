@@ -228,25 +228,35 @@ func Test_listChildrenTypes(t *testing.T) {
 		args args
 		want int
 	}{
+		// {
+		// 	name: "Two Dif Primitives",
+		// 	args: args{
+		// 		[]JSONElement{
+		// 			&JSONPrimitive{
+		// 				Datatype: String,
+		// 			},
+		// 			&JSONPrimitive{
+		// 				Datatype: Int,
+		// 			},
+		// 		},
+		// 	},
+		// 	want: 2,
+		// },
 		{
 			name: "Different Primitives",
 			args: args{
 				[]JSONElement{
 					&JSONPrimitive{
 						Datatype: Bool,
-						Key:      "Testbool",
 					},
 					&JSONPrimitive{
 						Datatype: String,
-						Key:      "Teststring",
 					},
 					&JSONPrimitive{
 						Datatype: Float,
-						Key:      "Testfloat",
 					},
 					&JSONPrimitive{
 						Datatype: Int,
-						Key:      "Testint",
 					},
 				},
 			},

@@ -23,13 +23,13 @@ func (arr *JSONArray) GetDatatype() Datatype {
 }
 
 func (arr *JSONArray) AddChild(c JSONElement) {
-	if arr.Keys == nil {
-		arr.Keys = make(map[string]bool)
+	if arr.Types == nil {
+		arr.Types = make(map[Datatype]bool)
 	}
-	ckey := c.GetKey()
-	if arr.Keys[ckey] {
+	ctype := c.GetDatatype()
+	if arr.Types[ctype] {
 		for _, child := range arr.Children {
-			if child.GetDatatype() == Object && child.GetKey() == ckey {
+			if child.GetDatatype() == Object && child.GetDatatype() == ctype {
 				err := mergeObjects(c, child)
 				if err != nil {
 					panic(err)
@@ -39,13 +39,12 @@ func (arr *JSONArray) AddChild(c JSONElement) {
 	} else {
 		arr.Children = append(arr.Children, c)
 		c.SetParent(arr)
-		arr.Keys[ckey] = true
+		arr.Types[ctype] = true
 	}
 }
 
 func (arr *JSONArray) String() string {
 	childrenTypeCount := countChildrenTypes(arr.Children)
-	fmt.Println("Children Count", childrenTypeCount)
 	var toString string
 	if childrenTypeCount == 1 {
 		firstChild := arr.Children[0]
@@ -106,12 +105,8 @@ func (arr *JSONArray) stringMultipleTypes() string {
 
 func countChildrenTypes(c []JSONElement) int {
 	foundChildrenTypes := make(map[Datatype]bool)
-	var foundChildren []Datatype
 	for _, entry := range c {
 		foundChildrenTypes[entry.GetDatatype()] = true
-	}
-	for k := range foundChildrenTypes {
-		foundChildren = append(foundChildren, k)
 	}
 	return len(foundChildrenTypes)
 }

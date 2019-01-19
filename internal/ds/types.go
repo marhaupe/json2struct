@@ -35,7 +35,7 @@ type JSONArray struct {
 	Key      string
 	Children []JSONElement
 	Parent   JSONNode
-	Keys     map[string]bool
+	Types    map[Datatype]bool
 }
 
 type JSONPrimitive struct {
