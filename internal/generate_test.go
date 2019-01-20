@@ -4,6 +4,14 @@ import (
 	"testing"
 )
 
+func TestDetectInvalidJson(t *testing.T) {
+	json := `{ "Key": value }`
+	_, err := Generate(json)
+	if err == nil {
+		t.Error("Supplied an invalid JSON that has not been detected as such")
+	}
+}
+
 func setupCases() map[string]string {
 	cases := make(map[string]string)
 
