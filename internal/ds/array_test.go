@@ -170,6 +170,24 @@ func Test_listChildrenTypes(t *testing.T) {
 	}
 }
 
+func TestSetGetParent(t *testing.T) {
+	arr := &JSONArray{}
+	parent := &JSONObject{}
+	arr.SetParent(parent)
+	if !reflect.DeepEqual(arr.GetParent(), parent) {
+		t.Error("Parent has not been set or retrieved properly")
+	}
+}
+
+func TestGetKey(t *testing.T) {
+	arr := &JSONArray{
+		Key: "Testkey",
+	}
+	if arr.GetKey() != arr.Key {
+		t.Error("Key has not been retrieved properly")
+	}
+
+}
 func TestAddChild(t *testing.T) {
 	type TestParams struct {
 		name string
