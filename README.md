@@ -1,7 +1,7 @@
 # json2struct
 
 [![Build Status](https://travis-ci.com/marhaupe/json2struct.svg?branch=master)](https://travis-ci.com/marhaupe/json2struct)
-[![Coverage Status](https://coveralls.io/repos/github/marhaupe/json2struct/badge.svg?branch=master)](https://img.shields.io/coveralls/github/marhaupe/json2struct/master.svg)
+[![Coverage Status](https://coveralls.io/repos/github/marhaupe/json2struct/badge.svg?branch=master)](https://coveralls.io/github/marhaupe/json2struct?branch=master)
 
 This projects aims to make your life a lot easier by automatically generating structs for a given JSON. 
 
