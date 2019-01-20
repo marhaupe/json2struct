@@ -9,39 +9,38 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// JSONString may optionally contain the JSON provided by the user
+var JSONString string
+
 func init() {
-	rootCmd.AddCommand(createCmd)
+	rootCmd.Flags().StringVarP(&JSONString, "string", "s", "", "JSON file as string")
 }
 
 var rootCmd = &cobra.Command{
-	Use:     "json2struct <jsonString>",
-	Short:   "Generate a struct from a JSON string argument",
-	Example: "json2struct \"$(curl \"https://reqres.in/api/users?page=2\")\"",
-	Args:    cobra.ExactArgs(1),
-
-	Run: rootFunc,
+	Use:   "json2struct",
+	Short: "These are all available commands to help you parse JSONs to Go structs",
+	Args:  cobra.ExactArgs(0),
+	Run:   rootFunc,
 }
 
 func rootFunc(cmd *cobra.Command, args []string) {
-	jsonstr := args[0]
-	gen, err := internal.Generate(jsonstr)
+	if JSONString != "" {
+		fmt.Println(generateFromString())
+	} else {
+		fmt.Println(generateFromEditor())
+	}
+}
+
+func generateFromString() string {
+	gen, err := internal.Generate(JSONString)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	fmt.Println(gen)
+	return gen
 }
 
-var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create your JSON in the editor",
-	Long:  "Create your JSON in the editor. Make sure to save the file via :wq or similar",
-	Args:  cobra.ExactArgs(0),
-
-	Run: createFunc,
-}
-
-func createFunc(cmd *cobra.Command, args []string) {
+func generateFromEditor() string {
 	editor := editor.New()
 	editor.Display()
 	jsonstr, err := editor.Consume()
@@ -54,5 +53,5 @@ func createFunc(cmd *cobra.Command, args []string) {
 		fmt.Println(err)
 		os.Exit(3)
 	}
-	fmt.Println(gen)
+	return gen
 }

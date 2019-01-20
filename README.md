@@ -13,22 +13,23 @@ go get github.com/marhaupe/json2struct
 
 ## Usage
 
-### No additional commands:
-Call `json2struct` with the JSON string as an argument. 
+### Base command:
+Calling `json2struct` without arguments opens the superior text editor for unix systems, vim 🤖. Write the JSON you want to parse in there and save and exit - in case you always forget how to do that: `:wq!`.
+
+![Showcase](.github/with_editor.gif)
+
+### Flags:
+Call `json2struct -s` or `json2struct --string` with the JSON string as an argument. 
 
 ```bash
- json2struct "$(curl "https://reqres.in/api/users?page=2")"
+ json2struct -s "$(curl "https://reqres.in/api/users?page=2")"
 ```
 
-![Showcase](.github/showcase.gif)
+![Showcase](.github/direct_input.gif)
 
 
 This option lets you pipe JSONs as input, but does not handle inputting JSONs directly very well since you need to escape quotes and stuff like that.
 
-### Command `create`:
-Calling `json2struct create` opens the superior text editor for unix systems, vim 🤖. Write the JSON you want to parse in there and save and exit - just in case you get stuck: `:wq!`. 
-
-![Showcase](.github/showcase_create.gif)
 ## Lastly
 
 Please feel free to open pull requests for features you miss, stuff that doesn't work, the usual.
