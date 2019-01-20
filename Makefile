@@ -1,10 +1,10 @@
 OUTPUT ?= "./json2struct"
 
 build:
-	CGO_ENABLED=0 go build -a -installsuffix cgo -o $(OUTPUT)
+	go build -o $(OUTPUT)
 
 install: 
-	CGO_ENABLED=0 go install -a -installsuffix cgo
+	go install 
 
 test:
 	go test ./...
