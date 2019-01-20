@@ -1,4 +1,4 @@
-package ds
+package parse
 
 import (
 	"reflect"

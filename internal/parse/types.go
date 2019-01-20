@@ -1,4 +1,4 @@
-package ds
+package parse
 
 type Datatype int
 

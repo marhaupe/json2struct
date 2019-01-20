@@ -1,4 +1,4 @@
-package internal
+package lex
 
 import (
 	"encoding/json"
@@ -8,20 +8,20 @@ import (
 	"sync"
 )
 
-// LexResult is meant to be used as a chan struct to enable sharing
+// Result is meant to be used as a chan struct to enable sharing
 // error messages between goroutines
-type LexResult struct {
+type Result struct {
 	Token json.Token
 	Error error
 }
 
 // Lex consumes a string s containing the JSON object and writes each
 // result containing either the token or the error to c
-func Lex(s string, lr chan LexResult, wg *sync.WaitGroup) {
+func Lex(s string, lr chan Result, wg *sync.WaitGroup) {
 	defer func() {
 		if r := recover(); r != nil {
 			err := fmt.Errorf("%v", r)
-			lr <- LexResult{Error: err, Token: nil}
+			lr <- Result{Error: err, Token: nil}
 			close(lr)
 		}
 	}()
@@ -38,9 +38,9 @@ func Lex(s string, lr chan LexResult, wg *sync.WaitGroup) {
 			break
 		}
 		if err != nil {
-			lr <- LexResult{Token: nil, Error: err}
+			lr <- Result{Token: nil, Error: err}
 		}
-		lr <- LexResult{Token: t, Error: nil}
+		lr <- Result{Token: t, Error: nil}
 	}
 	close(lr)
 }

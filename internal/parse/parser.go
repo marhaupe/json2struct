@@ -1,4 +1,4 @@
-package internal
+package parse
 
 import (
 	"encoding/json"
@@ -6,42 +6,42 @@ import (
 	"math"
 	"sync"
 
-	"github.com/marhaupe/json2struct/internal/ds"
+	"github.com/marhaupe/json2struct/internal/lex"
 )
 
-// Parser contains fields to enable parsing of JSON tokens to
+// parse contains fields to enable parsing of JSON tokens to
 // JSONElements
-type Parser struct {
-	rootEl ds.JSONNode
-	lr     chan LexResult
+type parse struct {
+	rootEl JSONNode
+	lr     chan lex.Result
 	wg     *sync.WaitGroup
 }
 
-// ParseResult is meant to be used as a chan struct to enable sharing
+// Result is meant to be used as a chan struct to enable sharing
 // error messages between goroutines
-type ParseResult struct {
-	Node  ds.JSONNode
+type Result struct {
+	Node  JSONNode
 	Error error
 }
 
 // Parse parses JSON tokens received from chan lr and writes either the resulting
 // error or the parsed JSONNode to chan pr
-func Parse(pr chan ParseResult, lr chan LexResult, wg *sync.WaitGroup) {
+func Parse(pr chan Result, lr chan lex.Result, wg *sync.WaitGroup) {
 	defer func() {
 		if r := recover(); r != nil {
 			err := fmt.Errorf("%v", r)
-			pr <- ParseResult{Node: nil, Error: err}
+			pr <- Result{Node: nil, Error: err}
 			close(pr)
 		}
 	}()
 
-	p := Parser{lr: lr, wg: wg}
+	p := parse{lr: lr, wg: wg}
 	p.parse()
-	pr <- ParseResult{Node: p.rootEl, Error: nil}
+	pr <- Result{Node: p.rootEl, Error: nil}
 	close(pr)
 }
 
-func (p *Parser) parse() {
+func (p *parse) parse() {
 	defer p.wg.Done()
 
 	// Consuming first Token, { or [
@@ -58,8 +58,8 @@ func (p *Parser) parse() {
 	}
 }
 
-func (p *Parser) parseObject(objKey string) *ds.JSONObject {
-	obj := &ds.JSONObject{Key: objKey}
+func (p *parse) parseObject(objKey string) *JSONObject {
+	obj := &JSONObject{Key: objKey}
 	var key string
 	for r := range p.lr {
 		if r.Error != nil {
@@ -84,8 +84,8 @@ func (p *Parser) parseObject(objKey string) *ds.JSONObject {
 	return obj
 }
 
-func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
-	arr := &ds.JSONArray{Key: arrKey}
+func (p *parse) parseArray(arrKey string) *JSONArray {
+	arr := &JSONArray{Key: arrKey}
 
 	for t := range p.lr {
 		if t.Error != nil {
@@ -100,7 +100,7 @@ func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
 	return arr
 }
 
-func (p *Parser) buildUpElement(node ds.JSONNode, key string, t json.Token, closing json.Delim) bool {
+func (p *parse) buildUpElement(node JSONNode, key string, t json.Token, closing json.Delim) bool {
 	switch t {
 	case closing:
 		return true
@@ -114,27 +114,27 @@ func (p *Parser) buildUpElement(node ds.JSONNode, key string, t json.Token, clos
 	return false
 }
 
-func (p *Parser) parsePrimitive(key string, value json.Token) *ds.JSONPrimitive {
-	prim := &ds.JSONPrimitive{Key: key}
+func (p *parse) parsePrimitive(key string, value json.Token) *JSONPrimitive {
+	prim := &JSONPrimitive{Key: key}
 	prim.Datatype = detectPrimitiveType(value)
 	return prim
 }
 
-func detectPrimitiveType(t json.Token) ds.Datatype {
+func detectPrimitiveType(t json.Token) Datatype {
 	switch t.(type) {
 	case float64:
 		if t == math.Trunc(t.(float64)) {
-			return ds.Int
+			return Int
 		}
-		return ds.Float
+		return Float
 	case string:
-		return ds.String
+		return String
 	case bool:
-		return ds.Bool
+		return Bool
 	case nil:
-		return ds.Null
+		return Null
 	default:
 		fmt.Printf("Could not determine datatype of field with value %v\n", t)
-		return ds.String
+		return String
 	}
 }
