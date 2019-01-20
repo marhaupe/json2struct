@@ -91,7 +91,6 @@ func (p *Parser) parseArray(arrKey string) *ds.JSONArray {
 		if t.Error != nil {
 			panic(t.Error)
 		}
-		// key := generateArrayKeyForToken(t.Token)
 		key := ""
 		done := p.buildUpElement(arr, key, t.Token, json.Delim(']'))
 		if done {
@@ -113,32 +112,6 @@ func (p *Parser) buildUpElement(node ds.JSONNode, key string, t json.Token, clos
 		node.AddChild(p.parsePrimitive(key, t))
 	}
 	return false
-}
-
-func generateArrayKeyForToken(t json.Token) string {
-	switch t {
-	// These delims will get detected as keys
-	case json.Delim('}'), json.Delim(']'):
-		return "closing_delim"
-	case json.Delim('{'):
-		return "object_in_array"
-	case json.Delim('['):
-		return "array_in_array"
-	default:
-		switch detectPrimitiveType(t) {
-		case ds.String:
-			return "string_in_array"
-		case ds.Bool:
-			return "bool_in_array"
-		case ds.Float:
-			return "float_in_array"
-		case ds.Int:
-			return "int_in_array"
-		case ds.Null:
-			return "null_in_array"
-		}
-	}
-	panic(fmt.Sprintf("Error generating key for token %v", t))
 }
 
 func (p *Parser) parsePrimitive(key string, value json.Token) *ds.JSONPrimitive {

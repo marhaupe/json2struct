@@ -1,116 +1,142 @@
 package ds
 
 import (
-	"reflect"
 	"testing"
 )
 
 func TestString(t *testing.T) {
-	obj := &JSONObject{}
-	wanted := "type JSONToStruct struct{\n" +
-		"}\n"
-	got := obj.String()
-	if got != wanted {
-		t.Errorf("Failed Test %v\ngot:\n%v\nwanted:\n%v", t.Name(), got, wanted)
+	type TestParams struct {
+		name string
+		got  string
+		want string
 	}
-
-	obj = &JSONObject{
-		Parent: &JSONObject{},
-		Key:    "testobj",
+	tests := []func() TestParams{
+		func() TestParams {
+			obj := &JSONObject{
+				Parent: &JSONObject{},
+				Key:    "testobj",
+			}
+			wanted := "Testobj struct{\n" +
+				"} `json:\"testobj\"`\n"
+			got := obj.String()
+			return TestParams{
+				got:  got,
+				want: wanted,
+				name: "Plain Object",
+			}
+		},
+		func() TestParams {
+			obj := &JSONObject{}
+			wanted := "type JSONToStruct struct{\n" +
+				"}\n"
+			got := obj.String()
+			return TestParams{
+				got:  got,
+				want: wanted,
+				name: "Plain Root Object",
+			}
+		},
+		func() TestParams {
+			obj := &JSONObject{
+				Parent: &JSONObject{},
+				Key:    "testobj",
+			}
+			obj.AddChild(&JSONPrimitive{
+				Key:      "teststring",
+				Datatype: String,
+			})
+			wanted := "Testobj struct{\n" +
+				"Teststring string `json:\"teststring\"`\n" +
+				"} `json:\"testobj\"`\n"
+			got := obj.String()
+			return TestParams{
+				got:  got,
+				want: wanted,
+				name: "Object With Primitive",
+			}
+		},
+		func() TestParams {
+			obj := &JSONObject{}
+			wanted := "type JSONToStruct struct{\n" +
+				"}\n"
+			got := obj.String()
+			return TestParams{
+				got:  got,
+				want: wanted,
+				name: "Plain Object",
+			}
+		},
 	}
-	wanted = "Testobj struct{\n" +
-		"} `json:\"testobj\"`\n"
-	got = obj.String()
-	if got != wanted {
-		t.Errorf("Failed Test %v\ngot:\n%v\nwanted:\n%v", t.Name(), got, wanted)
-	}
-
-	obj = &JSONObject{
-		Parent: &JSONObject{},
-		Key:    "testobj",
-	}
-	obj.AddChild(&JSONPrimitive{
-		Key:      "teststring",
-		Datatype: String,
-	})
-	wanted = "Testobj struct{\n" +
-		"Teststring string `json:\"teststring\"`\n" +
-		"} `json:\"testobj\"`\n"
-	got = obj.String()
-	if got != wanted {
-		t.Errorf("Failed Test %v\ngot:\n%v\nwanted:\n%v", t.Name(), got, wanted)
+	for _, test := range tests {
+		testcase := test()
+		if testcase.got != testcase.want {
+			t.Errorf("Test = %v Got = %v, want = %v", testcase.name, testcase.got, testcase.want)
+		}
 	}
 }
-func TestAddChild(t *testing.T) {
-	obj := &JSONObject{
-		Key: "Testobj",
+func TestAddChildVarious(t *testing.T) {
+	type TestParams struct {
+		name string
+		got  JSONElement
+		want JSONElement
 	}
-	objToAdd := &JSONObject{
-		Key: "ToAdd",
+	tests := []func() TestParams{
+		func() TestParams {
+			obj := &JSONObject{
+				Key: "Testobj",
+			}
+			objToAdd := &JSONObject{
+				Key: "ToAdd",
+			}
+			obj.AddChild(objToAdd)
+			return TestParams{
+				name: "Add object to object",
+				want: objToAdd,
+				got:  obj.Children[0],
+			}
+		},
+		func() TestParams {
+			obj := &JSONObject{
+				Key: "Testobj",
+			}
+			childObj1 := &JSONObject{
+				Key: "Testobj",
+			}
+			childObj1.AddChild(&JSONPrimitive{
+				Key:      "Teststring",
+				Datatype: String,
+			})
+			childObj2 := &JSONObject{
+				Key: "Testobj",
+			}
+			childObj2.AddChild(&JSONPrimitive{
+				Key:      "Testint",
+				Datatype: Int,
+			})
+			obj.AddChild(childObj1)
+			obj.AddChild(childObj2)
+
+			if len(obj.Children) != 1 {
+				t.Error("childobj2 has been added but should have been merged")
+			}
+			got, ok := obj.Children[0].(*JSONObject)
+			if !ok {
+				t.Error("Casting child to object failed")
+			}
+			if len(got.Children) != 2 {
+				t.Error("Children count is not two")
+			}
+			if got.Children[0].GetDatatype() != String && got.Children[0].GetKey() != "Teststring" ||
+				got.Children[1].GetDatatype() != Int && got.Children[1].GetKey() != "Testint" {
+				t.Error("Objects have not been merged the right way")
+			}
+			return TestParams{}
+		},
 	}
-
-	// Looks like this:
-	// {
-	// 		"Testobj" : {
-	// 			"ToAdd": {}
-	// 		}
-	// }
-	obj.AddChild(objToAdd)
-	if !reflect.DeepEqual(obj.Children[0], objToAdd) {
-		t.Errorf("Added object to object the wrong way")
-	}
-
-	// Looks like this:
-	// {
-	// 		"Testobj" : {
-	// 			"ToAdd": {
-	// 					"Testint": 0,
-	//      }
-	// 		}
-	// }
-	objToAdd.AddChild(&JSONPrimitive{
-		Key:      "Testint",
-		Datatype: Int,
-	})
-	if !reflect.DeepEqual(obj.Children[0], objToAdd) {
-		t.Errorf("Added primitive to nested object the wrong way")
-	}
-
-	// Looks like this:
-	// {
-	// 		"Testobj" : {
-	// 			"ToAdd": {
-	// 					"Testint": 0,
-	//      },
-	//			"ToAdd": {
-	//			    "Testbool": false,
-	//		  }
-	// 		}
-	// }
-	secondObjToAdd := &JSONObject{
-		Key: "ToAdd",
-	}
-	secondObjToAdd.AddChild(&JSONPrimitive{
-		Key:      "Testbool",
-		Datatype: Bool,
-	})
-
-	obj.AddChild(secondObjToAdd)
-
-	mergedObj := &JSONObject{
-		Parent: obj,
-		Key:    "ToAdd",
-	}
-	mergedObj.AddChild(&JSONPrimitive{
-		Key:      "Testint",
-		Datatype: Int,
-	})
-	mergedObj.AddChild(&JSONPrimitive{
-		Key:      "Testbool",
-		Datatype: Bool,
-	})
-
-	if !reflect.DeepEqual(obj.Children[0], mergedObj) {
-		t.Errorf("Failed to correctly merge objects\ngot:\n%v\nwanted:\n%v\n", mergedObj, obj.Children[0])
+	for _, test := range tests {
+		testcase := test()
+		if testcase.got != testcase.want {
+			t.Errorf("Test = %v Got = %v, want = %v", testcase.name, testcase.got, testcase.want)
+		}
 	}
 }
