@@ -7,7 +7,7 @@ install:
 	go install 
 
 test:
-	go test
+	go test ./...
 
 testrace:
 	go test -race ./...
