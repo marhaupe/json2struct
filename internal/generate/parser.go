@@ -74,7 +74,7 @@ func (p *Parser) parseObject(objKey string) *tree.JSONObject {
 				return obj
 			}
 		} else {
-			done := p.buildUpElement(obj, key, r.Token, json.Delim('}'))
+			done := p.buildUpElement(obj, key, r.Token)
 			if done {
 				return obj
 			}
@@ -92,7 +92,7 @@ func (p *Parser) parseArray(arrKey string) *tree.JSONArray {
 			panic(t.Error)
 		}
 		key := ""
-		done := p.buildUpElement(arr, key, t.Token, json.Delim(']'))
+		done := p.buildUpElement(arr, key, t.Token)
 		if done {
 			return arr
 		}
@@ -100,9 +100,9 @@ func (p *Parser) parseArray(arrKey string) *tree.JSONArray {
 	return arr
 }
 
-func (p *Parser) buildUpElement(node tree.JSONNode, key string, t json.Token, closing json.Delim) bool {
+func (p *Parser) buildUpElement(node tree.JSONNode, key string, t json.Token) (done bool) {
 	switch t {
-	case closing:
+	case json.Delim('}'), json.Delim(']'):
 		return true
 	case json.Delim('{'):
 		node.AddChild(p.parseObject(key))
