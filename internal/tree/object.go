@@ -29,10 +29,9 @@ func (obj *JSONObject) AddChild(c JSONElement) {
 	if obj.Keys[ckey] {
 		for _, child := range obj.Children {
 			if child.GetDatatype() == Object && child.GetKey() == ckey {
-				err := mergeObjects(c, child)
-				if err != nil {
-					panic(err)
-				}
+				childObj := child.(*JSONObject)
+				cObj := c.(*JSONObject)
+				mergeObjects(cObj, childObj)
 			}
 		}
 	} else {

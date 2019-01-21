@@ -1,7 +1,6 @@
 package tree
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -27,13 +26,12 @@ func (arr *JSONArray) AddChild(c JSONElement) {
 		arr.Types = make(map[Datatype]bool)
 	}
 	ctype := c.GetDatatype()
-	if arr.Types[ctype] {
+	if arr.Types[ctype] && ctype == Object {
 		for _, child := range arr.Children {
-			if child.GetDatatype() == Object && child.GetDatatype() == ctype {
-				err := mergeObjects(c, child)
-				if err != nil {
-					panic(err)
-				}
+			if child.GetDatatype() == Object {
+				childObj := child.(*JSONObject)
+				cObj := c.(*JSONObject)
+				mergeObjects(cObj, childObj)
 			}
 		}
 	} else {
@@ -111,14 +109,8 @@ func countChildrenTypes(c []JSONElement) int {
 	return len(foundChildrenTypes)
 }
 
-func mergeObjects(source JSONElement, target JSONElement) error {
-	objToAdd, ok := source.(*JSONObject)
-	if !ok {
-		return errors.New("Error parsing JSONElement to *JSONObject")
+func mergeObjects(source *JSONObject, target *JSONObject) {
+	for _, child := range source.Children {
+		target.AddChild(child)
 	}
-	childObj, ok := target.(*JSONObject)
-	for _, child := range objToAdd.Children {
-		childObj.AddChild(child)
-	}
-	return nil
 }
