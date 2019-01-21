@@ -105,7 +105,7 @@ func TestJSONPrimitive(t *testing.T) {
 	}
 }
 
-func TestGetParent(t *testing.T) {
+func TestGetParentPrimitives(t *testing.T) {
 	prim := &JSONPrimitive{
 		Key:      "Test",
 		Datatype: String,

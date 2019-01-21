@@ -1,8 +1,18 @@
 package tree
 
 import (
+	"reflect"
 	"testing"
 )
+
+func TestGetParentObjects(t *testing.T) {
+	obj := &JSONObject{}
+	root := &JSONObject{}
+	root.AddChild(obj)
+	if !reflect.DeepEqual(obj.GetParent(), root) {
+		t.Error("Parent has not been set or retrieved properly")
+	}
+}
 
 func TestString(t *testing.T) {
 	type TestParams struct {

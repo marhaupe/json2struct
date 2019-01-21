@@ -5,6 +5,83 @@ import (
 	"testing"
 )
 
+func TestStringRootArray(t *testing.T) {
+	type TestParams struct {
+		name string
+		got  string
+		want string
+	}
+	tests := []func() TestParams{
+		func() TestParams {
+			rootArr := &JSONArray{}
+			childPrimitive := &JSONPrimitive{
+				Datatype: String,
+			}
+			rootArr.AddChild(childPrimitive)
+			return TestParams{
+				got:  rootArr.String(),
+				want: "type JSONToStruct []string",
+				name: "With Child String Primitives",
+			}
+		},
+		func() TestParams {
+			rootArr := &JSONArray{}
+			childString := &JSONPrimitive{
+				Datatype: String,
+			}
+			childInt := &JSONPrimitive{
+				Datatype: Int,
+			}
+			rootArr.AddChild(childInt)
+			rootArr.AddChild(childString)
+			return TestParams{
+				got:  rootArr.String(),
+				want: "type JSONToStruct []interface{}",
+				name: "With Child String Primitives",
+			}
+		},
+		func() TestParams {
+			rootArr := &JSONArray{}
+			childArray := &JSONArray{}
+			rootArr.AddChild(childArray)
+			return TestParams{
+				got:  rootArr.String(),
+				want: "type JSONToStruct []interface{}",
+				name: "With Child Array",
+			}
+		},
+		func() TestParams {
+			rootArr := &JSONArray{}
+			childObj := &JSONObject{}
+			nullPrim := &JSONPrimitive{
+				Key:      "Testnull",
+				Datatype: Null,
+			}
+			stringPrim := &JSONPrimitive{
+				Key:      "Teststring",
+				Datatype: String,
+			}
+			childObj.AddChild(nullPrim)
+			childObj.AddChild(stringPrim)
+			rootArr.AddChild(childObj)
+			return TestParams{
+				got: rootArr.String(),
+				want: "type JSONToStruct []struct{\n" +
+					"Testnull interface{} `json:\"Testnull\"`\n" +
+					"Teststring string `json:\"Teststring\"`\n" +
+					"}\n",
+				name: "With Child Object",
+			}
+		},
+	}
+	for _, test := range tests {
+		testcase := test()
+		if testcase.got != testcase.want {
+			t.Errorf("Test = %v Got = %v, want = %v", testcase.name, testcase.got, testcase.want)
+		}
+	}
+}
+
 func TestStringNodes(t *testing.T) {
 	type TestParams struct {
 		name string
@@ -170,7 +247,7 @@ func Test_listChildrenTypes(t *testing.T) {
 	}
 }
 
-func TestSetGetParent(t *testing.T) {
+func TestSetGetParentArray(t *testing.T) {
 	arr := &JSONArray{}
 	parent := &JSONObject{}
 	arr.SetParent(parent)
@@ -179,7 +256,7 @@ func TestSetGetParent(t *testing.T) {
 	}
 }
 
-func TestGetKey(t *testing.T) {
+func TestGetKeyArray(t *testing.T) {
 	arr := &JSONArray{
 		Key: "Testkey",
 	}
@@ -279,8 +356,8 @@ func TestAddPrimitives(t *testing.T) {
 
 	// Adding same datatype again. The child should not be added
 	arr.AddChild(sprim)
-	if len(arr.Children) != 1 {
-		t.Error("sprim was added again but should not have been")
+	if len(arr.Children) != 2 {
+		t.Error("sprim was not added again but should have been")
 	}
 
 	bprim := &JSONPrimitive{
@@ -288,10 +365,10 @@ func TestAddPrimitives(t *testing.T) {
 		Datatype: Bool,
 	}
 	arr.AddChild(bprim)
-	if len(arr.Children) != 2 {
+	if len(arr.Children) != 3 {
 		t.Error("brim has not been added")
 	}
-	if !reflect.DeepEqual(arr.Children[1], bprim) {
+	if !reflect.DeepEqual(arr.Children[2], bprim) {
 		t.Error("brim has not been added the right way")
 	}
 }
