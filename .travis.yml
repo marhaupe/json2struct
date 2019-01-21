@@ -1,8 +1,5 @@
 language: go
 
-before_install:
-  - go get github.com/mattn/goveralls
-
 script:
   - go test -race -coverprofile=coverage.txt -covermode=atomic ./...
 
