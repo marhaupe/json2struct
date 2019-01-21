@@ -1,6 +1,9 @@
 package tree
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestJSONPrimitive_Panic(t *testing.T) {
 
@@ -73,6 +76,14 @@ func TestJSONPrimitive(t *testing.T) {
 			want: "Key string `json:\"key\"`\n",
 		},
 		{
+			name: "Basic Null",
+			fields: fields{
+				Key:  "key",
+				Type: Null,
+			},
+			want: "Key interface{} `json:\"key\"`\n",
+		},
+		{
 			name: "Basic Float",
 			fields: fields{
 				Key:  "key",
@@ -91,5 +102,19 @@ func TestJSONPrimitive(t *testing.T) {
 				t.Errorf("JSONPrimitive.String() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestGetParent(t *testing.T) {
+	prim := &JSONPrimitive{
+		Key:      "Test",
+		Datatype: String,
+	}
+	parent := &JSONObject{
+		Key: "Testobject",
+	}
+	parent.AddChild(prim)
+	if !reflect.DeepEqual(prim.GetParent(), parent) {
+		t.Error("Parent has not been set or retrieved properly")
 	}
 }
