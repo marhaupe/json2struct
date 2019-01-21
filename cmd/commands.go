@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/marhaupe/json2struct/internal"
 	"github.com/marhaupe/json2struct/internal/editor"
+	"github.com/marhaupe/json2struct/internal/generate"
 	"github.com/spf13/cobra"
 )
 
