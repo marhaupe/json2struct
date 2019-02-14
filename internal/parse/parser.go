@@ -1,3 +1,5 @@
+// Package parse provides fields to enable the parsing of a JSON, meant to be used in
+// conjunction with package lex
 package parse
 
 import (
@@ -10,43 +12,42 @@ import (
 	"github.com/marhaupe/json2struct/internal/lex"
 )
 
-// Parser contains fields to enable parsing of JSON tokens to
-// JSONElements
+// Parser contains fields to enable parsing of JSON tokens to an ast
 type Parser struct {
-	rootEl ast.JSONNode
-	lr     chan lex.Result
+	rootEl ast.Node
+	lexRes chan lex.Result
 	wg     *sync.WaitGroup
 }
 
-// Result is meant to be used as a chan struct to enable sharing
-// error messages between goroutines
+// Result is the result of a the parsing of JSON. It either contains Node, representing
+// the root JSON node and thus the root of the ast, or an error
 type Result struct {
-	Node  ast.JSONNode
+	Node  ast.Node
 	Error error
 }
 
-// Parse parses JSON tokens received from chan lr and writes either the resulting
-// error or the parsed JSONNode to chan pr
-func Parse(pr chan Result, lr chan lex.Result, wg *sync.WaitGroup) {
+// Parse parses JSON tokens received from lexRes and writes either the resulting error
+// or the parsed tree to parseRes
+func Parse(parseRes chan Result, lexRes chan lex.Result, wg *sync.WaitGroup) {
 	defer func() {
 		if r := recover(); r != nil {
 			err := fmt.Errorf("%v", r)
-			pr <- Result{Node: nil, Error: err}
-			close(pr)
+			parseRes <- Result{Node: nil, Error: err}
+			close(parseRes)
 		}
 	}()
 
-	p := Parser{lr: lr, wg: wg}
+	p := Parser{lexRes: lexRes, wg: wg}
 	p.parse()
-	pr <- Result{Node: p.rootEl, Error: nil}
-	close(pr)
+	parseRes <- Result{Node: p.rootEl, Error: nil}
+	close(parseRes)
 }
 
 func (p *Parser) parse() {
 	defer p.wg.Done()
 
 	// Consuming first Token, { or [
-	r := <-p.lr
+	r := <-p.lexRes
 	if r.Error != nil {
 		panic(r.Error)
 	}
@@ -62,7 +63,7 @@ func (p *Parser) parse() {
 func (p *Parser) parseObject(objKey string) *ast.JSONObject {
 	obj := &ast.JSONObject{Key: objKey}
 	var key string
-	for r := range p.lr {
+	for r := range p.lexRes {
 		if r.Error != nil {
 			panic(r.Error)
 		}
@@ -88,7 +89,7 @@ func (p *Parser) parseObject(objKey string) *ast.JSONObject {
 func (p *Parser) parseArray(arrKey string) *ast.JSONArray {
 	arr := &ast.JSONArray{Key: arrKey}
 
-	for t := range p.lr {
+	for t := range p.lexRes {
 		if t.Error != nil {
 			panic(t.Error)
 		}
@@ -101,7 +102,7 @@ func (p *Parser) parseArray(arrKey string) *ast.JSONArray {
 	return arr
 }
 
-func (p *Parser) buildUpElement(node ast.JSONNode, key string, t json.Token) (done bool) {
+func (p *Parser) buildUpElement(node ast.Node, key string, t json.Token) (done bool) {
 	switch t {
 	case json.Delim('}'), json.Delim(']'):
 		return true

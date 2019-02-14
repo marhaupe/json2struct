@@ -37,7 +37,7 @@ func TestJSONPrimitive_Panic(t *testing.T) {
 					t.Error("Program should have panicked because of invalid Ptype")
 				}
 			}()
-			jp.String()
+			_ = jp.String()
 		})
 	}
 }

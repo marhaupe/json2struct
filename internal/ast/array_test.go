@@ -208,7 +208,7 @@ func TestStringPrimitives(t *testing.T) {
 
 func Test_listChildrenTypes(t *testing.T) {
 	type args struct {
-		c []JSONElement
+		c []Element
 	}
 	tests := []struct {
 		name string
@@ -218,7 +218,7 @@ func Test_listChildrenTypes(t *testing.T) {
 		{
 			name: "Different Primitives",
 			args: args{
-				[]JSONElement{
+				[]Element{
 					&JSONPrimitive{
 						Datatype: Bool,
 					},
@@ -268,8 +268,8 @@ func TestGetKeyArray(t *testing.T) {
 func TestAddChild(t *testing.T) {
 	type TestParams struct {
 		name string
-		got  JSONElement
-		want JSONElement
+		got  Element
+		want Element
 	}
 	tests := []func() TestParams{
 		func() TestParams {

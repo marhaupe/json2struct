@@ -1,3 +1,5 @@
+// Package lex provides fields to enable the tokenization of a JSON, meant to be
+// used in conjunction with package parse.
 package lex
 
 import (
@@ -8,21 +10,21 @@ import (
 	"sync"
 )
 
-// Result is meant to be used as a chan struct to enable sharing
-// error messages between goroutines
+// Result is the result of a the lexing of JSON. It either contains Result, representing
+// a json.Token like { or }, or and error
 type Result struct {
 	Token json.Token
 	Error error
 }
 
 // Lex consumes a string s containing the JSON object and writes each
-// result containing either the token or the error to c
-func Lex(s string, lr chan Result, wg *sync.WaitGroup) {
+// result containing either the token or the error to lexRes
+func Lex(s string, lexRes chan Result, wg *sync.WaitGroup) {
 	defer func() {
 		if r := recover(); r != nil {
 			err := fmt.Errorf("%v", r)
-			lr <- Result{Error: err, Token: nil}
-			close(lr)
+			lexRes <- Result{Error: err, Token: nil}
+			close(lexRes)
 		}
 	}()
 	defer wg.Done()
@@ -38,9 +40,9 @@ func Lex(s string, lr chan Result, wg *sync.WaitGroup) {
 			break
 		}
 		if err != nil {
-			lr <- Result{Token: nil, Error: err}
+			lexRes <- Result{Token: nil, Error: err}
 		}
-		lr <- Result{Token: t, Error: nil}
+		lexRes <- Result{Token: t, Error: nil}
 	}
-	close(lr)
+	close(lexRes)
 }

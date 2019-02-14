@@ -87,8 +87,8 @@ func TestString(t *testing.T) {
 func TestAddChildVarious(t *testing.T) {
 	type TestParams struct {
 		name string
-		got  JSONElement
-		want JSONElement
+		got  Element
+		want Element
 	}
 	tests := []func() TestParams{
 		func() TestParams {

@@ -5,23 +5,32 @@ import (
 	"strings"
 )
 
-func (arr *JSONArray) SetParent(p JSONNode) {
+// SetParent sets p as the parent node of arr
+func (arr *JSONArray) SetParent(p Node) {
 	arr.Parent = p
 }
 
-func (arr *JSONArray) GetParent() JSONNode {
+// GetParent returns the parent node of arr
+func (arr *JSONArray) GetParent() Node {
 	return arr.Parent
 }
 
+// GetKey returns the key of arr
 func (arr *JSONArray) GetKey() string {
 	return arr.Key
 }
 
+// GetDatatype returns the datatype (Object, Array, Int, String, Float, Bool or Null)
+// of arr
 func (arr *JSONArray) GetDatatype() Datatype {
 	return Array
 }
 
-func (arr *JSONArray) AddChild(c JSONElement) {
+// AddChild adds c to the children of arr and adds arr as parent of c.
+// If an child with the same key exists, the child will not be added,
+// with the exception of both children being objects. Only then both
+// objects will get merged into each other
+func (arr *JSONArray) AddChild(c Element) {
 	if arr.Types == nil {
 		arr.Types = make(map[Datatype]bool)
 	}
@@ -41,6 +50,7 @@ func (arr *JSONArray) AddChild(c JSONElement) {
 	}
 }
 
+// String returns Go Code ready for unmarshalling
 func (arr *JSONArray) String() string {
 	childrenTypeCount := countChildrenTypes(arr.Children)
 	var toString string
@@ -101,7 +111,7 @@ func (arr *JSONArray) stringMultipleTypes() string {
 	return fmt.Sprintf("%s []interface{} `json:\"%s\"`\n", strings.Title(arr.Key), arr.Key)
 }
 
-func countChildrenTypes(c []JSONElement) int {
+func countChildrenTypes(c []Element) int {
 	foundChildrenTypes := make(map[Datatype]bool)
 	for _, entry := range c {
 		foundChildrenTypes[entry.GetDatatype()] = true
