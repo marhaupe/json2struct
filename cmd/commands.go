@@ -32,7 +32,7 @@ func rootFunc(cmd *cobra.Command, args []string) {
 }
 
 func generateFromString() string {
-	gen, err := internal.Generate(JSONString)
+	gen, err := generate.Generate(JSONString)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -48,7 +48,7 @@ func generateFromEditor() string {
 		fmt.Println("Error while reading from VIM", err)
 		os.Exit(2)
 	}
-	gen, err := internal.Generate(jsonstr)
+	gen, err := generate.Generate(jsonstr)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(3)

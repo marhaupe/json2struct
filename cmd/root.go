@@ -1,3 +1,4 @@
+// Package cmd contains fields to configure the cli tool shipped with json2struct
 package cmd
 
 import "fmt"

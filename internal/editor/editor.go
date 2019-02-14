@@ -1,3 +1,5 @@
+// Package editor contains fields to create, edit, save and then delete files
+// with currently only vim
 package editor
 
 import (
