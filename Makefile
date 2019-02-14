@@ -1,7 +1,7 @@
-OUTPUT ?= "./json2struct"
+output ?= "json2struct"
 
 build:
-	go build -o $(OUTPUT)
+	go build -o $(output)
 
 install: 
 	go install 
