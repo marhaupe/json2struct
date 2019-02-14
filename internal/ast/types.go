@@ -1,4 +1,4 @@
-package tree
+package ast
 
 type Datatype int
 

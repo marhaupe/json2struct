@@ -1,4 +1,4 @@
-package internal
+package parse
 
 import (
 	"encoding/json"
@@ -6,38 +6,39 @@ import (
 	"math"
 	"sync"
 
-	"github.com/marhaupe/json2struct/internal/tree"
+	"github.com/marhaupe/json2struct/internal/ast"
+	"github.com/marhaupe/json2struct/internal/lex"
 )
 
 // Parser contains fields to enable parsing of JSON tokens to
 // JSONElements
 type Parser struct {
-	rootEl tree.JSONNode
-	lr     chan LexResult
+	rootEl ast.JSONNode
+	lr     chan lex.Result
 	wg     *sync.WaitGroup
 }
 
-// ParseResult is meant to be used as a chan struct to enable sharing
+// Result is meant to be used as a chan struct to enable sharing
 // error messages between goroutines
-type ParseResult struct {
-	Node  tree.JSONNode
+type Result struct {
+	Node  ast.JSONNode
 	Error error
 }
 
 // Parse parses JSON tokens received from chan lr and writes either the resulting
 // error or the parsed JSONNode to chan pr
-func Parse(pr chan ParseResult, lr chan LexResult, wg *sync.WaitGroup) {
+func Parse(pr chan Result, lr chan lex.Result, wg *sync.WaitGroup) {
 	defer func() {
 		if r := recover(); r != nil {
 			err := fmt.Errorf("%v", r)
-			pr <- ParseResult{Node: nil, Error: err}
+			pr <- Result{Node: nil, Error: err}
 			close(pr)
 		}
 	}()
 
 	p := Parser{lr: lr, wg: wg}
 	p.parse()
-	pr <- ParseResult{Node: p.rootEl, Error: nil}
+	pr <- Result{Node: p.rootEl, Error: nil}
 	close(pr)
 }
 
@@ -58,8 +59,8 @@ func (p *Parser) parse() {
 	}
 }
 
-func (p *Parser) parseObject(objKey string) *tree.JSONObject {
-	obj := &tree.JSONObject{Key: objKey}
+func (p *Parser) parseObject(objKey string) *ast.JSONObject {
+	obj := &ast.JSONObject{Key: objKey}
 	var key string
 	for r := range p.lr {
 		if r.Error != nil {
@@ -84,8 +85,8 @@ func (p *Parser) parseObject(objKey string) *tree.JSONObject {
 	return obj
 }
 
-func (p *Parser) parseArray(arrKey string) *tree.JSONArray {
-	arr := &tree.JSONArray{Key: arrKey}
+func (p *Parser) parseArray(arrKey string) *ast.JSONArray {
+	arr := &ast.JSONArray{Key: arrKey}
 
 	for t := range p.lr {
 		if t.Error != nil {
@@ -100,7 +101,7 @@ func (p *Parser) parseArray(arrKey string) *tree.JSONArray {
 	return arr
 }
 
-func (p *Parser) buildUpElement(node tree.JSONNode, key string, t json.Token) (done bool) {
+func (p *Parser) buildUpElement(node ast.JSONNode, key string, t json.Token) (done bool) {
 	switch t {
 	case json.Delim('}'), json.Delim(']'):
 		return true
@@ -114,27 +115,27 @@ func (p *Parser) buildUpElement(node tree.JSONNode, key string, t json.Token) (d
 	return false
 }
 
-func (p *Parser) parsePrimitive(key string, value json.Token) *tree.JSONPrimitive {
-	prim := &tree.JSONPrimitive{Key: key}
+func (p *Parser) parsePrimitive(key string, value json.Token) *ast.JSONPrimitive {
+	prim := &ast.JSONPrimitive{Key: key}
 	prim.Datatype = detectPrimitiveType(value)
 	return prim
 }
 
-func detectPrimitiveType(t json.Token) tree.Datatype {
+func detectPrimitiveType(t json.Token) ast.Datatype {
 	switch t.(type) {
 	case float64:
 		if t == math.Trunc(t.(float64)) {
-			return tree.Int
+			return ast.Int
 		}
-		return tree.Float
+		return ast.Float
 	case string:
-		return tree.String
+		return ast.String
 	case bool:
-		return tree.Bool
+		return ast.Bool
 	case nil:
-		return tree.Null
+		return ast.Null
 	default:
 		fmt.Printf("Could not determine datatype of field with value %v\n", t)
-		return tree.String
+		return ast.String
 	}
 }
