@@ -1,4 +1,5 @@
-package internal
+// Package generate contains fields to generate a Go struct from a given JSON string
+package generate
 
 import (
 	"fmt"
