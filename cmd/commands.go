@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/marhaupe/json2struct/internal/editor"
@@ -12,8 +13,12 @@ import (
 // JSONString may optionally contain the JSON provided by the user
 var JSONString string
 
+// JSONFile may optionally contain the path to a JSON file provided by the user
+var JSONFile string
+
 func init() {
-	rootCmd.Flags().StringVarP(&JSONString, "string", "s", "", "JSON file as string")
+	rootCmd.Flags().StringVarP(&JSONString, "string", "s", "", "JSON string")
+	rootCmd.Flags().StringVarP(&JSONFile, "file", "f", "", "Path to JSON file")
 }
 
 var rootCmd = &cobra.Command{
@@ -24,11 +29,27 @@ var rootCmd = &cobra.Command{
 }
 
 func rootFunc(cmd *cobra.Command, args []string) {
-	if JSONString != "" {
+	if JSONFile != "" {
+		fmt.Println(generateFromFile())
+	} else if JSONString != "" {
 		fmt.Println(generateFromString())
 	} else {
 		fmt.Println(generateFromEditor())
 	}
+}
+
+func generateFromFile() string {
+	data, err := ioutil.ReadFile(JSONFile)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(4)
+	}
+	gen, err := generate.Generate(string(data))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(5)
+	}
+	return gen
 }
 
 func generateFromString() string {
