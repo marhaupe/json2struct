@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"go/format"
 	"io/ioutil"
 	"os"
 
@@ -29,13 +30,20 @@ var rootCmd = &cobra.Command{
 }
 
 func rootFunc(cmd *cobra.Command, args []string) {
+	var res string
 	if JSONFile != "" {
-		fmt.Println(generateFromFile())
+		res = generateFromFile()
 	} else if JSONString != "" {
-		fmt.Println(generateFromString())
+		res = generateFromString()
 	} else {
-		fmt.Println(generateFromEditor())
+		res = generateFromEditor()
 	}
+	format, err := format.Source([]byte(res))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(5)
+	}
+	fmt.Println(string(format))
 }
 
 func generateFromFile() string {
