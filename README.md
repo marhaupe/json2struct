@@ -6,33 +6,58 @@
 
 This project aims to make your life a lot easier by automatically generating structs for a given JSON. 
 
-## Installation
+# Installation
 
 ```bash
 go get github.com/marhaupe/json2struct
 ```
 
-## Usage
+# Usage
 
-### Base command:
-Calling `json2struct` without arguments opens the superior text editor for unix systems, vim 🤖. Insert the JSON data you want to parse and save and exit - in case you always forget how to do that: `:wq!`.
+## Base command:
 
-![Showcase](.github/with_editor.gif)
+Calling `json2struct` without arguments opens the superior text editor for unix systems, vim 🤖. Insert the JSON data you want to parse and save and exit ([`:wq!`](https://stackoverflow.com/a/11828573/7471182)). Example:
 
-### Flags:
-Call `json2struct -s` or `json2struct --string` with the JSON data as argument. 
+![Example](.github/with_editor.gif)
+
+## Flags:
+
+### Call `json2struct -s` or `json2struct --string` with the JSON data as argument. 
+
+Example:
 
 ```bash
  json2struct -s "$(curl "https://reqres.in/api/users?page=2")"
 ```
 
-![Showcase](.github/direct_input.gif)
-
+Result:
+```go
+type JSONToStruct struct {
+        Page        int `json:"page"`        Per_page    int `json:"per_page"`
+        Total       int `json:"total"`
+        Total_pages int `json:"total_pages"`
+        Data        []struct {
+                Id         int    `json:"id"`
+                First_name string `json:"first_name"`
+                Last_name  string `json:"last_name"`
+                Avatar     string `json:"avatar"`
+        } `json:"data"`
+}
+```
 
 The `string` option lets you pipe JSON data as input. The current implementation lacks some features, e.g. you need to escape quotes manually. PR's are more than welcome.
 
 
-## Lastly
+### Call `json2struct -f` or `json2struct --file` with the path to a JSON file as argument.
+
+Example:
+
+```bash
+json2struct -f apiResult.json
+```
+
+
+### Lastly
 
 Please feel free to open a pull request for missing features or bugs.
 
