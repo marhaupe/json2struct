@@ -45,7 +45,7 @@ type JSONToStruct struct {
 }
 ```
 
-The `string` option lets you pipe JSON data as input. The current implementation lacks some features, e.g. you need to escape quotes manually. PR's are more than welcome.
+The `string` option lets you pipe JSON data as input. The current implementation lacks some features, e.g. you need to escape quotes manually. PRs are more than welcome.
 
 
 ### Call `json2struct -f` or `json2struct --file` with the path to a JSON file as argument.
