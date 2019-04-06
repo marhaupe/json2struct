@@ -38,7 +38,7 @@ func TestString(t *testing.T) {
 		func() TestParams {
 			obj := &JSONObject{}
 			wanted := "type JSONToStruct struct{\n" +
-				"}\n"
+				"}"
 			got := obj.String()
 			return TestParams{
 				got:  got,
@@ -68,7 +68,7 @@ func TestString(t *testing.T) {
 		func() TestParams {
 			obj := &JSONObject{}
 			wanted := "type JSONToStruct struct{\n" +
-				"}\n"
+				"}"
 			got := obj.String()
 			return TestParams{
 				got:  got,

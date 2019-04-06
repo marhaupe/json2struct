@@ -69,7 +69,7 @@ func TestStringRootArray(t *testing.T) {
 				want: "type JSONToStruct []struct{\n" +
 					"Testnull interface{} `json:\"Testnull\"`\n" +
 					"Teststring string `json:\"Teststring\"`\n" +
-					"}\n",
+					"}",
 				name: "With Child Object",
 			}
 		},
