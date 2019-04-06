@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"go/format"
 	"io/ioutil"
 	"os"
 
@@ -38,12 +37,7 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	} else {
 		res = generateFromEditor()
 	}
-	format, err := format.Source([]byte(res))
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(5)
-	}
-	fmt.Println(string(format))
+	fmt.Println(res)
 }
 
 func generateFromFile() string {
@@ -52,7 +46,7 @@ func generateFromFile() string {
 		fmt.Println(err)
 		os.Exit(4)
 	}
-	gen, err := generate.Generate(string(data))
+	gen, err := generate.GenerateWithFormatting(string(data))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(5)
@@ -61,7 +55,7 @@ func generateFromFile() string {
 }
 
 func generateFromString() string {
-	gen, err := generate.Generate(JSONString)
+	gen, err := generate.GenerateWithFormatting(JSONString)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -77,7 +71,7 @@ func generateFromEditor() string {
 		fmt.Println("Error while reading from VIM", err)
 		os.Exit(2)
 	}
-	gen, err := generate.Generate(jsonstr)
+	gen, err := generate.GenerateWithFormatting(jsonstr)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(3)

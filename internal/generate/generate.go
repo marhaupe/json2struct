@@ -3,6 +3,7 @@ package generate
 
 import (
 	"fmt"
+	"go/format"
 	"sync"
 
 	"github.com/marhaupe/json2struct/internal/lex"
@@ -25,5 +26,18 @@ func Generate(s string) (string, error) {
 	if res.Error != nil {
 		return "", res.Error
 	}
+
 	return fmt.Sprint(res.Node), nil
+}
+
+func GenerateWithFormatting(s string) (string, error) {
+	res, err := Generate(s)
+	if err != nil {
+		return "", err
+	}
+	formattedBytes, err := format.Source([]byte(res))
+	if err != nil {
+		return "", err
+	}
+	return string(formattedBytes), nil
 }
