@@ -85,7 +85,7 @@ func (arr *JSONArray) stringObjects() string {
 		}
 	}
 	if arr.Parent == nil {
-		return fmt.Sprintf("type JSONToStruct []struct{\n%s}\n", b.String())
+		return fmt.Sprintf("type JSONToStruct []struct{\n%s}", b.String())
 	}
 	return fmt.Sprintf("%s []struct{\n%s} `json:\"%s\"`\n", strings.Title(arr.Key), b.String(), arr.Key)
 }

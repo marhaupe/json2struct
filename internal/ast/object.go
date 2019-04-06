@@ -57,7 +57,7 @@ func (obj *JSONObject) String() string {
 		fmt.Fprintf(&b, entry.String())
 	}
 	if obj.Parent == nil {
-		return fmt.Sprintf("type JSONToStruct struct{\n%s}\n", b.String())
+		return fmt.Sprintf("type JSONToStruct struct{\n%s}", b.String())
 	}
 	return fmt.Sprintf("%s struct{\n%s} `json:\"%s\"`\n", strings.Title(obj.Key), b.String(), obj.Key)
 }
