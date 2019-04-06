@@ -1,0 +1,10 @@
+[
+	{
+		"thissucks": true
+	},
+	{
+		"thisdoesntsuck": {
+			"value": false
+		}
+	}
+]

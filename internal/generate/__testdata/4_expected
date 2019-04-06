@@ -1,0 +1,4 @@
+type JSONToStruct []struct {
+	Teststring string `json:"teststring"`
+	Testbool   bool   `json:"testbool"`
+}

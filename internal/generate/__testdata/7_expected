@@ -1,0 +1,4 @@
+type JSONToStruct struct {
+	Testfloat float64 `json:"Testfloat"`
+	Testint   int     `json:"Testint"`
+}

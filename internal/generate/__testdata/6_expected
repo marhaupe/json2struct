@@ -1,0 +1,5 @@
+type JSONToStruct struct {
+	NestedObj struct {
+		Testbool bool `json:"Testbool"`
+	} `json:"NestedObj"`
+}

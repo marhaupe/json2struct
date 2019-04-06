@@ -1,0 +1,8 @@
+type JSONToStruct struct {
+	Src       string `json:"src"`
+	Name      string `json:"name"`
+	HOffset   int    `json:"hOffset"`
+	VOffset   int    `json:"vOffset"`
+	Alignment string `json:"alignment"`
+	Visible   bool   `json:"visible"`
+}

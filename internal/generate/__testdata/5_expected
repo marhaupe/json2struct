@@ -1,0 +1,6 @@
+type JSONToStruct []struct {
+	Thissucks      bool `json:"thissucks"`
+	Thisdoesntsuck struct {
+		Value bool `json:"value"`
+	} `json:"thisdoesntsuck"`
+}
