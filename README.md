@@ -33,7 +33,8 @@ Example:
 Result:
 ```go
 type JSONToStruct struct {
-        Page        int `json:"page"`        Per_page    int `json:"per_page"`
+        Page        int `json:"page"`        
+        Per_page    int `json:"per_page"`
         Total       int `json:"total"`
         Total_pages int `json:"total_pages"`
         Data        []struct {
