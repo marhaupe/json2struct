@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"os"
 
 	"github.com/marhaupe/json2struct/internal/editor"
 	"github.com/marhaupe/json2struct/internal/generate"
+	"github.com/marhaupe/json2struct/internal/lex"
 	"github.com/spf13/cobra"
 )
 
@@ -73,17 +75,41 @@ func generateFromString() string {
 }
 
 func generateFromEditor() string {
-	editor := editor.New()
-	editor.Display()
-	jsonstr, err := editor.Consume()
-	if err != nil {
-		fmt.Println("Error while reading from VIM", err)
-		os.Exit(2)
-	}
+	jsonstr := awaitValidInput()
 	gen, err := generate.GenerateWithFormatting(jsonstr)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(3)
+		os.Exit(2)
 	}
 	return gen
+}
+
+func awaitValidInput() string {
+	edit := editor.New()
+	defer edit.Delete()
+	edit.Display()
+
+	var jsonstr string
+	jsonstr, _ = edit.Read()
+
+	isValid := lex.ValidateJSON(jsonstr)
+	if isValid {
+		return jsonstr
+	}
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Print("You supplied an invalid json. Do you want to fix it (y/n)?  ")
+
+		input, _ := reader.ReadString('\n')
+		userWantsFix := string(input[0]) == "y"
+		if !userWantsFix {
+			return ""
+		}
+
+		edit.Display()
+		jsonstr, _ = edit.Read()
+		isValid := lex.ValidateJSON(jsonstr)
+		if isValid {
+			return jsonstr
+		}
+	}
 }
