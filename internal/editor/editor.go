@@ -34,12 +34,20 @@ func (e *Editor) Display() {
 
 // Consume consumes the content in the created file and closes and deletes it
 func (e *Editor) Consume() (string, error) {
-	filename := e.file.Name()
-	defer os.Remove(filename)
+	defer e.Delete()
+	return e.Read()
+}
+
+func (e *Editor) Read() (string, error) {
 	defer e.file.Close()
 	if e.err != nil {
 		return "", e.err
 	}
 	b, err := ioutil.ReadAll(e.file)
 	return string(b), err
+}
+
+func (e *Editor) Delete() error {
+	filename := e.file.Name()
+	return os.Remove(filename)
 }

@@ -10,6 +10,7 @@ import (
 func TestConsumeEmptyFile(t *testing.T) {
 	editor := New()
 	content, err := editor.Consume()
+	editor.Delete()
 	if content != "" {
 		t.Error("Content is not empty but should be")
 	}
