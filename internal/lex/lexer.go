@@ -10,11 +10,17 @@ import (
 	"sync"
 )
 
+var ErrorInvalidJson = "Invalid json"
+
 // Result is the result of a the lexing of JSON. It either contains Result, representing
 // a json.Token like { or }, or and error
 type Result struct {
 	Token json.Token
 	Error error
+}
+
+func ValidateJSON(s string) bool {
+	return json.Valid([]byte(s))
 }
 
 // Lex consumes a string s containing the JSON object and writes each
@@ -28,9 +34,9 @@ func Lex(s string, lexRes chan Result, wg *sync.WaitGroup) {
 		}
 	}()
 	defer wg.Done()
-	ok := json.Valid([]byte(s))
+	ok := ValidateJSON(s)
 	if !ok {
-		panic("Invalid json")
+		panic(ErrorInvalidJson)
 	}
 
 	d := json.NewDecoder(strings.NewReader(s))
