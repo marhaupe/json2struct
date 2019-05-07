@@ -19,16 +19,27 @@ type Editor struct {
 // New initializes an Editor instance ready to be used
 func New() *Editor {
 	e := &Editor{}
+	e.setupFile()
+	e.setupCmd()
+	return e
+}
+
+func (e *Editor) setupFile() {
 	e.file, e.err = os.OpenFile("json2struct.temp", os.O_RDWR|os.O_CREATE, 0666)
+}
+
+func (e *Editor) setupCmd() {
 	e.cmd = exec.Command("vim", e.file.Name())
 	e.cmd.Stdin = os.Stdin
 	e.cmd.Stdout = os.Stdout
 	e.cmd.Stderr = os.Stderr
-	return e
 }
 
 // Display spawns a new Vim process and pipes stdin, stdout and stderr to it
 func (e *Editor) Display() {
+	if e.cmd.Process != nil {
+		e.setupCmd()
+	}
 	e.cmd.Run()
 }
 
@@ -39,7 +50,6 @@ func (e *Editor) Consume() (string, error) {
 }
 
 func (e *Editor) Read() (string, error) {
-	defer e.file.Close()
 	if e.err != nil {
 		return "", e.err
 	}
