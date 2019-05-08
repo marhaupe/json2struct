@@ -12,6 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var version string
+
 // InputString may optionally contain the JSON provided by the user
 var InputString string
 
@@ -25,15 +27,27 @@ var rootCmd = &cobra.Command{
 	Run:   rootFunc,
 }
 
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Print the version number",
+	Args:  cobra.ExactArgs(0),
+	Run:   cmdFunc,
+}
+
 func init() {
 	rootCmd.Flags().StringVarP(&InputString, "string", "s", "", "JSON string")
 	rootCmd.Flags().StringVarP(&InputFile, "file", "f", "", "Path to JSON file")
+	rootCmd.AddCommand(versionCmd)
 }
 
 func main() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 	}
+}
+
+func cmdFunc(cmd *cobra.Command, args []string) {
+	fmt.Println(version)
 }
 
 func rootFunc(cmd *cobra.Command, args []string) {
