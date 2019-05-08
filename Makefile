@@ -1,7 +1,10 @@
 output ?= "json2struct"
+version := $(shell git describe --tags)
+
+.PHONY: build install test testrace coverage
 
 build:
-	go build -o $(output)
+	go build -o ${output} -ldflags="-X main.version=${version}"
 
 install: 
 	go install 
@@ -12,7 +15,9 @@ test:
 testrace:
 	go test -race ./...
 
-coverage:
+coverage: cover.html
+
+cover.html:
 	go test ./... -coverprofile cover.out
 	go tool cover -html=cover.out -o cover.html 
 	rm cover.out
