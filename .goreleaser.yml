@@ -1,0 +1,23 @@
+builds:
+  -
+    main: ./main.go
+    binary: json2struct
+    ldflags:
+     - -s -w -X github.com/marhaupe/json2struct/cmd.version={{.Version}}
+    goos:
+      - darwin
+      - linux
+    env:
+      - CGO_ENABLED=0
+archives:
+- replacements:
+    darwin: Darwin
+    linux: Linux
+checksum:
+  name_template: 'checksums.txt'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
