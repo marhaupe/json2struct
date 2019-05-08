@@ -8,9 +8,17 @@ This CLI tool aims to make your life a lot easier by automatically generating st
 
 # Installation
 
+## MacOS and Linux
+
+Download the [archive](https://github.com/marhaupe/json2struct/releases) and extract it somewhere your `$PATH` is set to, for example to `$GOBIN`:
 ```bash
-go get github.com/marhaupe/json2struct
+tar -C $GOBIN -xzf <tarball>
 ```
+
+## Windows
+
+Currently, `json2struct` does not work on Windows. Feel free to leave an issue if you want me to start working on it.
+
 
 # Usage
 
