@@ -4,7 +4,7 @@ version := $(shell git describe --tags)
 .PHONY: build install test testrace coverage
 
 build:
-	go build -o ${output} -ldflags="-X main.version=${version}"
+	go build -o ${output} -ldflags="-X github.com/marhaupe/json2struct/cmd.version=${version}"
 
 install: 
 	go install 
