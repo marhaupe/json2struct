@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/marhaupe/json2struct/branch/master/graph/badge.svg)](https://codecov.io/gh/marhaupe/json2struct)
 [![GoDoc](https://godoc.org/github.com/marhaupe/json2struct?status.svg)](https://godoc.org/github.com/marhaupe/json2struct)
 
-This project aims to make your life a lot easier by automatically generating structs for a given JSON. 
+This CLI tool aims to make your life a lot easier by automatically generating structs for a given JSON. 
 
 # Installation
 
