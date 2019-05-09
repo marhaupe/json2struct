@@ -15,19 +15,21 @@ import (
 var (
 	inputString string
 	inputFile   string
+	version     string
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "json2struct",
-	Short: "These are all available commands to help you parse JSONs to Go structs",
-	Args:  cobra.ExactArgs(0),
-	Run:   rootFunc,
+	Use:     "json2struct",
+	Short:   "Parse a JSON into a generated Go struct",
+	Version: version,
+	Args:    cobra.ExactArgs(0),
+	Run:     rootFunc,
 }
 
 func init() {
 	rootCmd.Flags().StringVarP(&inputString, "string", "s", "", "JSON string")
 	rootCmd.Flags().StringVarP(&inputFile, "file", "f", "", "Path to JSON file")
-	rootCmd.AddCommand(versionCmd)
+	// rootCmd.AddCommand(versionCmd)
 }
 
 func Execute() {
