@@ -2,7 +2,7 @@ OUTPUT?="json2struct"
 VERSION=$(shell git describe --tags)
 LDFLAGS="-X github.com/marhaupe/json2struct/cmd.version=$(VERSION)"
 
-.PHONY: build install test testrace coverage clean
+.PHONY: build install test testrace clean coverage 
 
 build:
 	go build -o $(OUTPUT) -ldflags=$(LDFLAGS)
