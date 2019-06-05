@@ -2,13 +2,19 @@ package cmd
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"go/printer"
+	"go/token"
 	"io/ioutil"
 	"os"
 
+	"github.com/marhaupe/json2struct/internal/generator"
+
+	"github.com/marhaupe/json2struct/internal/parse"
+
 	"github.com/marhaupe/json2struct/internal/editor"
-	"github.com/marhaupe/json2struct/internal/generate"
-	"github.com/marhaupe/json2struct/internal/lex"
 	"github.com/spf13/cobra"
 )
 
@@ -16,73 +22,55 @@ var (
 	inputString string
 	inputFile   string
 	version     string
-)
 
-var rootCmd = &cobra.Command{
-	Use:     "json2struct",
-	Short:   "Parse a JSON into a generated Go struct",
-	Version: version,
-	Args:    cobra.ExactArgs(0),
-	Run:     rootFunc,
-}
+	rootCmd = &cobra.Command{
+		Use:     "json2struct",
+		Short:   "Parse a JSON into a generated Go struct",
+		Version: version,
+		Args:    cobra.ExactArgs(0),
+		Run:     rootFunc,
+	}
+)
 
 func init() {
 	rootCmd.Flags().StringVarP(&inputString, "string", "s", "", "JSON string")
 	rootCmd.Flags().StringVarP(&inputFile, "file", "f", "", "Path to JSON file")
-	// rootCmd.AddCommand(versionCmd)
 }
 
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
+	err := rootCmd.Execute()
+	if err != nil {
 		fmt.Println(err)
 	}
 }
 
 func rootFunc(cmd *cobra.Command, args []string) {
-	var res string
-
+	var json string
 	switch {
 	case inputFile != "":
-		res = generateFromFile()
+		json = readFromFile()
 	case inputString != "":
-		res = generateFromString()
+		json = inputString
 	default:
-		res = generateFromEditor()
+		json = readFromEditor()
 	}
+
+	res := generate(json)
 
 	fmt.Println(res)
 }
 
-func generateFromFile() string {
+func readFromFile() string {
 	data, err := ioutil.ReadFile(inputFile)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(4)
 	}
-	gen, err := generate.GenerateWithFormatting(string(data))
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(5)
-	}
-	return gen
+	return string(data)
 }
 
-func generateFromString() string {
-	gen, err := generate.GenerateWithFormatting(inputString)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	return gen
-}
-
-func generateFromEditor() string {
-	jsonstr := awaitValidInput()
-	gen, err := generate.GenerateWithFormatting(jsonstr)
-	if err != nil {
-		os.Exit(2)
-	}
-	return gen
+func readFromEditor() string {
+	return awaitValidInput()
 }
 
 func awaitValidInput() string {
@@ -93,7 +81,7 @@ func awaitValidInput() string {
 	var jsonstr string
 	jsonstr, _ = edit.Read()
 
-	isValid := lex.ValidateJSON(jsonstr)
+	isValid := json.Valid([]byte(jsonstr))
 	if isValid {
 		return jsonstr
 	}
@@ -109,9 +97,21 @@ func awaitValidInput() string {
 
 		edit.Display()
 		jsonstr, _ = edit.Read()
-		isValid := lex.ValidateJSON(jsonstr)
+		isValid := json.Valid([]byte(jsonstr))
 		if isValid {
 			return jsonstr
 		}
 	}
+}
+
+func generate(json string) string {
+	node := parse.ParseFromString(json)
+
+	ast := generator.GenerateAST(node)
+
+	fileset := token.NewFileSet()
+	var buf bytes.Buffer
+	printer.Fprint(&buf, fileset, ast)
+
+	return fmt.Sprintf("%s\n", buf.String())
 }

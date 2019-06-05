@@ -1,4 +1,4 @@
-package generate
+package cmd
 
 import (
 	"go/format"
@@ -24,10 +24,7 @@ func TestFiles(t *testing.T) {
 	}
 
 	for input, expected := range inputExpected {
-		actual, err := GenerateWithFormatting(input)
-		if err != nil {
-			t.Errorf("Input %v generated error %v", input, err)
-		}
+		actual := generate(input)
 		if !reflect.DeepEqual(actual, expected) {
 			t.Errorf("Test failed.\nActual: %v\nActualLen: %v\nExpected: %v\nExpectedLen: %v\n", actual, len(actual), expected, len(expected))
 		}
