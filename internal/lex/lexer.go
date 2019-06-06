@@ -1,6 +1,7 @@
 package lex
 
 import (
+	"strings"
 	"unicode/utf8"
 )
 
@@ -15,7 +16,7 @@ type ItemType int
 const (
 	ItemString ItemType = iota
 	ItemBool
-	ItemFloat
+	ItemNumber
 	ItemNil
 	ItemKey
 	ItemLeftBrace
@@ -70,6 +71,12 @@ func (l *Lexer) peek() rune {
 	rn := l.next()
 	l.backup()
 	return rn
+}
+
+func (l *Lexer) acceptRun(valid string) {
+	for strings.ContainsRune(valid, l.next()) {
+	}
+	l.backup()
 }
 
 func (l *Lexer) backup() {
@@ -162,6 +169,10 @@ func lexBool(l *Lexer) stateFn {
 }
 
 func lexNumber(l *Lexer) stateFn {
+	l.acceptRun("+-")
+	l.acceptRun("0123456789")
+	l.acceptRun(".eE+-0123456789")
+	l.emit(ItemNumber)
 	return lexWhitespace
 }
 

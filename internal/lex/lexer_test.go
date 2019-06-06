@@ -21,6 +21,8 @@ var (
 	iLeftBrace  = mkItem(ItemLeftBrace, "{")
 	iRightBrace = mkItem(ItemRightBrace, "}")
 	iEOF        = mkItem(ItemEOF, "")
+	iColon      = mkItem(ItemColon, ":")
+	iComma      = mkItem(ItemComma, ",")
 )
 
 // collect gathers the emitted items into a slice.
@@ -66,6 +68,31 @@ var lexTests = []lexTest{
 		mkItem(ItemString, "bool1"),
 		mkItem(ItemColon, ":"),
 		mkItem(ItemBool, "true"),
+		iRightBrace,
+		iEOF,
+	}},
+	{"valid numbers", `{
+		"number1": 1,
+		"number2": 1.0,
+		"number3": -1,
+		"number4": -1.0
+		}`, []Item{
+		iLeftBrace,
+		mkItem(ItemString, "number1"),
+		iColon,
+		mkItem(ItemNumber, "1"),
+		iComma,
+		mkItem(ItemString, "number2"),
+		iColon,
+		mkItem(ItemNumber, "1.0"),
+		iComma,
+		mkItem(ItemString, "number3"),
+		iColon,
+		mkItem(ItemNumber, "-1"),
+		iComma,
+		mkItem(ItemString, "number4"),
+		iColon,
+		mkItem(ItemNumber, "-1.0"),
 		iRightBrace,
 		iEOF,
 	}},
