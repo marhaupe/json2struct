@@ -103,7 +103,7 @@ const (
 type stateFn func(l *Lexer) stateFn
 
 func lexWhitespace(l *Lexer) stateFn {
-	for r := l.next(); isSpace(r) || r == '\n'; l.next() {
+	for r := l.next(); isSpace(r) || r == '\n'; r = l.next() {
 	}
 	l.backup()
 	l.ignore()
@@ -166,12 +166,19 @@ func lexNumber(l *Lexer) stateFn {
 }
 
 func lexString(l *Lexer) stateFn {
+	// the current rune is known to be `"`. Throw it away in order to emit the raw string value
+	// e.g. example instead of "example".
+	l.ignore()
 	for r := l.next(); r != '"'; r = l.next() {
 		if r == EOF {
 			panic("unterminated string")
 		}
 	}
+
+	// the current rune is the closing `"`. Throw this one away as well by decrementing the position. Reset the correct state after emitting the lexem.
+	l.Pos--
 	l.emit(ItemString)
+	l.Pos++
 	return lexWhitespace
 }
 
