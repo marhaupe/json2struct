@@ -96,6 +96,36 @@ var lexTests = []lexTest{
 		iRightBrace,
 		iEOF,
 	}},
+	{"valid strings", `{
+		"string1": "value1",
+		"string2": "true",
+		"string3": "false",
+		"string4": "null",
+		"string5": "1"
+		}`, []Item{
+		iLeftBrace,
+		mkItem(ItemString, "string1"),
+		iColon,
+		mkItem(ItemString, "value1"),
+		iComma,
+		mkItem(ItemString, "string2"),
+		iColon,
+		mkItem(ItemString, "true"),
+		iComma,
+		mkItem(ItemString, "string3"),
+		iColon,
+		mkItem(ItemString, "false"),
+		iComma,
+		mkItem(ItemString, "string4"),
+		iColon,
+		mkItem(ItemString, "null"),
+		iComma,
+		mkItem(ItemString, "string5"),
+		iColon,
+		mkItem(ItemString, "1"),
+		iRightBrace,
+		iEOF,
+	}},
 }
 
 func TestLex(t *testing.T) {
