@@ -2,17 +2,10 @@ package cmd
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"go/printer"
-	"go/token"
 	"io/ioutil"
 	"os"
-
-	"github.com/marhaupe/json2struct/internal/generator"
-
-	"github.com/marhaupe/json2struct/internal/parse"
 
 	"github.com/marhaupe/json2struct/internal/editor"
 	"github.com/spf13/cobra"
@@ -105,13 +98,14 @@ func awaitValidInput() string {
 }
 
 func generate(json string) string {
-	node := parse.ParseFromString(json)
+	// node := parse.ParseFromString(json)
 
-	ast := generator.GenerateAST(node)
+	// ast := generator.GenerateAST(node)
 
-	fileset := token.NewFileSet()
-	var buf bytes.Buffer
-	printer.Fprint(&buf, fileset, ast)
+	// fileset := token.NewFileSet()
+	// var buf bytes.Buffer
+	// printer.Fprint(&buf, fileset, ast)
 
-	return fmt.Sprintf("%s\n", buf.String())
+	// return fmt.Sprintf("%s\n", buf.String())
+	return ""
 }
