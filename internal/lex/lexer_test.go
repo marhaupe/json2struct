@@ -23,23 +23,6 @@ var (
 	iEOF        = mkItem(ItemEOF, "")
 )
 
-var lexTests = []lexTest{
-	{"empty file", "", []Item{mkItem(ItemEOF, "")}},
-	{"empty json", "{}", []Item{
-		iLeftBrace,
-		iRightBrace,
-		iEOF,
-	}},
-	{"only bool", `{"bool1": true}`, []Item{
-		iLeftBrace,
-		mkItem(ItemString, "bool1"),
-		mkItem(ItemColon, ":"),
-		mkItem(ItemBool, "true"),
-		iRightBrace,
-		iEOF,
-	}},
-}
-
 // collect gathers the emitted items into a slice.
 func collect(t *lexTest) (items []Item) {
 	l := Lex(t.name, t.input)
@@ -69,6 +52,23 @@ func equal(i1, i2 []Item, checkPos bool) bool {
 		}
 	}
 	return true
+}
+
+var lexTests = []lexTest{
+	{"empty file", "", []Item{mkItem(ItemEOF, "")}},
+	{"empty json", "{}", []Item{
+		iLeftBrace,
+		iRightBrace,
+		iEOF,
+	}},
+	{"only bool", `{"bool1": true}`, []Item{
+		iLeftBrace,
+		mkItem(ItemString, "bool1"),
+		mkItem(ItemColon, ":"),
+		mkItem(ItemBool, "true"),
+		iRightBrace,
+		iEOF,
+	}},
 }
 
 func TestLex(t *testing.T) {
