@@ -24,6 +24,7 @@ const (
 	ItemRightSqrBrace
 	ItemComma
 	ItemColon
+	ItemEOF
 )
 
 const EOF = -1
@@ -55,11 +56,11 @@ func Lex(name, json string) *Lexer {
 }
 
 func (l *Lexer) next() rune {
-	if l.Pos > len(l.Input) {
+	if l.Pos >= len(l.Input) {
 		l.Width = 0
-		return -1
+		return EOF
 	}
-	rn, width := utf8.DecodeLastRuneInString(l.Input[l.Pos:])
+	rn, width := utf8.DecodeRuneInString(l.Input[l.Pos:])
 	l.Width = width
 	l.Pos += l.Width
 	return rn
@@ -103,12 +104,14 @@ type stateFn func(l *Lexer) stateFn
 
 func lexWhitespace(l *Lexer) stateFn {
 	for r := l.next(); isSpace(r) || r == '\n'; l.next() {
-		l.peek()
 	}
 	l.backup()
 	l.ignore()
 
 	switch r := l.next(); {
+	case r == EOF:
+		l.emit(ItemEOF)
+		return nil
 	case r == '{':
 		return lexLeftBrace
 	case r == '[':
@@ -140,7 +143,7 @@ func lexWhitespace(l *Lexer) stateFn {
 func lexNull(l *Lexer) stateFn {
 	l.Pos += len("null")
 	l.emit(ItemNil)
-	return nil
+	return lexWhitespace
 }
 
 func lexBool(l *Lexer) stateFn {
@@ -159,13 +162,13 @@ func lexBool(l *Lexer) stateFn {
 }
 
 func lexNumber(l *Lexer) stateFn {
-	return nil
+	return lexWhitespace
 }
 
 func lexString(l *Lexer) stateFn {
 	for r := l.next(); r != '"'; r = l.next() {
 		if r == EOF {
-			panic("unexpected eof while lexing string")
+			panic("unterminated string")
 		}
 	}
 	l.emit(ItemString)
@@ -173,27 +176,34 @@ func lexString(l *Lexer) stateFn {
 }
 
 func lexComma(l *Lexer) stateFn {
-	return nil
+	l.emit(ItemComma)
+	return lexWhitespace
 }
 
 func lexColon(l *Lexer) stateFn {
-	return nil
+	l.emit(ItemColon)
+	return lexWhitespace
 }
 
 func lexLeftBrace(l *Lexer) stateFn {
-	return nil
+	l.emit(ItemLeftBrace)
+	return lexWhitespace
 }
 
 func lexRightBrace(l *Lexer) stateFn {
-	return nil
+	l.emit(ItemRightBrace)
+	return lexWhitespace
+
 }
 
 func lexLeftSqrBrace(l *Lexer) stateFn {
-	return nil
+	l.emit(ItemLeftSqrBrace)
+	return lexWhitespace
 }
 
 func lexRightSqrBrace(l *Lexer) stateFn {
-	return nil
+	l.emit(ItemRightSqrBrace)
+	return lexWhitespace
 }
 
 func isSpace(r rune) bool {
