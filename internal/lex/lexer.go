@@ -103,10 +103,6 @@ func (l *Lexer) run() {
 	close(l.Items)
 }
 
-const (
-	errorInvalidStart = "json started with neither [ nor {"
-)
-
 type stateFn func(l *Lexer) stateFn
 
 func lexWhitespace(l *Lexer) stateFn {
@@ -211,7 +207,6 @@ func lexLeftBrace(l *Lexer) stateFn {
 func lexRightBrace(l *Lexer) stateFn {
 	l.emit(ItemRightBrace)
 	return lexWhitespace
-
 }
 
 func lexLeftSqrBrace(l *Lexer) stateFn {
