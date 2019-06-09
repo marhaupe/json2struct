@@ -18,11 +18,13 @@ func mkItem(typ ItemType, text string) Item {
 }
 
 var (
-	iLeftBrace  = mkItem(ItemLeftBrace, "{")
-	iRightBrace = mkItem(ItemRightBrace, "}")
-	iEOF        = mkItem(ItemEOF, "")
-	iColon      = mkItem(ItemColon, ":")
-	iComma      = mkItem(ItemComma, ",")
+	iLeftBrace     = mkItem(ItemLeftBrace, "{")
+	iRightBrace    = mkItem(ItemRightBrace, "}")
+	iLeftSqrBrace  = mkItem(ItemLeftSqrBrace, "[")
+	iRightSqrBrace = mkItem(ItemRightSqrBrace, "]")
+	iEOF           = mkItem(ItemEOF, "")
+	iColon         = mkItem(ItemColon, ":")
+	iComma         = mkItem(ItemComma, ",")
 )
 
 // collect gathers the emitted items into a slice.
@@ -57,21 +59,28 @@ func equal(i1, i2 []Item, checkPos bool) bool {
 }
 
 var lexTests = []lexTest{
-	{"empty file", "", []Item{mkItem(ItemEOF, "")}},
-	{"empty json", "{}", []Item{
+	{"empty file", "", []Item{iEOF}},
+	{"empty object root", "{}", []Item{
 		iLeftBrace,
 		iRightBrace,
 		iEOF,
 	}},
-	{"only bool", `{"bool1": true}`, []Item{
+	{"bools in object root", `{
+		"bool1": true, 
+		"bool2": false
+		}`, []Item{
 		iLeftBrace,
 		mkItem(ItemString, "bool1"),
-		mkItem(ItemColon, ":"),
+		iColon,
 		mkItem(ItemBool, "true"),
+		iComma,
+		mkItem(ItemString, "bool2"),
+		iColon,
+		mkItem(ItemBool, "false"),
 		iRightBrace,
 		iEOF,
 	}},
-	{"valid numbers", `{
+	{"valid numbers in object root", `{
 		"number1": 1,
 		"number2": 1.0,
 		"number3": -1,
@@ -96,7 +105,7 @@ var lexTests = []lexTest{
 		iRightBrace,
 		iEOF,
 	}},
-	{"valid strings", `{
+	{"valid strings in object root", `{
 		"string1": "value1",
 		"string2": "true",
 		"string3": "false",
@@ -124,6 +133,53 @@ var lexTests = []lexTest{
 		iColon,
 		mkItem(ItemString, "1"),
 		iRightBrace,
+		iEOF,
+	}},
+	{"null in object root", `{ "null1": null }`, []Item{
+		iLeftBrace,
+		mkItem(ItemString, "null1"),
+		iColon,
+		mkItem(ItemNil, "null"),
+		iRightBrace,
+		iEOF,
+	}},
+	{"nested objects with multiple keys and values", `
+	{
+		"obj1": {
+		"null1": null,
+		"bool1": true
+		}
+	}`, []Item{
+		iLeftBrace,
+		mkItem(ItemString, "obj1"),
+		iColon,
+		iLeftBrace,
+		mkItem(ItemString, "null1"),
+		iColon,
+		mkItem(ItemNil, "null"),
+		iComma,
+		mkItem(ItemString, "bool1"),
+		iColon,
+		mkItem(ItemBool, "true"),
+		iRightBrace,
+		iRightBrace,
+		iEOF,
+	}},
+	{"empty array root", "[]", []Item{
+		iLeftSqrBrace,
+		iRightSqrBrace,
+		iEOF,
+	}},
+	{"bools in array root", `[ true, false, false, true ]`, []Item{
+		iLeftSqrBrace,
+		mkItem(ItemBool, "true"),
+		iComma,
+		mkItem(ItemBool, "false"),
+		iComma,
+		mkItem(ItemBool, "false"),
+		iComma,
+		mkItem(ItemBool, "true"),
+		iRightSqrBrace,
 		iEOF,
 	}},
 }
