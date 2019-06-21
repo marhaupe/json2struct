@@ -67,16 +67,8 @@ func equal(t1, t2 Node) bool {
 		}
 		return true
 
-	case NodeTypeString:
-		fallthrough
-	case NodeTypeBool:
-		fallthrough
-	case NodeTypeNil:
-		fallthrough
-	case NodeTypeNumber:
-		return true
 	default:
-		return false
+		return true
 	}
 }
 
@@ -91,17 +83,54 @@ func TestParseFromString(t *testing.T) {
 		want Node
 	}{
 		{
-			name: "Empty JSON",
+			name: "Empty object",
 			args: args{
 				json: `{}`,
 			},
 			want: mkObjectNode(make(map[string][]Node)),
 		},
+		{
+			name: "Empty array",
+			args: args{
+				json: `[]`,
+			},
+			want: mkArrayNode(make([]Node, 0)),
+		},
+		{
+			name: "Object with primitives",
+			args: args{
+				// TODO: This actually does not work the way I want it to work.
+				// Ideally, the generated tree contains the value aswell.
+				json: `{
+					"teststring": "hi",
+					"testbool": true,
+					"testnumber": 5.4
+					}`,
+			},
+			want: mkObjectNode(
+				map[string][]Node{
+					"teststring": []Node{PrimitiveNode{NodeType: NodeTypeString}},
+					"testbool":   []Node{PrimitiveNode{NodeType: NodeTypeBool}},
+					"testnumber": []Node{PrimitiveNode{NodeType: NodeTypeNumber}},
+				},
+			)},
+		{
+			name: "Array with strings",
+			args: args{
+				json: `[ "test", "1234", "true" ]`,
+			},
+			want: mkArrayNode(
+				[]Node{
+					PrimitiveNode{NodeType: NodeTypeString},
+					PrimitiveNode{NodeType: NodeTypeString},
+					PrimitiveNode{NodeType: NodeTypeString},
+				},
+			)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := ParseFromString(tt.args.name, tt.args.json); !equal(got, tt.want) {
-				t.Errorf("ParseFromString(): \ngot:\n %v \nwant:\n %v", got, tt.want)
+				t.Errorf("ParseFromString(): \ngot:\n %#v \nwant:\n %#v", got, tt.want)
 			}
 		})
 	}

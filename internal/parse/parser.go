@@ -65,6 +65,8 @@ func (p *Parser) parse() Node {
 }
 
 func (p *Parser) parseObject() *ObjectNode {
+	p.LastItem = p.Item
+
 	object := &ObjectNode{NodeType: NodeTypeObject}
 	var currentKey string
 
@@ -80,7 +82,7 @@ func (p *Parser) parseObject() *ObjectNode {
 			// A string can indicate that the current lexem is either a key or a value.
 			// It's a key if the previous lexem is a comma.
 			// It's a value if the previous lexem is a colon.
-			if p.LastItem.Typ == lex.ItemComma {
+			if p.LastItem.Typ == lex.ItemComma || p.LastItem.Typ == lex.ItemLeftBrace {
 				currentKey = p.Item.Value
 			} else {
 				object.children[currentKey] = append(object.children[currentKey], p.parseString())
@@ -96,9 +98,9 @@ func (p *Parser) parseObject() *ObjectNode {
 		case lex.ItemNumber:
 			object.children[currentKey] = append(object.children[currentKey], p.parseNumber())
 		case lex.ItemColon:
-			continue
+			break
 		case lex.ItemComma:
-			continue
+			break
 		default:
 			panic("expected a value of type object, array, null, bool, string or number but got something else")
 		}
@@ -113,6 +115,7 @@ func (p *Parser) parseObject() *ObjectNode {
 }
 
 func (p *Parser) parseArray() *ArrayNode {
+	p.LastItem = p.Item
 	array := &ArrayNode{NodeType: NodeTypeArray}
 
 	for p.Item = p.Lexer.NextItem(); p.Item.Typ != lex.ItemRightSqrBrace; p.Item = p.Lexer.NextItem() {
