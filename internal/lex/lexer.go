@@ -67,12 +67,6 @@ func (l *Lexer) next() rune {
 	return rn
 }
 
-func (l *Lexer) peek() rune {
-	rn := l.next()
-	l.backup()
-	return rn
-}
-
 func (l *Lexer) acceptRun(valid string) {
 	for strings.ContainsRune(valid, l.next()) {
 	}
