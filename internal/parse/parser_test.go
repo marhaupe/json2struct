@@ -56,7 +56,8 @@ func TestParseFromString(t *testing.T) {
 				json: `{
 					"teststring": "hi",
 					"testbool": true,
-					"testnumber": 5.4
+					"testnumber": 5.4,
+					"testnil": null
 					}`,
 			},
 			want: mkObjectNode(
@@ -64,6 +65,7 @@ func TestParseFromString(t *testing.T) {
 					"teststring": []Node{mkPrim(NodeTypeString, "hi")},
 					"testbool":   []Node{mkPrim(NodeTypeBool, "true")},
 					"testnumber": []Node{mkPrim(NodeTypeNumber, "5.4")},
+					"testnil":    []Node{mkPrim(NodeTypeNil, "null")},
 				},
 			)},
 		{
@@ -77,7 +79,22 @@ func TestParseFromString(t *testing.T) {
 					mkPrim(NodeTypeString, "1234"),
 					mkPrim(NodeTypeString, "true"),
 				},
-			)},
+			),
+		},
+		{
+			name: "Array with different primitives",
+			args: args{
+				json: `[ "test", 1234, true, null ]`,
+			},
+			want: mkArrayNode(
+				[]Node{
+					mkPrim(NodeTypeString, "test"),
+					mkPrim(NodeTypeNumber, "1234"),
+					mkPrim(NodeTypeBool, "true"),
+					mkPrim(NodeTypeNil, "null"),
+				},
+			),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
