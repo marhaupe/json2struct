@@ -26,7 +26,7 @@ func mkPrim(typ NodeType, value string) *PrimitiveNode {
 	}
 }
 
-func TestParseFromString(t *testing.T) {
+func TestParseArrayFromString(t *testing.T) {
 	type args struct {
 		name string
 		json string
@@ -37,37 +37,12 @@ func TestParseFromString(t *testing.T) {
 		want Node
 	}{
 		{
-			name: "Empty object",
-			args: args{
-				json: `{}`,
-			},
-			want: mkObjectNode(make(map[string][]Node)),
-		},
-		{
 			name: "Empty array",
 			args: args{
 				json: `[]`,
 			},
 			want: mkArrayNode(make([]Node, 0)),
 		},
-		{
-			name: "Object with primitives",
-			args: args{
-				json: `{
-					"teststring": "hi",
-					"testbool": true,
-					"testnumber": 5.4,
-					"testnil": null
-					}`,
-			},
-			want: mkObjectNode(
-				map[string][]Node{
-					"teststring": []Node{mkPrim(NodeTypeString, "hi")},
-					"testbool":   []Node{mkPrim(NodeTypeBool, "true")},
-					"testnumber": []Node{mkPrim(NodeTypeNumber, "5.4")},
-					"testnil":    []Node{mkPrim(NodeTypeNil, "null")},
-				},
-			)},
 		{
 			name: "Array with strings",
 			args: args{
@@ -92,6 +67,118 @@ func TestParseFromString(t *testing.T) {
 					mkPrim(NodeTypeNumber, "1234"),
 					mkPrim(NodeTypeBool, "true"),
 					mkPrim(NodeTypeNil, "null"),
+				},
+			),
+		},
+		{
+			name: "Array with objects",
+			args: args{
+				json: `[{ "teststring": "hi" }]`,
+			},
+			want: mkArrayNode(
+				[]Node{
+					mkObjectNode(
+						map[string][]Node{
+							"teststring": []Node{mkPrim(NodeTypeString, "hi")},
+						},
+					),
+				},
+			),
+		},
+		{
+			name: "Array with arrays",
+			args: args{
+				json: `[[ "hi", "ho" ]]`,
+			},
+			want: mkArrayNode(
+				[]Node{
+					mkArrayNode(
+						[]Node{
+							mkPrim(NodeTypeString, "hi"),
+							mkPrim(NodeTypeString, "ho"),
+						},
+					),
+				},
+			),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ParseFromString(tt.args.name, tt.args.json); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ParseFromString(): \ngot:\n %#v \nwant:\n %#v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestParseObjectFromString(t *testing.T) {
+	type args struct {
+		name string
+		json string
+	}
+	tests := []struct {
+		name string
+		args args
+		want Node
+	}{
+		{
+			name: "Empty object",
+			args: args{
+				json: `{}`,
+			},
+			want: mkObjectNode(make(map[string][]Node)),
+		},
+		{
+			name: "Object with primitives",
+			args: args{
+				json: `{
+					"teststring": "hi",
+					"testbool": true,
+					"testnumber": 5.4,
+					"testnil": null
+					}`,
+			},
+			want: mkObjectNode(
+				map[string][]Node{
+					"teststring": []Node{mkPrim(NodeTypeString, "hi")},
+					"testbool":   []Node{mkPrim(NodeTypeBool, "true")},
+					"testnumber": []Node{mkPrim(NodeTypeNumber, "5.4")},
+					"testnil":    []Node{mkPrim(NodeTypeNil, "null")},
+				},
+			),
+		},
+		{
+			name: "Object with objects",
+			args: args{
+				json: `{ "testobject": { "teststring": "hi" }}`,
+			},
+			want: mkObjectNode(
+				map[string][]Node{
+					"testobject": []Node{
+						mkObjectNode(
+							map[string][]Node{
+								"teststring": []Node{mkPrim(NodeTypeString, "hi")},
+							},
+						),
+					},
+				},
+			),
+		},
+		{
+			name: "Object with arrays",
+			args: args{
+				json: `{ "testarray": [ "hi", "ho" ]}`,
+			},
+			want: mkObjectNode(
+				map[string][]Node{
+					"testarray": []Node{
+						mkArrayNode(
+							[]Node{
+								mkPrim(NodeTypeString, "hi"),
+								mkPrim(NodeTypeString, "ho"),
+							},
+						),
+					},
 				},
 			),
 		},
