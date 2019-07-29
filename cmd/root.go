@@ -8,6 +8,8 @@ import (
 	"os"
 
 	"github.com/marhaupe/json2struct/internal/editor"
+	"github.com/marhaupe/json2struct/internal/generator"
+	"github.com/marhaupe/json2struct/internal/parse"
 	"github.com/spf13/cobra"
 )
 
@@ -98,14 +100,7 @@ func awaitValidInput() string {
 }
 
 func generate(json string) string {
-	// node := parse.ParseFromString(json)
-
-	// ast := generator.GenerateAST(node)
-
-	// fileset := token.NewFileSet()
-	// var buf bytes.Buffer
-	// printer.Fprint(&buf, fileset, ast)
-
-	// return fmt.Sprintf("%s\n", buf.String())
-	return ""
+	node := parse.ParseFromString("json2struct", json)
+	file := generator.GenerateFile(node)
+	return fmt.Sprintf("%#v", file)
 }

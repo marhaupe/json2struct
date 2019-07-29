@@ -1,3 +1,5 @@
+github.com/dave/jennifer v1.3.0 h1:p3tl41zjjCZTNBytMwrUuiAnherNUZktlhPTKoF/sEk=
+github.com/dave/jennifer v1.3.0/go.mod h1:fIb+770HOpJ2fmN9EPPKOqm1vMGhB+TwXKMZhrIygKg=
 github.com/golang/go v0.0.0-20190605005325-5f509148b13f h1:me9nZJyxQLQpVvJRVJsxXdu4K0JqPQPMotLvPJAf9+s=
 github.com/golang/go v0.0.0-20190605005325-5f509148b13f/go.mod h1:VnTjtYw+XLkxokOYpCb9NBW3cOTFO8+uqxF7o10XJQk=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
