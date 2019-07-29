@@ -42,6 +42,7 @@ type ObjectNode struct {
 
 type PrimitiveNode struct {
 	NodeType
+	value string
 }
 
 func ParseFromString(name, json string) Node {
@@ -60,21 +61,20 @@ func (p *Parser) parse() Node {
 	case lex.ItemLeftSqrBrace:
 		return p.parseArray()
 	default:
-		panic("expected either a curly or a square brace but got something else")
+		panic("error parsing document: unexpected item " + p.Item.Value)
 	}
 }
 
 func (p *Parser) parseObject() *ObjectNode {
 	p.LastItem = p.Item
 
-	object := &ObjectNode{NodeType: NodeTypeObject}
+	object := &ObjectNode{
+		NodeType: NodeTypeObject,
+		children: make(map[string][]Node),
+	}
+
 	var currentKey string
-
 	for p.Item = p.Lexer.NextItem(); p.Item.Typ != lex.ItemRightBrace; p.Item = p.Lexer.NextItem() {
-
-		if object.children == nil {
-			object.children = make(map[string][]Node)
-		}
 
 		switch p.Item.Typ {
 		case lex.ItemString:
@@ -102,13 +102,13 @@ func (p *Parser) parseObject() *ObjectNode {
 		case lex.ItemComma:
 			break
 		default:
-			panic("expected a value of type object, array, null, bool, string or number but got something else")
+			panic("error parsing object: unexpected item " + p.Item.Value)
 		}
 		p.LastItem = p.Item
 	}
 
 	if p.LastItem.Typ == lex.ItemComma {
-		panic("a closing curly brace mustn't follow a comma")
+		panic("error parsing object: a closing curly brace mustn't follow a comma")
 	}
 
 	return object
@@ -116,7 +116,10 @@ func (p *Parser) parseObject() *ObjectNode {
 
 func (p *Parser) parseArray() *ArrayNode {
 	p.LastItem = p.Item
-	array := &ArrayNode{NodeType: NodeTypeArray}
+	array := &ArrayNode{
+		NodeType: NodeTypeArray,
+		children: make([]Node, 0),
+	}
 
 	for p.Item = p.Lexer.NextItem(); p.Item.Typ != lex.ItemRightSqrBrace; p.Item = p.Lexer.NextItem() {
 		switch p.Item.Typ {
@@ -132,14 +135,16 @@ func (p *Parser) parseArray() *ArrayNode {
 			array.children = append(array.children, p.parseString())
 		case lex.ItemNumber:
 			array.children = append(array.children, p.parseNumber())
+		case lex.ItemComma:
+			break
 		default:
-			panic("expected a value of type object, array, null, bool, string or number but got something else")
+			panic("error parsing array: unexpected item " + p.Item.Value)
 		}
 		p.LastItem = p.Item
 	}
 
 	if p.LastItem.Typ == lex.ItemComma {
-		panic("a closing square brace mustn't follow a comma")
+		panic("error parsing array: a closing square brace mustn't follow a comma")
 	}
 
 	return array
@@ -148,23 +153,27 @@ func (p *Parser) parseArray() *ArrayNode {
 func (p *Parser) parseBool() *PrimitiveNode {
 	return &PrimitiveNode{
 		NodeType: NodeTypeBool,
+		value:    p.Item.Value,
 	}
 }
 
 func (p *Parser) parseString() *PrimitiveNode {
 	return &PrimitiveNode{
 		NodeType: NodeTypeString,
+		value:    p.Item.Value,
 	}
 }
 
 func (p *Parser) parseNil() *PrimitiveNode {
 	return &PrimitiveNode{
 		NodeType: NodeTypeNil,
+		value:    p.Item.Value,
 	}
 }
 
 func (p *Parser) parseNumber() *PrimitiveNode {
 	return &PrimitiveNode{
 		NodeType: NodeTypeNumber,
+		value:    p.Item.Value,
 	}
 }
