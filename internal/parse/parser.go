@@ -80,7 +80,7 @@ func (p *Parser) parseObject() *ObjectNode {
 		case lex.ItemString:
 
 			// A string can indicate that the current lexem is either a key or a value.
-			// It's a key if the previous lexem is a comma.
+			// It's a key if the previous lexem is a comma or an opening brace.
 			// It's a value if the previous lexem is a colon.
 			if p.LastItem.Typ == lex.ItemComma || p.LastItem.Typ == lex.ItemLeftBrace {
 				currentKey = p.Item.Value
