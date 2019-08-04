@@ -30,14 +30,14 @@ const (
 
 type ArrayNode struct {
 	NodeType
-	children []Node
+	Children []Node
 }
 
 type ObjectNode struct {
 	NodeType
 
 	// The JSON spec allows different types of values for the same key. Because of that, a simple `map[string]Node` is not enough.
-	children map[string][]Node
+	Children map[string][]Node
 }
 
 type PrimitiveNode struct {
@@ -70,7 +70,7 @@ func (p *Parser) parseObject() *ObjectNode {
 
 	object := &ObjectNode{
 		NodeType: NodeTypeObject,
-		children: make(map[string][]Node),
+		Children: make(map[string][]Node),
 	}
 
 	var currentKey string
@@ -85,18 +85,18 @@ func (p *Parser) parseObject() *ObjectNode {
 			if p.LastItem.Typ == lex.ItemComma || p.LastItem.Typ == lex.ItemLeftBrace {
 				currentKey = p.Item.Value
 			} else {
-				object.children[currentKey] = append(object.children[currentKey], p.parseString())
+				object.Children[currentKey] = append(object.Children[currentKey], p.parseString())
 			}
 		case lex.ItemLeftBrace:
-			object.children[currentKey] = append(object.children[currentKey], p.parseObject())
+			object.Children[currentKey] = append(object.Children[currentKey], p.parseObject())
 		case lex.ItemLeftSqrBrace:
-			object.children[currentKey] = append(object.children[currentKey], p.parseArray())
+			object.Children[currentKey] = append(object.Children[currentKey], p.parseArray())
 		case lex.ItemBool:
-			object.children[currentKey] = append(object.children[currentKey], p.parseBool())
+			object.Children[currentKey] = append(object.Children[currentKey], p.parseBool())
 		case lex.ItemNil:
-			object.children[currentKey] = append(object.children[currentKey], p.parseNil())
+			object.Children[currentKey] = append(object.Children[currentKey], p.parseNil())
 		case lex.ItemNumber:
-			object.children[currentKey] = append(object.children[currentKey], p.parseNumber())
+			object.Children[currentKey] = append(object.Children[currentKey], p.parseNumber())
 		case lex.ItemColon:
 			break
 		case lex.ItemComma:
@@ -118,23 +118,23 @@ func (p *Parser) parseArray() *ArrayNode {
 	p.LastItem = p.Item
 	array := &ArrayNode{
 		NodeType: NodeTypeArray,
-		children: make([]Node, 0),
+		Children: make([]Node, 0),
 	}
 
 	for p.Item = p.Lexer.NextItem(); p.Item.Typ != lex.ItemRightSqrBrace; p.Item = p.Lexer.NextItem() {
 		switch p.Item.Typ {
 		case lex.ItemLeftBrace:
-			array.children = append(array.children, p.parseObject())
+			array.Children = append(array.Children, p.parseObject())
 		case lex.ItemLeftSqrBrace:
-			array.children = append(array.children, p.parseArray())
+			array.Children = append(array.Children, p.parseArray())
 		case lex.ItemNil:
-			array.children = append(array.children, p.parseNil())
+			array.Children = append(array.Children, p.parseNil())
 		case lex.ItemBool:
-			array.children = append(array.children, p.parseBool())
+			array.Children = append(array.Children, p.parseBool())
 		case lex.ItemString:
-			array.children = append(array.children, p.parseString())
+			array.Children = append(array.Children, p.parseString())
 		case lex.ItemNumber:
-			array.children = append(array.children, p.parseNumber())
+			array.Children = append(array.Children, p.parseNumber())
 		case lex.ItemComma:
 			break
 		default:

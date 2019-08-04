@@ -7,14 +7,14 @@ import (
 
 func mkObjectNode(children map[string][]Node) *ObjectNode {
 	return &ObjectNode{
-		children: children,
+		Children: children,
 		NodeType: NodeTypeObject,
 	}
 }
 
 func mkArrayNode(children []Node) *ArrayNode {
 	return &ArrayNode{
-		children: children,
+		Children: children,
 		NodeType: NodeTypeArray,
 	}
 }

@@ -11,28 +11,30 @@ import (
 func GenerateFile(tree parse.Node) *jen.File {
 	g := Generator{
 		Tree:        tree,
-		CurrentNode: tree,
+		currentNode: tree,
+		file:        jen.NewFile("generated"),
 	}
-	return g.run()
+	return g.start()
 }
 
 type Generator struct {
 	Tree        parse.Node
-	CurrentNode parse.Node
+	currentNode parse.Node
 
 	file        *jen.File
 	currentStmt *jen.Statement
 }
 
-func (g Generator) run() *jen.File {
-	g.file = jen.NewFile("generated")
-	g.currentStmt = g.file.Type().Id("JSONToStruct")
+func (g Generator) start() *jen.File {
+	rootStmt := g.file.Type().Id("JSONToStruct")
 
 	switch g.Tree.Type() {
 	case parse.NodeTypeArray:
-		g.currentStmt.Index().Struct()
+		casted := g.Tree.(*parse.ArrayNode)
+		rootStmt.Add(makeArray(casted))
 	case parse.NodeTypeObject:
-		g.currentStmt.Struct()
+		casted := g.Tree.(*parse.ObjectNode)
+		rootStmt.Add(makeStruct(casted))
 	default:
 		panic("temp 1")
 	}
@@ -41,29 +43,93 @@ func (g Generator) run() *jen.File {
 
 }
 
-func makePrimitiveDecl(typ parse.NodeType, varname string) *jen.Statement {
+func countChildrenTypes(node *parse.ArrayNode) int {
+	// If there are only zero or one children, then there are zero or one
+	// different types of children aswell.
+	childrenCount := len(node.Children)
+	if childrenCount == 0 || childrenCount == 1 {
+		return childrenCount
+	}
 
-	// We have to return e.g. `Title string `json:"title"``.
-	// Start with the identifier, e.g. `Title`. This has to be uppercase.
+	foundTypes := make(map[parse.NodeType]bool, 0)
+	for _, child := range node.Children {
+		foundTypes[child.Type()] = true
+	}
+	return len(foundTypes)
+}
+
+// addJSONTag adds the json-tag, e.g. `json:"title"`. This has to match the original varname from the json file
+func makeJSONTag(varname string) *jen.Statement {
+	return jen.Tag(map[string]string{"json": varname})
+}
+
+func makeArray(arr *parse.ArrayNode) *jen.Statement {
+
+	childrenTypeCount := countChildrenTypes(arr)
+	if childrenTypeCount != 1 || arr.Children[0].Type() == parse.NodeTypeArray {
+		return jen.Index().Interface()
+	}
+
+	if arr.Children[0].Type() == parse.NodeTypeObject {
+		mergedChildren := make(map[string][]parse.Node)
+		for _, child := range arr.Children {
+			childObj := child.(*parse.ObjectNode)
+
+			for key, val := range childObj.Children {
+				mergedChildren[key] = val
+			}
+		}
+		compositeObj := &parse.ObjectNode{
+			NodeType: parse.NodeTypeObject,
+			Children: mergedChildren,
+		}
+		return jen.Index().Add(makeStruct(compositeObj))
+	}
+
+	return jen.Index().Add(makePrimTypedef(arr.Children[0].Type()))
+}
+
+func makeStruct(obj *parse.ObjectNode) *jen.Statement {
+
+	var children []jen.Code
+	for varname, valueArray := range obj.Children {
+		if len(valueArray) != 1 {
+			children = append(children, makeVarname(varname).Interface().Add(makeJSONTag(varname)))
+		} else {
+			switch valueArray[0].Type() {
+			case parse.NodeTypeArray:
+				childArr := valueArray[0].(*parse.ArrayNode)
+				children = append(children, makeVarname(varname).Add(makeArray(childArr)).Add(makeJSONTag(varname)))
+			case parse.NodeTypeObject:
+				childObj := valueArray[0].(*parse.ObjectNode)
+				children = append(children, makeVarname(varname).Add(makeStruct(childObj)).Add(makeJSONTag(varname)))
+			default:
+				children = append(children, makeVarname(varname).Add(makePrimTypedef(valueArray[0].Type())).Add(makeJSONTag(varname)))
+			}
+		}
+	}
+	return jen.Struct(children...)
+}
+
+// We have to return e.g. `Title string `json:"title"``.
+// Start with the identifier, e.g. `Title`. This has to be uppercase.
+func makeVarname(varname string) *jen.Statement {
 	upperCaseVarname := strings.Title(strings.ToLower(varname))
-	stmt := jen.Id(upperCaseVarname)
+	return jen.Id(upperCaseVarname)
+}
 
-	// Depending on `typ`, add the type of the identifier, e.g. `Title string`.
+// Depending on `typ`, add the type of the identifier, e.g. `Title string`.
+func makePrimTypedef(typ parse.NodeType) *jen.Statement {
 	switch typ {
 	case parse.NodeTypeBool:
-		stmt = stmt.Bool()
+		return jen.Bool()
 	case parse.NodeTypeNil:
-		stmt = stmt.Interface()
+		return jen.Interface()
 	case parse.NodeTypeString:
-		stmt = stmt.String()
+		return jen.String()
 	case parse.NodeTypeNumber:
-		stmt = stmt.Float64()
+		return jen.Float64()
 	default:
 		panic("temp 2")
 	}
-
-	// Add the json-tag, e.g. `json:"title"`. This has to match the original varname from the json file
-	stmt = stmt.Tag(map[string]string{"json": varname})
-
-	return stmt
 }
