@@ -1,3 +1,5 @@
+package generated
+
 type JSONToStruct struct {
 	Testobj struct {
 		Teststring string `json:"Teststring"`

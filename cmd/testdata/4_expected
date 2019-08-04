@@ -1,4 +1,6 @@
-type JSONToStruct []struct {
+package generated
+
+type JSONToStruct []struct{
 	Teststring string `json:"teststring"`
 	Testbool   bool   `json:"testbool"`
 }
