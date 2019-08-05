@@ -2,7 +2,7 @@ package generated
 
 type JSONToStruct struct {
 	Testobj struct {
-		Teststring string `json:"Teststring"`
 		Testbool   bool   `json:"Testbool"`
+		Teststring string `json:"Teststring"`
 	} `json:"Testobj"`
 }

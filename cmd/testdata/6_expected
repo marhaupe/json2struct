@@ -1,6 +1,6 @@
 package generated
 
-type JSONToStruct struct{
+type JSONToStruct struct {
 	Nestedobj struct {
 		Testbool bool `json:"Testbool"`
 	} `json:"NestedObj"`

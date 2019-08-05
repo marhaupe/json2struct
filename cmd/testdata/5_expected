@@ -1,8 +1,8 @@
 package generated
 
-type JSONToStruct []struct{
-	Thissucks      bool `json:"thissucks"`
+type JSONToStruct []struct {
 	Thisdoesntsuck struct {
 		Value bool `json:"value"`
 	} `json:"thisdoesntsuck"`
+	Thissucks bool `json:"thissucks"`
 }

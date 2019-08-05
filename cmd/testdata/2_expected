@@ -1,10 +1,10 @@
 package generated
 
 type JSONToStruct struct {
-	Src       string `json:"src"`
-	Name      string `json:"name"`
-	Hoffset   int    `json:"hOffset"`
-	Voffset   int    `json:"vOffset"`
 	Alignment string `json:"alignment"`
+	Hoffset   int    `json:"hOffset"`
+	Name      string `json:"name"`
+	Src       string `json:"src"`
+	Voffset   int    `json:"vOffset"`
 	Visible   bool   `json:"visible"`
 }

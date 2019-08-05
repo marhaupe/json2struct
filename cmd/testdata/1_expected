@@ -2,23 +2,23 @@ package generated
 
 type JSONToStruct struct {
 	Glossary struct {
-		Title    string `json:"title"`
 		Glossdiv struct {
-			Title     string `json:"title"`
 			Glosslist struct {
 				Glossentry struct {
+					Abbrev   string `json:"Abbrev"`
+					Acronym  string `json:"Acronym"`
+					Glossdef struct {
+						Glossseealso []string `json:"GlossSeeAlso"`
+						Para         string   `json:"para"`
+					} `json:"GlossDef"`
+					Glosssee  string `json:"GlossSee"`
+					Glossterm string `json:"GlossTerm"`
 					Id        string `json:"ID"`
 					Sortas    string `json:"SortAs"`
-					Glossterm string `json:"GlossTerm"`
-					Acronym   string `json:"Acronym"`
-					Abbrev    string `json:"Abbrev"`
-					Glossdef  struct {
-						Para         string   `json:"para"`
-						Glossseealso []string `json:"GlossSeeAlso"`
-					} `json:"GlossDef"`
-					Glosssee string `json:"GlossSee"`
 				} `json:"GlossEntry"`
 			} `json:"GlossList"`
+			Title string `json:"title"`
 		} `json:"GlossDiv"`
+		Title string `json:"title"`
 	} `json:"glossary"`
 }
