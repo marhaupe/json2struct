@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"go/format"
 	"io/ioutil"
 	"path"
 	"reflect"
@@ -18,15 +17,13 @@ func TestFiles(t *testing.T) {
 		t.Fatal("Error reading input files", err)
 	}
 
-	inputExpected, err := setupInputExpected(inputFiles)
-	if err != nil {
-		t.Fatal("Error setting test cases up", err)
-	}
-
-	for input, expected := range inputExpected {
+	for _, filename := range inputFiles {
+		input := readFile(filename)
+		expected := readFile(filename + expectedSuffix)
 		actual := generate(input)
 		if !reflect.DeepEqual(actual, expected) {
-			t.Errorf("Test failed.\nActual: %v\nActualLen: %v\nExpected: %v\nExpectedLen: %v\n", actual, len(actual), expected, len(expected))
+			t.Errorf("Test failed. Filename: %v\nActual: %v\nActualLen: %v\nExpected: %v\nExpectedLen: %v\n",
+				filename, actual, len(actual), expected, len(expected))
 		}
 	}
 }
@@ -61,19 +58,10 @@ func listValidInputFiles() ([]string, error) {
 	return validInputFiles, nil
 }
 
-func setupInputExpected(inputFiles []string) (map[string]string, error) {
-	inputExpected := make(map[string]string, len(inputFiles))
-	for _, f := range inputFiles {
-		input, err := ioutil.ReadFile(f)
-		if err != nil {
-			return nil, err
-		}
-		expected, err := ioutil.ReadFile(f + expectedSuffix)
-		if err != nil {
-			return nil, err
-		}
-		formattedExpected, _ := format.Source(expected)
-		inputExpected[string(input)] = string(formattedExpected)
+func readFile(filename string) string {
+	content, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic("error reading file " + filename)
 	}
-	return inputExpected, nil
+	return string(content)
 }
