@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"go/format"
 	"io/ioutil"
 	"path"
-	"reflect"
 	"strings"
 	"testing"
 )
@@ -18,10 +18,18 @@ func TestFiles(t *testing.T) {
 	}
 
 	for _, filename := range inputFiles {
+
 		input := readFile(filename)
 		expected := readFile(filename + expectedSuffix)
 		actual := generate(input)
-		if !reflect.DeepEqual(actual, expected) {
+
+		formatExpectedBytes, _ := format.Source([]byte(expected))
+		formatActualBytes, _ := format.Source([]byte(actual))
+
+		expected = string(formatExpectedBytes)
+		actual = string(formatActualBytes)
+
+		if actual != expected {
 			t.Errorf("Test failed. Filename: %v\nActual: %v\nActualLen: %v\nExpected: %v\nExpectedLen: %v\n",
 				filename, actual, len(actual), expected, len(expected))
 		}
