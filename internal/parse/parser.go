@@ -25,7 +25,8 @@ const (
 	NodeTypeString
 	NodeTypeBool
 	NodeTypeNil
-	NodeTypeNumber
+	NodeTypeFloat
+	NodeTypeInteger
 )
 
 type ArrayNode struct {
@@ -95,8 +96,10 @@ func (p *Parser) parseObject() *ObjectNode {
 			object.Children[currentKey] = append(object.Children[currentKey], p.parseBool())
 		case lex.ItemNil:
 			object.Children[currentKey] = append(object.Children[currentKey], p.parseNil())
-		case lex.ItemNumber:
-			object.Children[currentKey] = append(object.Children[currentKey], p.parseNumber())
+		case lex.ItemFloat:
+			object.Children[currentKey] = append(object.Children[currentKey], p.parseFloat())
+		case lex.ItemInteger:
+			object.Children[currentKey] = append(object.Children[currentKey], p.parseInteger())
 		case lex.ItemColon:
 			break
 		case lex.ItemComma:
@@ -133,8 +136,10 @@ func (p *Parser) parseArray() *ArrayNode {
 			array.Children = append(array.Children, p.parseBool())
 		case lex.ItemString:
 			array.Children = append(array.Children, p.parseString())
-		case lex.ItemNumber:
-			array.Children = append(array.Children, p.parseNumber())
+		case lex.ItemInteger:
+			array.Children = append(array.Children, p.parseInteger())
+		case lex.ItemFloat:
+			array.Children = append(array.Children, p.parseFloat())
 		case lex.ItemComma:
 			break
 		default:
@@ -171,9 +176,16 @@ func (p *Parser) parseNil() *PrimitiveNode {
 	}
 }
 
-func (p *Parser) parseNumber() *PrimitiveNode {
+func (p *Parser) parseFloat() *PrimitiveNode {
 	return &PrimitiveNode{
-		NodeType: NodeTypeNumber,
+		NodeType: NodeTypeFloat,
+		value:    p.Item.Value,
+	}
+}
+
+func (p *Parser) parseInteger() *PrimitiveNode {
+	return &PrimitiveNode{
+		NodeType: NodeTypeInteger,
 		value:    p.Item.Value,
 	}
 }

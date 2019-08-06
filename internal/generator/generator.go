@@ -210,7 +210,9 @@ func makePrimTypedef(typ parse.NodeType) *jen.Statement {
 		return jen.Interface()
 	case parse.NodeTypeString:
 		return jen.String()
-	case parse.NodeTypeNumber:
+	case parse.NodeTypeInteger:
+		return jen.Int()
+	case parse.NodeTypeFloat:
 		return jen.Float64()
 	default:
 		panic("temp 2")

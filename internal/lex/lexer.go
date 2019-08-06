@@ -16,7 +16,8 @@ type ItemType int
 const (
 	ItemString ItemType = iota
 	ItemBool
-	ItemNumber
+	ItemInteger
+	ItemFloat
 	ItemNil
 	ItemKey
 	ItemLeftBrace
@@ -67,10 +68,13 @@ func (l *Lexer) next() rune {
 	return rn
 }
 
-func (l *Lexer) acceptRun(valid string) {
+func (l *Lexer) acceptRun(valid string) int {
+	validCount := 0
 	for strings.ContainsRune(valid, l.next()) {
+		validCount++
 	}
 	l.backup()
+	return validCount
 }
 
 func (l *Lexer) backup() {
@@ -161,8 +165,14 @@ func lexBool(l *Lexer) stateFn {
 func lexNumber(l *Lexer) stateFn {
 	l.acceptRun("+-")
 	l.acceptRun("0123456789")
-	l.acceptRun(".eE+-0123456789")
-	l.emit(ItemNumber)
+
+	count := l.acceptRun(".eE+-0123456789")
+	if count > 0 {
+		l.emit(ItemFloat)
+	} else {
+		l.emit(ItemInteger)
+	}
+
 	return lexWhitespace
 }
 
