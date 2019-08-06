@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/marhaupe/json2struct/internal/parse"
@@ -43,16 +44,33 @@ func (g Generator) start() *jen.File {
 
 }
 
-func countChildrenTypes(node *parse.ArrayNode) int {
+func countObjectChildrenTypes(children map[string][]parse.Node) int {
 	// If there are only zero or one children, then there are zero or one
 	// different types of children aswell.
-	childrenCount := len(node.Children)
+	childrenCount := len(children)
 	if childrenCount == 0 || childrenCount == 1 {
 		return childrenCount
 	}
 
 	foundTypes := make(map[parse.NodeType]bool, 0)
-	for _, child := range node.Children {
+	for _, valueArray := range children {
+		for _, value := range valueArray {
+			foundTypes[value.Type()] = true
+		}
+	}
+	return len(foundTypes)
+}
+
+func countArrayChildrenTypes(children []parse.Node) int {
+	// If there are only zero or one children, then there are zero or one
+	// different types of children aswell.
+	childrenCount := len(children)
+	if childrenCount == 0 || childrenCount == 1 {
+		return childrenCount
+	}
+
+	foundTypes := make(map[parse.NodeType]bool, 0)
+	for _, child := range children {
 		foundTypes[child.Type()] = true
 	}
 	return len(foundTypes)
@@ -64,50 +82,115 @@ func makeJSONTag(varname string) *jen.Statement {
 }
 
 func makeArray(arr *parse.ArrayNode) *jen.Statement {
-
-	childrenTypeCount := countChildrenTypes(arr)
-	if childrenTypeCount != 1 || arr.Children[0].Type() == parse.NodeTypeArray {
+	// 	Many different datatypes e.g. strings and objects,
+	// 	or no datatypes at all (empty array)
+	//	-> The generated code is []interface{}
+	childrenTypeCount := countArrayChildrenTypes(arr.Children)
+	if childrenTypeCount != 1 {
 		return jen.Index().Interface()
 	}
 
-	if arr.Children[0].Type() == parse.NodeTypeObject {
-		mergedChildren := make(map[string][]parse.Node)
-		for _, child := range arr.Children {
-			childObj := child.(*parse.ObjectNode)
-
-			for key, val := range childObj.Children {
-				mergedChildren[key] = val
-			}
-		}
-		compositeObj := &parse.ObjectNode{
-			NodeType: parse.NodeTypeObject,
-			Children: mergedChildren,
-		}
-		return jen.Index().Add(makeStruct(compositeObj))
+	// 	Only arrays as children
+	//	-> The generated code is []interface{}
+	if arr.Children[0].Type() == parse.NodeTypeArray {
+		return jen.Index().Interface()
 	}
 
+	// 	Only structs as children
+	//	-> We have to merge the structs since we don't
+	// 			want to "lose" data when ultimately parsing with
+	//			the generated code.
+	if arr.Children[0].Type() == parse.NodeTypeObject {
+
+		// Only merge the children objects if the size is greater than one.
+		if len(arr.Children) > 1 {
+			mergedChildren := mergeChildren(arr.Children)
+
+			compositeObj := &parse.ObjectNode{
+				NodeType: parse.NodeTypeObject,
+				Children: mergedChildren,
+			}
+
+			return jen.Index().Add(makeStruct(compositeObj))
+		}
+
+		// At this point, we are sure that there is only one object as a child
+		return jen.Index().Add(makeStruct(arr.Children[0].(*parse.ObjectNode)))
+	}
+
+	// 	Only one primitive datatype e.g. only strings
+	//	-> The generated code is []string
 	return jen.Index().Add(makePrimTypedef(arr.Children[0].Type()))
 }
 
-func makeStruct(obj *parse.ObjectNode) *jen.Statement {
+func mergeChildren(children []parse.Node) map[string][]parse.Node {
+	mergedChildren := make(map[string][]parse.Node)
 
+	for _, child := range children {
+		childObj := child.(*parse.ObjectNode)
+
+		for key, val := range childObj.Children {
+			mergedChildren[key] = val
+		}
+	}
+
+	return mergedChildren
+}
+
+func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 	var children []jen.Code
-	for varname, valueArray := range obj.Children {
+
+	var sortedVarnames []string
+	for varname := range obj.Children {
+		sortedVarnames = append(sortedVarnames, varname)
+	}
+	sort.Strings(sortedVarnames)
+
+	for _, varname := range sortedVarnames {
+
+		valueArray := obj.Children[varname]
+
 		if len(valueArray) != 1 {
-			children = append(children, makeVarname(varname).Interface().Add(makeJSONTag(varname)))
+
+			// TODO: Wenn die Kinder Structs sind, mergen.
+			children = append(
+				children,
+				makeVarname(varname).
+					Add(jen.Interface()).
+					Add(makeJSONTag(varname)),
+			)
+
 		} else {
 			switch valueArray[0].Type() {
 			case parse.NodeTypeArray:
 				childArr := valueArray[0].(*parse.ArrayNode)
-				children = append(children, makeVarname(varname).Add(makeArray(childArr)).Add(makeJSONTag(varname)))
+				children = append(
+					children,
+					makeVarname(varname).
+						Add(makeArray(childArr)).
+						Add(makeJSONTag(varname)),
+				)
+
 			case parse.NodeTypeObject:
 				childObj := valueArray[0].(*parse.ObjectNode)
-				children = append(children, makeVarname(varname).Add(makeStruct(childObj)).Add(makeJSONTag(varname)))
+				children = append(
+					children,
+					makeVarname(varname).
+						Add(makeStruct(childObj)).
+						Add(makeJSONTag(varname)),
+				)
+
 			default:
-				children = append(children, makeVarname(varname).Add(makePrimTypedef(valueArray[0].Type())).Add(makeJSONTag(varname)))
+				children = append(
+					children,
+					makeVarname(varname).
+						Add(makePrimTypedef(valueArray[0].Type())).
+						Add(makeJSONTag(varname)),
+				)
 			}
 		}
 	}
+
 	return jen.Struct(children...)
 }
 
