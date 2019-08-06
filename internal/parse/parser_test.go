@@ -64,7 +64,7 @@ func TestParseArrayFromString(t *testing.T) {
 			want: mkArrayNode(
 				[]Node{
 					mkPrim(NodeTypeString, "test"),
-					mkPrim(NodeTypeNumber, "1234"),
+					mkPrim(NodeTypeInteger, "1234"),
 					mkPrim(NodeTypeBool, "true"),
 					mkPrim(NodeTypeNil, "null"),
 				},
@@ -142,7 +142,7 @@ func TestParseObjectFromString(t *testing.T) {
 				map[string][]Node{
 					"teststring": []Node{mkPrim(NodeTypeString, "hi")},
 					"testbool":   []Node{mkPrim(NodeTypeBool, "true")},
-					"testnumber": []Node{mkPrim(NodeTypeNumber, "5.4")},
+					"testnumber": []Node{mkPrim(NodeTypeFloat, "5.4")},
 					"testnil":    []Node{mkPrim(NodeTypeNil, "null")},
 				},
 			),

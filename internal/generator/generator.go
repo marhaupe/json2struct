@@ -152,13 +152,30 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 
 		if len(valueArray) != 1 {
 
-			// TODO: Wenn die Kinder Structs sind, mergen.
-			children = append(
-				children,
-				makeVarname(varname).
-					Add(jen.Interface()).
-					Add(makeJSONTag(varname)),
-			)
+			// At this point, we know that there are multiple values for the same
+			// key. If there are different objects for the same key, we should
+			// merge them together.
+			typeCount := countArrayChildrenTypes(valueArray)
+			if typeCount == 1 && valueArray[0].Type() == parse.NodeTypeObject {
+				mergedChildren := mergeChildren(valueArray)
+				compositeObj := &parse.ObjectNode{
+					NodeType: parse.NodeTypeObject,
+					Children: mergedChildren,
+				}
+				children = append(children,
+					makeVarname(varname).
+						Add(makeStruct(compositeObj)).
+						Add(makeJSONTag(varname)),
+				)
+
+			} else {
+				children = append(
+					children,
+					makeVarname(varname).
+						Add(jen.Interface()).
+						Add(makeJSONTag(varname)),
+				)
+			}
 
 		} else {
 			switch valueArray[0].Type() {
