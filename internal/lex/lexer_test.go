@@ -110,7 +110,8 @@ var lexTests = []lexTest{
 		"string2": "true",
 		"string3": "false",
 		"string4": "null",
-		"string5": "1"
+		"string5": "1",
+		"string6": "blabla \"xyz\""
 		}`, []Item{
 		iLeftBrace,
 		mkItem(ItemString, "string1"),
@@ -132,6 +133,10 @@ var lexTests = []lexTest{
 		mkItem(ItemString, "string5"),
 		iColon,
 		mkItem(ItemString, "1"),
+		iComma,
+		mkItem(ItemString, "string6"),
+		iColon,
+		mkItem(ItemString, "blabla \\\"xyz\\\""),
 		iRightBrace,
 		iEOF,
 	}},

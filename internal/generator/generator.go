@@ -2,6 +2,7 @@ package generator
 
 import (
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/marhaupe/json2struct/internal/parse"
@@ -211,11 +212,20 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 	return jen.Struct(children...)
 }
 
-// We have to return e.g. `Title string `json:"title"``.
-// Start with the identifier, e.g. `Title`. This has to be uppercase.
 func makeVarname(varname string) *jen.Statement {
 	upperCaseVarname := strings.Title(strings.ToLower(varname))
+
+	// Numbers are not a valid identifier.
+	if isNumber(varname) {
+		upperCaseVarname = "Number" + upperCaseVarname
+	}
+
 	return jen.Id(upperCaseVarname)
+}
+
+func isNumber(varname string) bool {
+	_, err := strconv.ParseFloat(varname, 64)
+	return err == nil
 }
 
 // Depending on `typ`, add the type of the identifier, e.g. `Title string`.

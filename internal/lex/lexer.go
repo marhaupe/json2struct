@@ -181,6 +181,9 @@ func lexString(l *Lexer) stateFn {
 	// e.g. example instead of "example".
 	l.ignore()
 	for r := l.next(); r != '"'; r = l.next() {
+		if r == '\\' {
+			r = l.next()
+		}
 		if r == EOF {
 			panic("unterminated string")
 		}
