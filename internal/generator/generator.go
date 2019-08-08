@@ -93,12 +93,13 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 	for _, varname := range sortedVarnames {
 
 		valueArray := obj.Children[varname]
+		childrenWithSharedKey := len(valueArray)
+		if childrenWithSharedKey == 0 {
+			continue
 
-		if len(valueArray) != 1 {
+		} else if childrenWithSharedKey > 1 {
 
-			// At this point, we know that there are multiple values for the same
-			// key. If there are different objects for the same key, we should
-			// merge them together.
+			// If there are different objects for the same key, we should merge them together.
 			typeCount := countNodeTypes(valueArray)
 			if typeCount == 1 && valueArray[0].Type() == parse.NodeTypeObject {
 				compositeObj := mergeObjects(castToObjectArr(valueArray))
@@ -156,10 +157,34 @@ func mergeObjects(children []*parse.ObjectNode) *parse.ObjectNode {
 
 	mergedChildren := make(map[string][]parse.Node)
 
-	for _, child := range children {
+	for _, object := range children {
 
-		for key, val := range child.Children {
-			mergedChildren[key] = val
+		for varname, valueArray := range object.Children {
+
+			if mergedChildren[varname] == nil {
+				mergedChildren[varname] = valueArray
+
+			} else {
+
+				// If we're currently dealing with a varname that
+				// has already been added to mergedChildren, we have to check
+				// if there are only objects as children of mergedChildren and valueArray
+				typeCount := countNodeTypes(mergedChildren[varname])
+				if typeCount == 1 &&
+					mergedChildren[varname][0].Type() == parse.NodeTypeObject &&
+					valueArray[0].Type() == parse.NodeTypeObject {
+
+					var objectsToBeMerged []*parse.ObjectNode
+
+					objectsToBeMerged = append(objectsToBeMerged, castToObjectArr(mergedChildren[varname])...)
+					objectsToBeMerged = append(objectsToBeMerged, castToObjectArr(valueArray)...)
+
+					mergedObj := mergeObjects(objectsToBeMerged)
+
+					mergedChildren[varname] = []parse.Node{mergedObj}
+
+				}
+			}
 		}
 	}
 

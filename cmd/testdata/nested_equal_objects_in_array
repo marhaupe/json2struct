@@ -1,0 +1,12 @@
+[
+  {
+    "data": {
+      "teststring": "hi"
+    }
+  },
+  {
+    "data": {
+      "testbool": true
+    }
+  }
+]
