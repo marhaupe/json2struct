@@ -45,24 +45,7 @@ func (g Generator) start() *jen.File {
 
 }
 
-func countObjectChildrenTypes(children map[string][]parse.Node) int {
-	// If there are only zero or one children, then there are zero or one
-	// different types of children aswell.
-	childrenCount := len(children)
-	if childrenCount == 0 || childrenCount == 1 {
-		return childrenCount
-	}
-
-	foundTypes := make(map[parse.NodeType]bool, 0)
-	for _, valueArray := range children {
-		for _, value := range valueArray {
-			foundTypes[value.Type()] = true
-		}
-	}
-	return len(foundTypes)
-}
-
-func countArrayChildrenTypes(children []parse.Node) int {
+func countNodeTypes(children []parse.Node) int {
 	// If there are only zero or one children, then there are zero or one
 	// different types of children aswell.
 	childrenCount := len(children)
@@ -86,7 +69,7 @@ func makeArray(arr *parse.ArrayNode) *jen.Statement {
 	// 	Many different datatypes e.g. strings and objects,
 	// 	or no datatypes at all (empty array)
 	//	-> The generated code is []interface{}
-	childrenTypeCount := countArrayChildrenTypes(arr.Children)
+	childrenTypeCount := countNodeTypes(arr.Children)
 	if childrenTypeCount != 1 {
 		return jen.Index().Interface()
 	}
@@ -105,14 +88,8 @@ func makeArray(arr *parse.ArrayNode) *jen.Statement {
 
 		// Only merge the children objects if the size is greater than one.
 		if len(arr.Children) > 1 {
-			mergedChildren := mergeChildren(arr.Children)
-
-			compositeObj := &parse.ObjectNode{
-				NodeType: parse.NodeTypeObject,
-				Children: mergedChildren,
-			}
-
-			return jen.Index().Add(makeStruct(compositeObj))
+			mergedObject := mergeObjects(castToObjectArr(arr.Children))
+			return jen.Index().Add(makeStruct(mergedObject))
 		}
 
 		// At this point, we are sure that there is only one object as a child
@@ -124,18 +101,33 @@ func makeArray(arr *parse.ArrayNode) *jen.Statement {
 	return jen.Index().Add(makePrimTypedef(arr.Children[0].Type()))
 }
 
-func mergeChildren(children []parse.Node) map[string][]parse.Node {
+func mergeObjects(children []*parse.ObjectNode) *parse.ObjectNode {
+
 	mergedChildren := make(map[string][]parse.Node)
 
 	for _, child := range children {
-		childObj := child.(*parse.ObjectNode)
 
-		for key, val := range childObj.Children {
+		for key, val := range child.Children {
 			mergedChildren[key] = val
 		}
 	}
 
-	return mergedChildren
+	return &parse.ObjectNode{
+		NodeType: parse.NodeTypeObject,
+		Children: mergedChildren,
+	}
+}
+
+func castToObjectArr(arr []parse.Node) []*parse.ObjectNode {
+	var objectArr []*parse.ObjectNode
+	for _, child := range arr {
+		obj, ok := child.(*parse.ObjectNode)
+		if !ok {
+			panic("casting to object arr failed")
+		}
+		objectArr = append(objectArr, obj)
+	}
+	return objectArr
 }
 
 func makeStruct(obj *parse.ObjectNode) *jen.Statement {
@@ -156,13 +148,10 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 			// At this point, we know that there are multiple values for the same
 			// key. If there are different objects for the same key, we should
 			// merge them together.
-			typeCount := countArrayChildrenTypes(valueArray)
+			typeCount := countNodeTypes(valueArray)
 			if typeCount == 1 && valueArray[0].Type() == parse.NodeTypeObject {
-				mergedChildren := mergeChildren(valueArray)
-				compositeObj := &parse.ObjectNode{
-					NodeType: parse.NodeTypeObject,
-					Children: mergedChildren,
-				}
+				compositeObj := mergeObjects(castToObjectArr(valueArray))
+
 				children = append(children,
 					makeVarname(varname).
 						Add(makeStruct(compositeObj)).
