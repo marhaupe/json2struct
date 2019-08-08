@@ -94,8 +94,37 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 
 		valueArray := obj.Children[varname]
 		childrenWithSharedKey := len(valueArray)
+
 		if childrenWithSharedKey == 0 {
 			continue
+		}
+
+		if childrenWithSharedKey == 1 {
+			switch valueArray[0].Type() {
+			case parse.NodeTypeArray:
+				childArr := valueArray[0].(*parse.ArrayNode)
+				children = append(
+					children,
+					makeVarname(varname).
+						Add(makeArray(childArr)).
+						Add(makeJSONTag(varname)),
+				)
+			case parse.NodeTypeObject:
+				childObj := valueArray[0].(*parse.ObjectNode)
+				children = append(
+					children,
+					makeVarname(varname).
+						Add(makeStruct(childObj)).
+						Add(makeJSONTag(varname)),
+				)
+			default:
+				children = append(
+					children,
+					makeVarname(varname).
+						Add(makePrimTypedef(valueArray[0].Type())).
+						Add(makeJSONTag(varname)),
+				)
+			}
 
 		} else if childrenWithSharedKey > 1 {
 
@@ -111,6 +140,7 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 				)
 
 			} else {
+				// In any other case, e.g. if theres a string and a bool under the same key, use interface{} as type.
 				children = append(
 					children,
 					makeVarname(varname).
@@ -119,34 +149,6 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 				)
 			}
 
-		} else {
-			switch valueArray[0].Type() {
-			case parse.NodeTypeArray:
-				childArr := valueArray[0].(*parse.ArrayNode)
-				children = append(
-					children,
-					makeVarname(varname).
-						Add(makeArray(childArr)).
-						Add(makeJSONTag(varname)),
-				)
-
-			case parse.NodeTypeObject:
-				childObj := valueArray[0].(*parse.ObjectNode)
-				children = append(
-					children,
-					makeVarname(varname).
-						Add(makeStruct(childObj)).
-						Add(makeJSONTag(varname)),
-				)
-
-			default:
-				children = append(
-					children,
-					makeVarname(varname).
-						Add(makePrimTypedef(valueArray[0].Type())).
-						Add(makeJSONTag(varname)),
-				)
-			}
 		}
 	}
 
@@ -154,11 +156,9 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 }
 
 func mergeObjects(children []*parse.ObjectNode) *parse.ObjectNode {
-
 	mergedChildren := make(map[string][]parse.Node)
 
 	for _, object := range children {
-
 		for varname, valueArray := range object.Children {
 
 			if mergedChildren[varname] == nil {
@@ -166,16 +166,16 @@ func mergeObjects(children []*parse.ObjectNode) *parse.ObjectNode {
 
 			} else {
 
-				// If we're currently dealing with a varname that
-				// has already been added to mergedChildren, we have to check
-				// if there are only objects as children of mergedChildren and valueArray
 				typeCount := countNodeTypes(mergedChildren[varname])
+				// We want to merge nested objects aswell.
+				// For that, we need to check if
+				// 1) the type for the values in mergedChildren is object
+				// 2) the type for the values in valueArray is object
 				if typeCount == 1 &&
 					mergedChildren[varname][0].Type() == parse.NodeTypeObject &&
 					valueArray[0].Type() == parse.NodeTypeObject {
 
 					var objectsToBeMerged []*parse.ObjectNode
-
 					objectsToBeMerged = append(objectsToBeMerged, castToObjectArr(mergedChildren[varname])...)
 					objectsToBeMerged = append(objectsToBeMerged, castToObjectArr(valueArray)...)
 
