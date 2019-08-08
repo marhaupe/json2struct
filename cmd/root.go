@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 
 	"github.com/marhaupe/json2struct/internal/editor"
 	"github.com/marhaupe/json2struct/internal/generator"
@@ -14,9 +15,10 @@ import (
 )
 
 var (
-	inputString string
-	inputFile   string
-	version     string
+	inputString     string
+	inputFile       string
+	version         string
+	shouldBenchmark bool
 
 	rootCmd = &cobra.Command{
 		Use:     "json2struct",
@@ -30,6 +32,7 @@ var (
 func init() {
 	rootCmd.Flags().StringVarP(&inputString, "string", "s", "", "JSON string")
 	rootCmd.Flags().StringVarP(&inputFile, "file", "f", "", "Path to JSON file")
+	rootCmd.Flags().BoolVarP(&shouldBenchmark, "benchmark", "b", false, "Measure execution time")
 }
 
 func Execute() {
@@ -40,6 +43,11 @@ func Execute() {
 }
 
 func rootFunc(cmd *cobra.Command, args []string) {
+
+	if shouldBenchmark {
+		defer benchmark()()
+	}
+
 	var json string
 	switch {
 	case inputFile != "":
@@ -51,7 +59,6 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	}
 
 	res := generate(json)
-
 	fmt.Println(res)
 }
 
@@ -96,6 +103,13 @@ func awaitValidInput() string {
 		if isValid {
 			return jsonstr
 		}
+	}
+}
+
+func benchmark() func() {
+	start := time.Now()
+	return func() {
+		fmt.Printf("generating took %v\n", time.Since(start))
 	}
 }
 
