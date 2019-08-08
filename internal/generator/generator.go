@@ -45,26 +45,6 @@ func (g Generator) start() *jen.File {
 
 }
 
-func countNodeTypes(children []parse.Node) int {
-	// If there are only zero or one children, then there are zero or one
-	// different types of children aswell.
-	childrenCount := len(children)
-	if childrenCount == 0 || childrenCount == 1 {
-		return childrenCount
-	}
-
-	foundTypes := make(map[parse.NodeType]bool, 0)
-	for _, child := range children {
-		foundTypes[child.Type()] = true
-	}
-	return len(foundTypes)
-}
-
-// addJSONTag adds the json-tag, e.g. `json:"title"`. This has to match the original varname from the json file
-func makeJSONTag(varname string) *jen.Statement {
-	return jen.Tag(map[string]string{"json": varname})
-}
-
 func makeArray(arr *parse.ArrayNode) *jen.Statement {
 	// 	Many different datatypes e.g. strings and objects,
 	// 	or no datatypes at all (empty array)
@@ -99,35 +79,6 @@ func makeArray(arr *parse.ArrayNode) *jen.Statement {
 	// 	Only one primitive datatype e.g. only strings
 	//	-> The generated code is []string
 	return jen.Index().Add(makePrimTypedef(arr.Children[0].Type()))
-}
-
-func mergeObjects(children []*parse.ObjectNode) *parse.ObjectNode {
-
-	mergedChildren := make(map[string][]parse.Node)
-
-	for _, child := range children {
-
-		for key, val := range child.Children {
-			mergedChildren[key] = val
-		}
-	}
-
-	return &parse.ObjectNode{
-		NodeType: parse.NodeTypeObject,
-		Children: mergedChildren,
-	}
-}
-
-func castToObjectArr(arr []parse.Node) []*parse.ObjectNode {
-	var objectArr []*parse.ObjectNode
-	for _, child := range arr {
-		obj, ok := child.(*parse.ObjectNode)
-		if !ok {
-			panic("casting to object arr failed")
-		}
-		objectArr = append(objectArr, obj)
-	}
-	return objectArr
 }
 
 func makeStruct(obj *parse.ObjectNode) *jen.Statement {
@@ -201,6 +152,23 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 	return jen.Struct(children...)
 }
 
+func mergeObjects(children []*parse.ObjectNode) *parse.ObjectNode {
+
+	mergedChildren := make(map[string][]parse.Node)
+
+	for _, child := range children {
+
+		for key, val := range child.Children {
+			mergedChildren[key] = val
+		}
+	}
+
+	return &parse.ObjectNode{
+		NodeType: parse.NodeTypeObject,
+		Children: mergedChildren,
+	}
+}
+
 func makeVarname(varname string) *jen.Statement {
 	upperCaseVarname := strings.Title(strings.ToLower(varname))
 
@@ -215,6 +183,11 @@ func makeVarname(varname string) *jen.Statement {
 func isNumber(varname string) bool {
 	_, err := strconv.ParseFloat(varname, 64)
 	return err == nil
+}
+
+// addJSONTag adds the json-tag, e.g. `json:"title"`. This has to match the original varname from the json file
+func makeJSONTag(varname string) *jen.Statement {
+	return jen.Tag(map[string]string{"json": varname})
 }
 
 // Depending on `typ`, add the type of the identifier, e.g. `Title string`.
@@ -233,4 +206,31 @@ func makePrimTypedef(typ parse.NodeType) *jen.Statement {
 	default:
 		panic("temp 2")
 	}
+}
+
+func castToObjectArr(arr []parse.Node) []*parse.ObjectNode {
+	var objectArr []*parse.ObjectNode
+	for _, child := range arr {
+		obj, ok := child.(*parse.ObjectNode)
+		if !ok {
+			panic("casting to object arr failed")
+		}
+		objectArr = append(objectArr, obj)
+	}
+	return objectArr
+}
+
+func countNodeTypes(children []parse.Node) int {
+	// If there are only zero or one children, then there are zero or one
+	// different types of children aswell.
+	childrenCount := len(children)
+	if childrenCount == 0 || childrenCount == 1 {
+		return childrenCount
+	}
+
+	foundTypes := make(map[parse.NodeType]bool, 0)
+	for _, child := range children {
+		foundTypes[child.Type()] = true
+	}
+	return len(foundTypes)
 }
