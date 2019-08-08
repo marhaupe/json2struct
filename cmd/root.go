@@ -43,11 +43,6 @@ func Execute() {
 }
 
 func rootFunc(cmd *cobra.Command, args []string) {
-
-	if shouldBenchmark {
-		defer benchmark()()
-	}
-
 	var json string
 	switch {
 	case inputFile != "":
@@ -56,6 +51,10 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		json = inputString
 	default:
 		json = readFromEditor()
+	}
+
+	if shouldBenchmark {
+		defer benchmark()()
 	}
 
 	res := generate(json)
