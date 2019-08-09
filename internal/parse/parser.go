@@ -1,6 +1,7 @@
 package parse
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -51,9 +52,16 @@ type PrimitiveNode struct {
 	value string
 }
 
-func ParseFromString(name, json string) (Node, error) {
+func ParseFromString(name, j string) (Node, error) {
+
+	// TODO: This is fine, but I want to find a solution that
+	// lets me catch panics and return errors to the program using
+	// `Lexer`
+	if !json.Valid([]byte(j)) {
+		return nil, errors.New("invalid json")
+	}
 	parser := &Parser{
-		Lexer: lex.Lex(name, json),
+		Lexer: lex.Lex(name, j),
 	}
 	return parser.parse()
 }

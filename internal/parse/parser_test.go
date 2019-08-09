@@ -104,7 +104,11 @@ func TestParseArrayFromString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ParseFromString(tt.args.name, tt.args.json); !reflect.DeepEqual(got, tt.want) {
+			got, err := ParseFromString(tt.args.name, tt.args.json)
+			if err != nil {
+				t.Errorf("ParseFromString(): got error %v", err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ParseFromString(): \ngot:\n %#v \nwant:\n %#v", got, tt.want)
 			}
 		})
@@ -185,7 +189,11 @@ func TestParseObjectFromString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ParseFromString(tt.args.name, tt.args.json); !reflect.DeepEqual(got, tt.want) {
+			got, err := ParseFromString(tt.args.name, tt.args.json)
+			if err != nil {
+				t.Errorf("ParseFromString(): got error %v", err)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ParseFromString(): \ngot:\n %#v \nwant:\n %#v", got, tt.want)
 			}
 		})
