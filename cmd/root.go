@@ -113,7 +113,17 @@ func benchmark() func() {
 }
 
 func generate(json string) string {
-	node := parse.ParseFromString("json2struct", json)
-	file := generator.GenerateFile(node)
+	node, err := parse.ParseFromString("json2struct", json)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	file, err := generator.GenerateFile(node)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(2)
+	}
+
 	return fmt.Sprintf("%#v", file)
 }

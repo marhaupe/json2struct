@@ -1,6 +1,11 @@
 package parse
 
-import "github.com/marhaupe/json2struct/internal/lex"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/marhaupe/json2struct/internal/lex"
+)
 
 type Parser struct {
 	Lexer    *lex.Lexer
@@ -46,23 +51,30 @@ type PrimitiveNode struct {
 	value string
 }
 
-func ParseFromString(name, json string) Node {
+func ParseFromString(name, json string) (Node, error) {
 	parser := &Parser{
 		Lexer: lex.Lex(name, json),
 	}
 	return parser.parse()
 }
 
-func (p *Parser) parse() Node {
+func (p *Parser) parse() (node Node, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			node = nil
+			err = errors.New("error parsing document: " + fmt.Sprint(r))
+		}
+	}()
+
 	p.Item = p.Lexer.NextItem()
 
 	switch p.Item.Typ {
 	case lex.ItemLeftBrace:
-		return p.parseObject()
+		return p.parseObject(), nil
 	case lex.ItemLeftSqrBrace:
-		return p.parseArray()
+		return p.parseArray(), nil
 	default:
-		panic("error parsing document: unexpected item " + p.Item.Value)
+		panic("unexpected item " + p.Item.Value)
 	}
 }
 

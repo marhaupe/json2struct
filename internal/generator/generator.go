@@ -1,6 +1,8 @@
 package generator
 
 import (
+	"errors"
+	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -10,7 +12,7 @@ import (
 	"github.com/dave/jennifer/jen"
 )
 
-func GenerateFile(tree parse.Node) *jen.File {
+func GenerateFile(tree parse.Node) (*jen.File, error) {
 	g := Generator{
 		Tree:        tree,
 		currentNode: tree,
@@ -27,7 +29,15 @@ type Generator struct {
 	currentStmt *jen.Statement
 }
 
-func (g Generator) start() *jen.File {
+func (g Generator) start() (file *jen.File, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			file = nil
+			err = errors.New("error generating file: " + fmt.Sprint(r))
+			return
+		}
+	}()
+
 	rootStmt := g.file.Type().Id("JSONToStruct")
 
 	switch g.Tree.Type() {
@@ -38,11 +48,10 @@ func (g Generator) start() *jen.File {
 		casted := g.Tree.(*parse.ObjectNode)
 		rootStmt.Add(makeStruct(casted))
 	default:
-		panic("temp 1")
+		panic("invalid json. expected { or [ as initial node but received something else")
 	}
 
-	return g.file
-
+	return g.file, nil
 }
 
 func makeArray(arr *parse.ArrayNode) *jen.Statement {
@@ -229,7 +238,7 @@ func makePrimTypedef(typ parse.NodeType) *jen.Statement {
 	case parse.NodeTypeFloat:
 		return jen.Float64()
 	default:
-		panic("temp 2")
+		panic("received unexpected primitive nodetype")
 	}
 }
 
@@ -238,7 +247,7 @@ func castToObjectArr(arr []parse.Node) []*parse.ObjectNode {
 	for _, child := range arr {
 		obj, ok := child.(*parse.ObjectNode)
 		if !ok {
-			panic("casting to object arr failed")
+			panic("casting a node to objectnode failed")
 		}
 		objectArr = append(objectArr, obj)
 	}
