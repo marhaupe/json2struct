@@ -3,7 +3,6 @@ package editor
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"testing"
 )
 
@@ -31,14 +30,6 @@ func TestConsumeWithErrors(t *testing.T) {
 	}
 }
 
-func fakeExecCommand(command string, args ...string) *exec.Cmd {
-	cs := []string{"-test.run=TestHelperProcess", "--", command}
-	cs = append(cs, args...)
-	cmd := exec.Command(os.Args[0], cs...)
-	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
-	return cmd
-}
-
 func TestNew(t *testing.T) {
 	editor := New()
 	if len(editor.cmd.Args) != 2 || editor.cmd.Args[1] != editor.file.Name() {
@@ -51,4 +42,22 @@ func TestNew(t *testing.T) {
 		t.Error("Cmd pipes have been set wrong")
 	}
 	editor.Consume()
+}
+
+func Test_getUserEditor(t *testing.T) {
+	os.Setenv("EDITOR", "nano")
+
+	editor := getUserEditor()
+
+	if editor != "nano" {
+		t.Fatalf("want nano but got %v", editor)
+	}
+
+	os.Unsetenv("EDITOR")
+
+	editor = getUserEditor()
+
+	if editor != defaultEditor {
+		t.Fatalf("want defaultEditor but got %v", editor)
+	}
 }

@@ -8,6 +8,12 @@ import (
 	"os/exec"
 )
 
+var (
+	// defaultEditor is used if $EDITOR is not set
+	defaultEditor = "vim"
+	filename      = ".jsontostruct_temp"
+)
+
 // Editor contains fields to display Vim, write contents to a file
 // and consume that file and it's contents
 type Editor struct {
@@ -25,11 +31,12 @@ func New() *Editor {
 }
 
 func (e *Editor) setupFile() {
-	e.file, e.err = os.OpenFile("json2struct.temp", os.O_RDWR|os.O_CREATE, 0666)
+	e.file, e.err = os.OpenFile(filename, os.O_RDWR|os.O_CREATE, 0666)
 }
 
 func (e *Editor) setupCmd() {
-	e.cmd = exec.Command("vim", e.file.Name())
+	editor := getUserEditor()
+	e.cmd = exec.Command(editor, e.file.Name())
 	e.cmd.Stdin = os.Stdin
 	e.cmd.Stdout = os.Stdout
 	e.cmd.Stderr = os.Stderr
@@ -60,4 +67,12 @@ func (e *Editor) Read() (string, error) {
 func (e *Editor) Delete() error {
 	filename := e.file.Name()
 	return os.Remove(filename)
+}
+
+func getUserEditor() string {
+	editor := os.Getenv("EDITOR")
+	if editor == "" {
+		return defaultEditor
+	}
+	return editor
 }
