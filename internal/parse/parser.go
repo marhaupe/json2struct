@@ -1,7 +1,6 @@
 package parse
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -53,13 +52,6 @@ type PrimitiveNode struct {
 }
 
 func ParseFromString(name, j string) (Node, error) {
-
-	// TODO: This is fine, but I want to find a solution that
-	// lets me catch panics and return errors to the program using
-	// `Lexer`
-	if !json.Valid([]byte(j)) {
-		return nil, errors.New("invalid json")
-	}
 	parser := &Parser{
 		Lexer: lex.Lex(name, j),
 	}
@@ -70,7 +62,7 @@ func (p *Parser) parse() (node Node, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			node = nil
-			err = errors.New("error parsing document: " + fmt.Sprint(r))
+			err = errors.New(fmt.Sprint(r))
 		}
 	}()
 
@@ -81,8 +73,10 @@ func (p *Parser) parse() (node Node, err error) {
 		return p.parseObject(), nil
 	case lex.ItemLeftSqrBrace:
 		return p.parseArray(), nil
+	case lex.ItemError:
+		panic(fmt.Sprintf("received error from lexer at pos %v: %v", p.Item.Pos, p.Item.Value))
 	default:
-		panic("unexpected item " + p.Item.Value)
+		panic(fmt.Sprintf("error determining root json type. unexpected item %v", p.Item.Value))
 	}
 }
 
@@ -124,14 +118,16 @@ func (p *Parser) parseObject() *ObjectNode {
 			break
 		case lex.ItemComma:
 			break
+		case lex.ItemError:
+			panic(fmt.Sprintf("received error from lexer. pos: %v, msg: %v", p.Item.Pos, p.Item.Value))
 		default:
-			panic("error parsing object: unexpected item " + p.Item.Value)
+			panic(fmt.Sprintf("error parsing object. unexpected item %v", p.Item.Value))
 		}
 		p.LastItem = p.Item
 	}
 
 	if p.LastItem.Typ == lex.ItemComma {
-		panic("error parsing object: a closing curly brace mustn't follow a comma")
+		panic("error parsing object. a closing curly brace mustn't follow a comma")
 	}
 
 	return object
@@ -162,6 +158,8 @@ func (p *Parser) parseArray() *ArrayNode {
 			array.Children = append(array.Children, p.parseFloat())
 		case lex.ItemComma:
 			break
+		case lex.ItemError:
+			panic(fmt.Sprintf("received error from lexer. pos: %v, msg: %v", p.Item.Pos, p.Item.Value))
 		default:
 			panic("error parsing array: unexpected item " + p.Item.Value)
 		}

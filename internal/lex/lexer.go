@@ -1,6 +1,7 @@
 package lex
 
 import (
+	"fmt"
 	"strings"
 	"unicode/utf8"
 )
@@ -27,6 +28,7 @@ const (
 	ItemComma
 	ItemColon
 	ItemEOF
+	ItemError
 )
 
 const EOF = -1
@@ -90,15 +92,30 @@ func (l *Lexer) emit(t ItemType) {
 	l.Start = l.Pos
 }
 
+func (l *Lexer) emitError(msg string) {
+	l.Items <- Item{
+		Typ:   ItemError,
+		Pos:   l.Pos,
+		Value: msg,
+	}
+	l.Start = l.Pos
+}
+
 func (l *Lexer) ignore() {
 	l.Start = l.Pos
 }
 
 func (l *Lexer) run() {
+	defer func() {
+		if r := recover(); r != nil {
+			l.emitError(fmt.Sprint(r))
+		}
+	}()
+
 	for state := lexWhitespace; state != nil; {
 		state = state(l)
 	}
-	close(l.Items)
+	defer close(l.Items)
 }
 
 type stateFn func(l *Lexer) stateFn
@@ -137,7 +154,7 @@ func lexWhitespace(l *Lexer) stateFn {
 		l.backup()
 		return lexBool
 	default:
-		panic("unexpected character " + string(r))
+		panic(fmt.Sprintf("unexpected character %v", string(r)))
 	}
 }
 

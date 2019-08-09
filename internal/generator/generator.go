@@ -33,7 +33,7 @@ func (g Generator) start() (file *jen.File, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			file = nil
-			err = errors.New("error generating file: " + fmt.Sprint(r))
+			err = errors.New(fmt.Sprint(r))
 			return
 		}
 	}()
