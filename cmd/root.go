@@ -43,22 +43,22 @@ func Execute() {
 }
 
 func rootFunc(cmd *cobra.Command, args []string) {
-	var json string
+	var userInput string
 	switch {
 	case inputFile != "":
-		json = readFromFile()
+		userInput = readFromFile()
 	case inputString != "":
-		json = inputString
+		userInput = inputString
 	default:
-		json = readFromEditor()
+		userInput = readFromEditor()
 	}
 
 	if shouldBenchmark {
 		defer benchmark()()
 	}
 
-	res := generate(json)
-	fmt.Println(res)
+	generatedCode := generate(userInput)
+	fmt.Println(generatedCode)
 }
 
 func readFromFile() string {
@@ -71,36 +71,30 @@ func readFromFile() string {
 }
 
 func readFromEditor() string {
-	return awaitValidInput()
-}
-
-func awaitValidInput() string {
 	edit := editor.New()
 	defer edit.Delete()
 	edit.Display()
 
-	var jsonstr string
-	jsonstr, _ = edit.Read()
+	var userInput string
+	userInput, _ = edit.Read()
 
-	isValid := json.Valid([]byte(jsonstr))
+	isValid := json.Valid([]byte(userInput))
 	if isValid {
-		return jsonstr
+		return userInput
 	}
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Print("You supplied an invalid json. Do you want to fix it (y/n)?  ")
-
-		input, _ := reader.ReadString('\n')
-		userWantsFix := string(input[0]) == "y"
+		fmt.Print("You supplied an invalid JSON. Do you want to fix it (y/n)?\t")
+		userAnswer, _ := reader.ReadString('\n')
+		userWantsFix := string(userAnswer[0]) == "y"
 		if !userWantsFix {
 			return ""
 		}
-
 		edit.Display()
-		jsonstr, _ = edit.Read()
-		isValid := json.Valid([]byte(jsonstr))
+		userInput, _ = edit.Read()
+		isValid := json.Valid([]byte(userInput))
 		if isValid {
-			return jsonstr
+			return userInput
 		}
 	}
 }
