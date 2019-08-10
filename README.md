@@ -14,7 +14,19 @@ Different to other tools, `json2struct` tries to avoid generating `interface{}` 
 
 # Installation
 
+## Homebrew
+
+```bash
+brew tap marhaupe/json2struct https://github.com/marhaupe/json2struct 
+
+brew install marhaupe/json2struct/json2struct
+```
+
+
+## Manually
+
 Simply grab the latest release [binaries](https://github.com/marhaupe/json2struct/releases). 
+
 
 # Usage
 
