@@ -1,0 +1,5 @@
+package generated
+
+type JSONToStruct struct {
+  A int `json:"a"`
+}
