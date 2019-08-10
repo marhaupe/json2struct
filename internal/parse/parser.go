@@ -26,7 +26,6 @@ func (t NodeType) Type() NodeType {
 const (
 	NodeTypeArray NodeType = iota
 	NodeTypeObject
-	NodeTypeKey
 	NodeTypeString
 	NodeTypeBool
 	NodeTypeNil
