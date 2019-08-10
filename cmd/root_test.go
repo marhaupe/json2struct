@@ -21,7 +21,10 @@ func TestFiles(t *testing.T) {
 
 		input := readFile(filename)
 		expected := readFile(filename + expectedSuffix)
-		actual := generate(input)
+		actual, err := generate(input)
+		if err != nil {
+			t.Errorf("Test resulted in error. Filename: %v, Error: %v", filename, err)
+		}
 
 		formatExpectedBytes, _ := format.Source([]byte(expected))
 		formatActualBytes, _ := format.Source([]byte(actual))
