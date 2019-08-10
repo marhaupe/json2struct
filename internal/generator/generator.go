@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"sort"
@@ -12,7 +13,29 @@ import (
 	"github.com/dave/jennifer/jen"
 )
 
-func GenerateFile(tree parse.Node) (*jen.File, error) {
+func GenerateOutputFromString(s string) (string, error) {
+	generatedFile, err := GenerateFileFromString(s)
+	if err != nil {
+		return "", err
+	}
+
+	buf := &bytes.Buffer{}
+	err = generatedFile.Render(buf)
+	if err != nil {
+		return "", fmt.Errorf("error rendering file: %v", err)
+	}
+	return buf.String(), nil
+}
+
+func GenerateFileFromString(s string) (*jen.File, error) {
+	node, err := parse.ParseFromString("json2struct", s)
+	if err != nil {
+		return nil, err
+	}
+	return GenerateFileFromAST(node)
+}
+
+func GenerateFileFromAST(tree parse.Node) (*jen.File, error) {
 	g := Generator{
 		Tree:        tree,
 		currentNode: tree,

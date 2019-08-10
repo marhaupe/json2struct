@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,7 +10,6 @@ import (
 
 	"github.com/marhaupe/json2struct/internal/editor"
 	"github.com/marhaupe/json2struct/internal/generator"
-	"github.com/marhaupe/json2struct/internal/parse"
 	"github.com/spf13/cobra"
 )
 
@@ -58,12 +56,12 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		defer benchmark()()
 	}
 
-	generatedCode, err := generate(userInput)
+	output, err := generator.GenerateOutputFromString(userInput)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	fmt.Println(generatedCode)
+	fmt.Println(output)
 }
 
 func readFromFile() string {
@@ -109,19 +107,4 @@ func benchmark() func() {
 	return func() {
 		fmt.Printf("generating took %v\n", time.Since(start))
 	}
-}
-
-func generate(json string) (string, error) {
-	node, err := parse.ParseFromString("json2struct", json)
-	if err != nil {
-		return "", err
-	}
-
-	file, err := generator.GenerateFile(node)
-	if err != nil {
-		return "", err
-	}
-	buf := &bytes.Buffer{}
-	err = file.Render(buf)
-	return buf.String(), err
 }
