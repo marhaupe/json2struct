@@ -59,12 +59,13 @@ func TestParseArrayFromString(t *testing.T) {
 		{
 			name: "Array with different primitives",
 			args: args{
-				json: `[ "test", 1234, true, null ]`,
+				json: `[ "test", 1234, 1.2, true, null ]`,
 			},
 			want: mkArrayNode(
 				[]Node{
 					mkPrim(NodeTypeString, "test"),
 					mkPrim(NodeTypeInteger, "1234"),
+					mkPrim(NodeTypeFloat, "1.2"),
 					mkPrim(NodeTypeBool, "true"),
 					mkPrim(NodeTypeNil, "null"),
 				},
@@ -138,7 +139,8 @@ func TestParseObjectFromString(t *testing.T) {
 				json: `{
 					"teststring": "hi",
 					"testbool": true,
-					"testnumber": 5.4,
+					"testfloat": 5.4,
+					"testint": 5,
 					"testnil": null
 					}`,
 			},
@@ -146,7 +148,8 @@ func TestParseObjectFromString(t *testing.T) {
 				map[string][]Node{
 					"teststring": []Node{mkPrim(NodeTypeString, "hi")},
 					"testbool":   []Node{mkPrim(NodeTypeBool, "true")},
-					"testnumber": []Node{mkPrim(NodeTypeFloat, "5.4")},
+					"testfloat":  []Node{mkPrim(NodeTypeFloat, "5.4")},
+					"testint":    []Node{mkPrim(NodeTypeInteger, "5")},
 					"testnil":    []Node{mkPrim(NodeTypeNil, "null")},
 				},
 			),
@@ -197,5 +200,27 @@ func TestParseObjectFromString(t *testing.T) {
 				t.Errorf("ParseFromString(): \ngot:\n %#v \nwant:\n %#v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestParseInvalidJSON(t *testing.T) {
+	tests := []struct {
+		name string
+		json string
+	}{
+		{
+			name: "array with comma before closing square brace",
+			json: "[ true, ]",
+		},
+		{
+			name: "object with comma before closing curly brace",
+			json: `{ "test": "hi", }`,
+		},
+	}
+
+	for _, test := range tests {
+		if _, err := ParseFromString("test", test.json); err == nil {
+			t.Errorf("TestParseInvalidJSON(): expected error, but received none. input: %v", test.json)
+		}
 	}
 }
