@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -57,7 +58,11 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		defer benchmark()()
 	}
 
-	generatedCode := generate(userInput)
+	generatedCode, err := generate(userInput)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	fmt.Println(generatedCode)
 }
 
@@ -106,18 +111,17 @@ func benchmark() func() {
 	}
 }
 
-func generate(json string) string {
+func generate(json string) (string, error) {
 	node, err := parse.ParseFromString("json2struct", json)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return "", err
 	}
 
 	file, err := generator.GenerateFile(node)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(2)
+		return "", err
 	}
-
-	return fmt.Sprintf("%#v", file)
+	buf := &bytes.Buffer{}
+	err = file.Render(buf)
+	return buf.String(), err
 }
