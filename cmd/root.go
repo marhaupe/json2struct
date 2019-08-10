@@ -21,7 +21,7 @@ var (
 
 	rootCmd = &cobra.Command{
 		Use:     "json2struct",
-		Short:   "Parse a JSON into a generated Go struct",
+		Short:   "json2struct generates Go type definitions for a JSON",
 		Version: version,
 		Args:    cobra.ExactArgs(0),
 		Run:     rootFunc,
@@ -30,8 +30,8 @@ var (
 
 func init() {
 	rootCmd.Flags().StringVarP(&inputString, "string", "s", "", "JSON string")
-	rootCmd.Flags().StringVarP(&inputFile, "file", "f", "", "Path to JSON file")
-	rootCmd.Flags().BoolVarP(&shouldBenchmark, "benchmark", "b", false, "Measure execution time")
+	rootCmd.Flags().StringVarP(&inputFile, "file", "f", "", "path to JSON file")
+	rootCmd.Flags().BoolVarP(&shouldBenchmark, "benchmark", "b", false, "measure execution time")
 }
 
 func Execute() {
