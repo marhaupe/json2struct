@@ -103,6 +103,7 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 
 		valueArray := obj.Children[varname]
 		childrenWithSharedKey := len(valueArray)
+		typeCount := countNodeTypes(valueArray)
 
 		if childrenWithSharedKey == 0 {
 			continue
@@ -137,27 +138,47 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 
 		} else if childrenWithSharedKey > 1 {
 
-			// If there are different objects for the same key, we should merge them together.
-			typeCount := countNodeTypes(valueArray)
-			if typeCount == 1 && valueArray[0].Type() == parse.NodeTypeObject {
-				compositeObj := mergeObjects(castToObjectArr(valueArray))
-
-				children = append(children,
-					makeVarname(varname).
-						Add(makeStruct(compositeObj)).
-						Add(makeJSONTag(varname)),
-				)
-
-			} else {
-				// In any other case, e.g. if theres a string and a bool under the same key, use interface{} as type.
+			if typeCount > 1 {
 				children = append(
 					children,
 					makeVarname(varname).
 						Add(jen.Interface()).
 						Add(makeJSONTag(varname)),
 				)
-			}
 
+				// If there are different objects for the same key, we should merge them together.
+			} else if typeCount == 1 {
+
+				switch typ := valueArray[0].Type(); typ {
+				case parse.NodeTypeObject:
+					compositeObj := mergeObjects(castToObjectArr(valueArray))
+					children = append(children,
+						makeVarname(varname).
+							Add(makeStruct(compositeObj)).
+							Add(makeJSONTag(varname)),
+					)
+				case parse.NodeTypeBool:
+					fallthrough
+				case parse.NodeTypeFloat:
+					fallthrough
+				case parse.NodeTypeString:
+					fallthrough
+				case parse.NodeTypeInteger:
+					children = append(children,
+						makeVarname(varname).
+							Add(makePrimTypedef(typ)).
+							Add(makeJSONTag(varname)),
+					)
+				default:
+					children = append(
+						children,
+						makeVarname(varname).
+							Add(jen.Interface()).
+							Add(makeJSONTag(varname)),
+					)
+
+				}
+			}
 		}
 	}
 
