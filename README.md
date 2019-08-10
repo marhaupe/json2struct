@@ -1,73 +1,46 @@
 # json2struct
 
+
 [![Build Status](https://travis-ci.com/marhaupe/json2struct.svg?branch=master)](https://travis-ci.com/marhaupe/json2struct)
 [![codecov](https://codecov.io/gh/marhaupe/json2struct/branch/master/graph/badge.svg)](https://codecov.io/gh/marhaupe/json2struct)
-[![GoDoc](https://godoc.org/github.com/marhaupe/json2struct?status.svg)](https://godoc.org/github.com/marhaupe/json2struct)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
+<!-- [![GoDoc](https://godoc.org/github.com/marhaupe/json2struct?status.svg)](https://godoc.org/github.com/marhaupe/json2struct) -->
 
-This CLI tool aims to make your life a lot easier by automatically generating structs for a given JSON. 
+> CLI tool to convert JSON to Go type definitions
+
+At some point when dealing with JSONs in Go, you will have to write types to `json.Unmarshal` your JSONs into. Doing this by hand is not only repetitive and time consuming, but also error prone. `json2struct` saves you this work by automatically parsing the JSON and generating you the matching type definitions ready to be used.
+
+Different to other tools, `json2struct` tries to avoid generating `interface{}` and `map[string]interface{}` as much as possible. Nonetheless it's very fast 🚀.
 
 # Installation
 
-## MacOS and Linux
-
-Download the [archive](https://github.com/marhaupe/json2struct/releases) and extract it somewhere your `$PATH` is set to, for example to `$GOBIN`:
-```bash
-tar -C $GOBIN -xzf <tarball>
-```
-
-## Windows
-
-Currently, `json2struct` does not work on Windows. Feel free to leave an issue if you want me to start working on it.
-
+Simply grab the latest release [binaries](https://github.com/marhaupe/json2struct/releases). 
 
 # Usage
 
-## Base command:
+> json2struct [flags]
 
-Calling `json2struct` without arguments opens the superior text editor for unix systems, vim 🤖. Insert the JSON data you want to parse and save and exit ([`:wq!`](https://stackoverflow.com/a/11828573/7471182)). Example:
+Calling `json2struct` without flags opens a text editor. Simply input your JSON and save and exit. 
 
-![Example](.github/with_editor.gif)
+![Example](.github/demo.gif)
 
 ## Flags:
 
-### Call `json2struct -s` or `json2struct --string` with the JSON data as argument. 
-
-Example:
-
-```bash
- json2struct -s "$(curl "https://reqres.in/api/users?page=2")"
-```
-
-Result:
-```go
-type JSONToStruct struct {
-        Page        int `json:"page"`        
-        Per_page    int `json:"per_page"`
-        Total       int `json:"total"`
-        Total_pages int `json:"total_pages"`
-        Data        []struct {
-                Id         int    `json:"id"`
-                First_name string `json:"first_name"`
-                Last_name  string `json:"last_name"`
-                Avatar     string `json:"avatar"`
-        } `json:"data"`
-}
-```
-
-The `string` option lets you pipe JSON data as input. The current implementation lacks some features, e.g. you need to escape quotes manually. PRs are more than welcome.
-
-
-### Call `json2struct -f` or `json2struct --file` with the path to a JSON file as argument.
-
-Example:
+### File
+>  -f, --file string:     path to JSON file 
 
 ```bash
 json2struct -f apiResult.json
 ```
 
+### String
+>  -s, --string string:   JSON string
 
-### Lastly
 
-Please feel free to open a pull request for missing features or bugs.
+```bash
+ json2struct -s "$(curl "https://reqres.in/api/users?page=2")"
+```
 
-Credits to Matt Holt (https://github.com/mholt/json-to-go), from whom I got the idea.
+
+### Benchmark
+>  -b, --benchmark:       measure execution time

@@ -1,0 +1,295 @@
+# The configurations that used for the recording, feel free to edit them
+config:
+
+  # Specify a command to be executed
+  # like `/bin/bash -l`, `ls`, or any other commands
+  # the default is bash for Linux
+  # or powershell.exe for Windows
+  command: /bin/bash -l
+  
+  # Specify the current working directory path
+  # the default is the current working directory path
+  cwd: /Users/haupma/Entwicklung/privat/json2struct
+  
+  # Export additional ENV variables
+  env:
+    recording: true
+  
+  # Explicitly set the number of columns
+  # or use `auto` to take the current
+  # number of columns of your shell
+  cols: 80
+  
+  # Explicitly set the number of rows
+  # or use `auto` to take the current
+  # number of rows of your shell
+  rows: 10
+  
+  # Amount of times to repeat GIF
+  # If value is -1, play once
+  # If value is 0, loop indefinitely
+  # If value is a positive number, loop n times
+  repeat: 0
+  
+  # Quality
+  # 1 - 100
+  quality: 100
+  
+  # Delay between frames in ms
+  # If the value is `auto` use the actual recording delays
+  frameDelay: auto
+  
+  # Maximum delay between frames in ms
+  # Ignored if the `frameDelay` isn't set to `auto`
+  # Set to `auto` to prevent limiting the max idle time
+  maxIdleTime: 5000
+  
+  # The surrounding frame box
+  # The `type` can be null, window, floating, or solid`
+  # To hide the title use the value null
+  # Don't forget to add a backgroundColor style with a null as type
+  frameBox:
+    type: floating
+    title: Demo
+    style:
+      border: 0px black solid
+      # boxShadow: none
+      # margin: 0px
+  
+  # Add a watermark image to the rendered gif
+  # You need to specify an absolute path for
+  # the image on your machine or a URL, and you can also
+  # add your own CSS styles
+  watermark:
+    imagePath: null
+    style:
+      position: absolute
+      right: 15px
+      bottom: 15px
+      width: 100px
+      opacity: 0.9
+  
+  # Cursor style can be one of
+  # `block`, `underline`, or `bar`
+  cursorStyle: block
+  
+  # Font family
+  # You can use any font that is installed on your machine
+  # in CSS-like syntax
+  fontFamily: "Monaco, Lucida Console, Ubuntu Mono, Monospace"
+  
+  # The size of the font
+  fontSize: 14
+  
+  # The height of lines
+  lineHeight: 1
+  
+  # The spacing between letters
+  letterSpacing: 0
+  
+  # Theme
+  theme:
+    background: "transparent"
+    foreground: "#afafaf"
+    cursor: "#c7c7c7"
+    black: "#232628"
+    red: "#fc4384"
+    green: "#b3e33b"
+    yellow: "#ffa727"
+    blue: "#75dff2"
+    magenta: "#ae89fe"
+    cyan: "#708387"
+    white: "#d5d5d0"
+    brightBlack: "#626566"
+    brightRed: "#ff7fac"
+    brightGreen: "#c8ed71"
+    brightYellow: "#ebdf86"
+    brightBlue: "#75dff2"
+    brightMagenta: "#ae89fe"
+    brightCyan: "#b1c6ca"
+    brightWhite: "#f9f9f4"
+  
+# Records, feel free to edit them
+records:
+  - delay: 0
+    content: "\e[?1034h "
+  - delay: 80
+    content: j
+  - delay: 80
+    content: s
+  - delay: 80
+    content: o
+  - delay: 80
+    content: 'n'
+  - delay: 80
+    content: '2'
+  - delay: 80
+    content: s
+  - delay: 80
+    content: t
+  - delay: 80
+    content: r
+  - delay: 80
+    content: u
+  - delay: 80
+    content: c
+  - delay: 80
+    content: t
+  - delay: 80
+    content: "\r\n"
+  - delay: 80
+    content: "\e[?2004h\e[?1049h\e[?1h\e=\e[?2004h\e[1;25r\e[?12h\e[?12l\e[27m\e[29m\e[m\e[38;5;252m\e[48;5;234m\e[H\e[2J\e[?25l\e[24;1H\".jsontostruct_temp\" 0L, 0C"
+  - delay: 80
+    content: "\e[2;1H▽\e[6n\e[2;1H  \e[1;1H\e[>c\e]11;?\a\e[1;1H\e[38;5;252m\e[48;5;235m 1 .jsontostruct_temp \e[m\e[38;5;252m\e[48;5;234m\e[38;5;235m\e[48;5;238m \e[m\e[38;5;252m\e[48;5;234m\e[38;5;248m\e[48;5;238m                                                     \e[m\e[38;5;252m\e[48;5;234m\e[38;5;242m\e[48;5;238m \e[m\e[38;5;252m\e[48;5;234m\e[38;5;248m\e[48;5;242m X \e[m\e[38;5;252m\e[48;5;234m\e[2;1H\e[38;5;242m \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \e[m\e[38;5;252m\e[48;5;234m\e[3;2H\e[38;5;69m\e[48;5;233m~                                                                              \e[4;2H~                                                                              \e[5;2H~                                                                              \e[6;2H~                                                                              \e[7;2H~                                                                              \e[8;2H~                                                                              \e[9;2H~                                                                              \e[10;2H~                                                                              \e[11;2H~                                                                              \e[12;2H~                                                                              \e[13;2H~                                                                              \e[14;2H~                                                                              \e[15;2H~                                                                              \e[16;2H~                                                                              \e[17;2H~                                                                              \e[18;2H~                                                                              \e[19;2H~                                                                              \e[20;2H~                                                                              \e[21;2H~                                                                              \e[22;2H~                                                                              \e[?25h\e[?12$p"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234m\e[25;1H\e[38;5;252m\e[48;5;18m-- INSERT --\e[m\e[38;5;252m\e[48;5;234m\e[23;1H\e[38;5;238m\e[48;5;119m INSERT \e[m\e[38;5;252m\e[48;5;234m\e[38;5;119m\e[48;5;240m \e[m\e[38;5;252m\e[48;5;234m\e[38;5;252m\e[48;5;240m master   .jsontostruct_temp \e[m\e[38;5;252m\e[48;5;234m\e[38;5;240m\e[48;5;238m \e[m\e[38;5;252m\e[48;5;234m\e[38;5;248m\e[48;5;238m                         \e[m\e[38;5;252m\e[48;5;234m\e[38;5;240m\e[48;5;238m \e[m\e[38;5;252m\e[48;5;234m\e[38;5;247m\e[48;5;240m 100% \e[m\e[38;5;252m\e[48;5;234m\e[38;5;244m\e[48;5;240m \e[m\e[38;5;252m\e[48;5;234m\e[38;5;238m\e[48;5;244m   0:1  \e[2;2H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[m\e[38;5;252m\e[48;5;234m\e[1;23H\e[38;5;252m\e[48;5;235m+ \e[m\e[38;5;252m\e[48;5;234m\e[38;5;235m\e[48;5;238m \e[?25l\e[m\e[38;5;252m\e[48;5;234m\e[2;2H\e[48;5;90m{}\e[m\e[38;5;252m\e[48;5;234m\e[23;39H\e[38;5;252m\e[48;5;240m  + \e[m\e[38;5;252m\e[48;5;234m\e[38;5;240m\e[48;5;238m \e[m\e[38;5;252m\e[48;5;234m\e[32C\e[38;5;238m\e[48;5;244m1:2\e[2;3H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[m\e[38;5;252m\e[48;5;234m\e[25;1H\e[K\e[?25l\e[24;1H\e[K\e[25;1H\e[38;5;252m\e[48;5;18m-- INSERT --\e[m\e[38;5;252m\e[48;5;234m\e[2;2H{\e[2;3H\e[K\e[3;2H    \e[3;6H\e[K\e[4;2H}\e[4;3H\e[K\e[23;67H\e[38;5;247m\e[48;5;240m 66\e[m\e[38;5;252m\e[48;5;234m\e[6C\e[38;5;238m\e[48;5;244m2:5\e[3;6H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[?25l\e[m\e[38;5;252m\e[48;5;234m\"\"\e[23;78H\e[38;5;238m\e[48;5;244m6\e[3;7H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mH\"\e[23;78H\e[38;5;238m\e[48;5;244m7\e[3;8H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234me\"\e[23;78H\e[38;5;238m\e[48;5;244m8\e[3;9H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234my\"\e[23;78H\e[38;5;238m\e[48;5;244m9\e[3;10H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[23;78H10\e[3;11H"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234m:\e[23;79H\e[38;5;238m\e[48;5;244m1\e[3;12H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[?25l\e[23;79H2\e[3;13H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[?25l\e[m\e[38;5;252m\e[48;5;234m\"\"\e[23;79H\e[38;5;238m\e[48;5;244m3\e[3;14H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mH\"\e[23;79H\e[38;5;238m\e[48;5;244m4\e[3;15H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mi\"\e[23;79H\e[38;5;238m\e[48;5;244m5\e[3;16H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234m!\"\e[23;79H\e[38;5;238m\e[48;5;244m6\e[3;17H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[23;79H7\e[3;18H"
+  - delay: 80
+    content: "\e[m\e[38;5;252m\e[48;5;234m,\b"
+  - delay: 80
+    content: " \b\e[?2004h\e[?25l\e[4;22r\e[4;1H\e[L\e[1;25r\e[3;18H,\r\n\e[38;5;242m \e[m\e[38;5;252m\e[48;5;234m\e[25;1H\e[K\e[25;1H\e[38;5;252m\e[48;5;18m-- INSERT --\e[m\e[38;5;252m\e[48;5;234m\e[23;68H\e[38;5;247m\e[48;5;240m75\e[m\e[38;5;252m\e[48;5;234m\e[6C\e[38;5;238m\e[48;5;244m3:5 \e[4;6H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[?25l\e[m\e[38;5;252m\e[48;5;234m\"\"\e[23;78H\e[38;5;238m\e[48;5;244m6\e[4;7H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mT\"\e[23;78H\e[38;5;238m\e[48;5;244m7\e[4;8H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mh\"\e[23;78H\e[38;5;238m\e[48;5;244m8\e[4;9H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mi\"\e[23;78H\e[38;5;238m\e[48;5;244m9\e[4;10H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234ms\"\e[23;78H\e[38;5;238m\e[48;5;244m10\e[4;11H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mI\"\e[23;79H\e[38;5;238m\e[48;5;244m1\e[4;12H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234ms\"\e[23;79H\e[38;5;238m\e[48;5;244m2\e[4;13H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mW\"\e[23;79H\e[38;5;238m\e[48;5;244m3\e[4;14H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[?25l\e[m\e[38;5;252m\e[48;5;234m\b\"\e[4;14H\e[K\e[23;79H\e[38;5;238m\e[48;5;244m2\e[4;13H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mA\"\e[23;79H\e[38;5;238m\e[48;5;244m3\e[4;14H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mw\"\e[23;79H\e[38;5;238m\e[48;5;244m4\e[4;15H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234me\"\e[23;79H\e[38;5;238m\e[48;5;244m5\e[4;16H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234ms\"\e[23;79H\e[38;5;238m\e[48;5;244m6\e[4;17H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mo\"\e[23;79H\e[38;5;238m\e[48;5;244m7\e[4;18H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mm\"\e[23;79H\e[38;5;238m\e[48;5;244m8\e[4;19H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234me\"\e[23;79H\e[38;5;238m\e[48;5;244m9\e[4;20H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[23;78H20\e[4;21H"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234m:\e[23;79H\e[38;5;238m\e[48;5;244m1\e[4;22H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[?25l\e[23;79H2\e[4;23H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mt\e[23;79H\e[38;5;238m\e[48;5;244m3\e[4;24H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mr\e[23;79H\e[38;5;238m\e[48;5;244m4\e[4;25H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234me\e[23;79H\e[38;5;238m\e[48;5;244m5\e[4;26H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[?25l\e[m\e[38;5;252m\e[48;5;234m\e[4;25H\e[K\e[23;79H\e[38;5;238m\e[48;5;244m4\e[4;25H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mu\e[23;79H\e[38;5;238m\e[48;5;244m5\e[4;26H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234me\e[23;79H\e[38;5;238m\e[48;5;244m6\e[4;27H\e[?25h"
+  - delay: 80
+    content: "\e[m\e[38;5;252m\e[48;5;234m,\b"
+  - delay: 80
+    content: " \b\e[?2004h\e[?25l\e[5;22r\e[5;1H\e[L\e[1;25r\e[4;27H,\r\n\e[38;5;242m \e[m\e[38;5;252m\e[48;5;234m\e[25;1H\e[K\e[25;1H\e[38;5;252m\e[48;5;18m-- INSERT --\e[m\e[38;5;252m\e[48;5;234m\e[23;68H\e[38;5;247m\e[48;5;240m80\e[m\e[38;5;252m\e[48;5;234m\e[6C\e[38;5;238m\e[48;5;244m4:5 \e[5;6H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[?25l\e[m\e[38;5;252m\e[48;5;234m\"\"\e[23;78H\e[38;5;238m\e[48;5;244m6\e[5;7H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mC\"\e[23;78H\e[38;5;238m\e[48;5;244m7\e[5;8H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mh\"\e[23;78H\e[38;5;238m\e[48;5;244m8\e[5;9H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234me\"\e[23;78H\e[38;5;238m\e[48;5;244m9\e[5;10H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mc\"\e[23;78H\e[38;5;238m\e[48;5;244m10\e[5;11H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mk\"\e[23;79H\e[38;5;238m\e[48;5;244m1\e[5;12H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mI\"\e[23;79H\e[38;5;238m\e[48;5;244m2\e[5;13H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mt\"\e[23;79H\e[38;5;238m\e[48;5;244m3\e[5;14H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mO\"\e[23;79H\e[38;5;238m\e[48;5;244m4\e[5;15H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mu\"\e[23;79H\e[38;5;238m\e[48;5;244m5\e[5;16H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mt\"\e[23;79H\e[38;5;238m\e[48;5;244m6\e[5;17H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[23;79H7\e[5;18H"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234m:\e[23;79H\e[38;5;238m\e[48;5;244m8\e[5;19H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[?25l\e[23;79H9\e[5;20H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[?25l\e[m\e[38;5;252m\e[48;5;234m\"\"\e[23;78H\e[38;5;238m\e[48;5;244m20\e[5;21H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mI\"\e[23;79H\e[38;5;238m\e[48;5;244m1\e[5;22H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[?25l\e[m\e[38;5;252m\e[48;5;234m \"\e[23;79H\e[38;5;238m\e[48;5;244m2\e[5;23H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mW\"\e[23;79H\e[38;5;238m\e[48;5;244m3\e[5;24H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234mi\"\e[23;79H\e[38;5;238m\e[48;5;244m4\e[5;25H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234ml\"\e[23;79H\e[38;5;238m\e[48;5;244m5\e[5;26H\e[?25h"
+  - delay: 80
+    content: "\e[?25l\e[m\e[38;5;252m\e[48;5;234ml\"\e[23;79H\e[38;5;238m\e[48;5;244m6\e[5;27H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[23;79H7\e[5;28H"
+  - delay: 80
+    content: "\e[m\e[38;5;252m\e[48;5;234m,\b"
+  - delay: 80
+    content: " \b\e[?25l,\e[23;79H\e[38;5;238m\e[48;5;244m8\e[5;29H\e[?25h"
+  - delay: 80
+    content: "\e[?2004h\e[?25l\e[m\e[38;5;252m\e[48;5;234m\e[5;28H\e[K\e[23;79H\e[38;5;238m\e[48;5;244m7\e[5;28H\e[?25h"
+  - delay: 80
+    content: "\e[m\e[38;5;252m\e[48;5;234m\e[25;1H\e[K\e[5;27H"
+  - delay: 80
+    content: "\e[?25l\e[23;1H\e[38;5;238m\e[48;5;117m NORMAL \e[m\e[38;5;252m\e[48;5;234m\e[38;5;117m\e[48;5;240m \e[m\e[38;5;252m\e[48;5;234m\e[69C\e[38;5;238m\e[48;5;244m6\e[?25h\e[?25l\r\n\e[m\e[38;5;252m\e[48;5;234m:\e[?2004h\e[?25h"
+  - delay: 80
+    content: w
+  - delay: 80
+    content: q
+  - delay: 1000
+    content: "\r\e[?25l\e[?2004l\".jsontostruct_temp\" 5L, 76C written"
+  - delay: 80
+    content: "\r\r\n\r\r\n\r\r\n\e[39;49m\e[?2004l\e[?1l\e>\e[?25h\e[?1049lpackage generated\r\n\r\ntype JSONToStruct struct {\r\n\tCheckitout    string `json:\"CheckItOut\"`\r\n\tHey           string `json:\"Hey\"`\r\n\tThisisawesome bool   `json:\"ThisIsAwesome\"`\r\n}\r\n\r\n "
+  - delay: 4000
+    content: "logout\r\n"
