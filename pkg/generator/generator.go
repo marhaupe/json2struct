@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/marhaupe/json2struct/internal/parse"
+	"github.com/marhaupe/json2struct/pkg/parse"
 
 	"github.com/dave/jennifer/jen"
 )

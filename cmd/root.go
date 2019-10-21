@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/marhaupe/json2struct/internal/editor"
-	"github.com/marhaupe/json2struct/internal/generator"
+	"github.com/marhaupe/json2struct/pkg/editor"
+	"github.com/marhaupe/json2struct/pkg/generator"
 	"github.com/spf13/cobra"
 )
 

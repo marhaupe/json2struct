@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/marhaupe/json2struct/internal/lex"
+	"github.com/marhaupe/json2struct/pkg/lex"
 )
 
 type Parser struct {
