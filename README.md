@@ -41,14 +41,14 @@ You probably don't want to manually write that 1MB JSON you have to generate a s
 
 
 ### Generating a struct from a string
->  -s, --string string:   JSON string
+>  -s, --string string: JSON string
 
 This is basically your bread and butter thanks to pipes. Usage:
 ```bash
  json2struct -s "$(curl "https://reqres.in/api/users?page=2")"
 ```
 ### Generating a struct from an existing file
->  -f, --file string:     path to JSON file 
+>  -f, --file string: path to JSON file 
 
 This is useful if you have a JSON file stored in your filesystem and are too lazy to use pipes. Usage:
 ```bash
@@ -56,8 +56,8 @@ json2struct -f input.json
 ```
 
 ### Other options
-> -b, --benchmark       measure execution time
+> -b, --benchmark: measure execution time
 
-> -h, --help            help for json2struct
+> -h, --help: help for json2struct
 
->      --version         version for json2struct
+> --version: version for json2struct
