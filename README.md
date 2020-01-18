@@ -57,5 +57,7 @@ json2struct -f input.json
 
 ### Other options
 > -b, --benchmark       measure execution time
+
 > -h, --help            help for json2struct
+
 >      --version         version for json2struct
