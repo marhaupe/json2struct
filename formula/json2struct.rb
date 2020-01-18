@@ -2,15 +2,17 @@
 class Json2struct < Formula
   desc ""
   homepage ""
-  version "1.3.0-beta.5"
+  version "1.3.0"
   bottle :unneeded
 
   if OS.mac?
-    url "https://github.com/marhaupe/json2struct/releases/download/v1.3.0-beta.5/json2struct_1.3.0-beta.5_macOS_64-bit.tar.gz"
-    sha256 "7078bf36341092e347f20c3b5445cfe99b7ac61962248c3e9c088d49e5544ea7"
+    url "https://github.com/marhaupe/json2struct/releases/download/v1.3.0/json2struct_1.3.0_macOS_64-bit.tar.gz"
+    sha256 "3f82dace61f1a2e6a94c701512fe28fe0ffce9dfe9e164699b562081b51b0814"
   elsif OS.linux?
-    url "https://github.com/marhaupe/json2struct/releases/download/v1.3.0-beta.5/json2struct_1.3.0-beta.5_linux_64-bit.tar.gz"
-    sha256 "6ac2ab055daaeb92cb35e7ad2c70097364b0857505800dcd80cc077d106f1d61"
+    if Hardware::CPU.intel?
+      url "https://github.com/marhaupe/json2struct/releases/download/v1.3.0/json2struct_1.3.0_linux_64-bit.tar.gz"
+      sha256 "9be7585b63803e787a34a58ea925d66644ae4402bd47e22f838ec703338d0362"
+    end
   end
   
   depends_on "git"
