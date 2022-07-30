@@ -1,13 +1,12 @@
 before:
   hooks:
-  - make clean
+    - make clean
 
 builds:
-  - 
-    main: ./main.go
+  - main: ./main.go
     binary: json2struct
     ldflags:
-     - -s -w -X github.com/marhaupe/json2struct/cmd.version={{.Version}}
+      - -s -w -X github.com/marhaupe/json2struct/cmd.version={{.Version}}
     goos:
       - darwin
       - linux
@@ -16,18 +15,16 @@ builds:
       - CGO_ENABLED=0
 
 archives:
-  - 
-    replacements:
+  - replacements:
       amd64: 64-bit
       386: 32-bit
       darwin: macOS
     format_overrides:
-    - goos: windows
-      format: zip
+      - goos: windows
+        format: zip
 
 brews:
-  - 
-    github:
+  - tap:
       owner: marhaupe
       name: json2struct
     commit_author:
@@ -36,7 +33,6 @@ brews:
     folder: formula
     dependencies:
       - git
-
 # snapcrafts:
 #   -
 #     # Replacements for GOOS and GOARCH in the package name.
@@ -62,12 +58,11 @@ brews:
 #     # we live in tweetspace and your description wants to look good in the snap
 #     # store.
 #     description: >
-#       At some point when dealing with JSONs in Go, you will have to write types to json.Unmarshal your JSONs into. 
-#       Doing this by hand is not only repetitive and time consuming, but also error prone. json2struct saves you this work by 
+#       At some point when dealing with JSONs in Go, you will have to write types to json.Unmarshal your JSONs into.
+#       Doing this by hand is not only repetitive and time consuming, but also error prone. json2struct saves you this work by
 #       automatically parsing the JSON and generating you the matching type definitions ready to be used.
 
-
-#       Different to other tools, json2struct tries to avoid generating interface{} and map[string]interface{} as much as possible. 
+#       Different to other tools, json2struct tries to avoid generating interface{} and map[string]interface{} as much as possible.
 #       Nonetheless it's very fast 🚀.
 
 #     # A guardrail to prevent you from releasing a snap to all your users before
