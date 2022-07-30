@@ -6,47 +6,65 @@ import (
 	"path"
 	"strings"
 	"testing"
+
+	"github.com/kylelemons/godebug/diff"
 )
 
-func Test_isNumber(t *testing.T) {
+func Test_identifierIsValid(t *testing.T) {
 	type args struct {
 		varname string
 	}
 	tests := []struct {
-		name string
-		args args
-		want bool
+		name                  string
+		args                  args
+		wantIsValid           bool
+		wantCleanedIdentifier string
 	}{
 		{
-			name: "floating",
-			args: args{"1.1"},
-			want: true,
+			name:        "floating",
+			args:        args{"1.1"},
+			wantIsValid: false,
 		},
 		{
-			name: "negative floating",
-			args: args{"-1.1"},
-			want: true,
+			name:        "negative floating",
+			args:        args{"-1.1"},
+			wantIsValid: false,
 		},
 		{
-			name: "int",
-			args: args{"1"},
-			want: true,
+			name:        "int",
+			args:        args{"1"},
+			wantIsValid: false,
 		},
 		{
-			name: "negative int",
-			args: args{"-1"},
-			want: true,
+			name:        "negative int",
+			args:        args{"-1"},
+			wantIsValid: false,
 		},
 		{
-			name: "not number",
-			args: args{"xyz"},
-			want: false,
+			name:        "$",
+			args:        args{"$test"},
+			wantIsValid: false,
+		},
+		{
+			name:        "only letters",
+			args:        args{"xyz"},
+			wantIsValid: true,
+		},
+		{
+			name:        "underscore",
+			args:        args{"_test"},
+			wantIsValid: true,
+		},
+		{
+			name:        "invalid character in the middle",
+			args:        args{"_$test"},
+			wantIsValid: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isNumber(tt.args.varname); got != tt.want {
-				t.Errorf("isNumber() = %v, want %v", got, tt.want)
+			if got, _ := identifierIsValid(tt.args.varname); got != tt.wantIsValid {
+				t.Errorf("identifierIsValid() = %v, want %v", got, tt.wantIsValid)
 			}
 		})
 	}
@@ -77,8 +95,7 @@ func TestFiles(t *testing.T) {
 		actual = string(formatActualBytes)
 
 		if actual != expected {
-			t.Errorf("Test failed. Filename: %v\nActual: %v\nActualLen: %v\nExpected: %v\nExpectedLen: %v\n",
-				filename, actual, len(actual), expected, len(expected))
+			t.Errorf("Test failed. \nFilename: %v \nDiff: \n\n%v", filename, diff.Diff(actual, expected))
 		}
 	}
 }

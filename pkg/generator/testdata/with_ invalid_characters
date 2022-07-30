@@ -1,0 +1,26 @@
+{
+  "contentType": "application/vnd.microsoft.card.adaptive",
+  "content": {
+    "type": "AdaptiveCard",
+    "body": [
+      {
+        "type": "TextBlock",
+        "text": "Hi <at>John Doe</at>"
+      }
+    ],
+    "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.0",
+    "msteams": {
+      "entities": [
+        {
+          "type": "mention",
+          "text": "<at>John Doe</at>",
+          "mentioned": {
+            "id": "29:123124124124",
+            "name": "John Doe"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+package generated
+
+type JSONToStruct struct {
+	Content struct {
+		_schema string `json:"$schema"`
+		Body    []struct {
+			Text string `json:"text"`
+			Type string `json:"type"`
+		} `json:"body"`
+		Msteams struct {
+			Entities []struct {
+				Mentioned struct {
+					Id   string `json:"id"`
+					Name string `json:"name"`
+				} `json:"mentioned"`
+				Text string `json:"text"`
+				Type string `json:"type"`
+			} `json:"entities"`
+		} `json:"msteams"`
+		Type    string `json:"type"`
+		Version string `json:"version"`
+	} `json:"content"`
+	Contenttype string `json:"contentType"`
+}

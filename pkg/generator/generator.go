@@ -5,10 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"sort"
-	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/marhaupe/json2struct/pkg/parse"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/dave/jennifer/jen"
 )
@@ -247,20 +249,58 @@ func mergeObjects(children []*parse.ObjectNode) *parse.ObjectNode {
 	}
 }
 
-func makeVarname(varname string) *jen.Statement {
-	upperCaseVarname := strings.Title(strings.ToLower(varname))
+var caser = cases.Title(language.English)
 
-	// Numbers are not a valid identifier.
-	if isNumber(varname) {
-		upperCaseVarname = "Number" + upperCaseVarname
+func makeVarname(varname string) *jen.Statement {
+	upperCaseVarname := caser.String(strings.ToLower(varname))
+
+	// Maybe we can find a shortcut? This is getting a bit computation heavy
+	if isValid, validIdentifier := identifierIsValid(varname); !isValid {
+		upperCaseVarname = validIdentifier
+		fmt.Println("Invalid identifier found. We cleaned that up for you, but you might want to double check if you're happy with our naming: ", validIdentifier)
+	}
+
+	if identifierIsPredeclared(varname) {
+		upperCaseVarname = "_" + upperCaseVarname
+		fmt.Println("Predeclared identifier found. We cleaned that up for you, but you might want to double check if you're happy with our naming: ", upperCaseVarname)
 	}
 
 	return jen.Id(upperCaseVarname)
 }
 
-func isNumber(varname string) bool {
-	_, err := strconv.ParseFloat(varname, 64)
-	return err == nil
+// Valid identifiers are specified here: https://go.dev/ref/spec#Identifiers.
+// Summarized we can say:
+// identifier 	  = letter { letter | unicode_digit } .
+// letter         = unicode_letter | "_" .
+// unicode_letter = /* a Unicode code point classified as "Letter" */ .
+// unicode_digit  = /* a Unicode code point classified as "Number, decimal digit" */ .
+func identifierIsValid(identifier string) (bool, string) {
+	characters := []rune(identifier)
+	if !isLetter(characters[0]) {
+		characters[0] = '_'
+	}
+	for i, char := range characters[1:] {
+		if !(isLetter(char) || unicode.IsDigit(char)) {
+			characters[i] = '_'
+		}
+	}
+	validIdentifier := string(characters)
+	return validIdentifier == identifier, validIdentifier
+}
+
+func isLetter(letter rune) bool {
+	return unicode.IsLetter(letter) || letter == '_'
+}
+
+var predeclaredIdentifiers = []string{"any", "bool", "byte", "comparable", "complex64", "complex128", "error", "float32", "float64", "int", "int8", "int16", "int32", "int64", "rune", "string", "uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "true", "false", "iota", "nil", "append", "cap", "close", "complex", "copy", "delete", "imag", "len", "make", "new", "panic", "print", "println", "real", "recover"}
+
+func identifierIsPredeclared(identifier string) bool {
+	for _, predeclared := range predeclaredIdentifiers {
+		if identifier == predeclared {
+			return true
+		}
+	}
+	return false
 }
 
 // addJSONTag adds the json-tag, e.g. `json:"title"`. This has to match the original varname from the json file

@@ -1,5 +1,5 @@
-package generated 
+package generated
 
-type JSONToStruct struct{
-  Number1234 string `json:"1234"`
+type JSONToStruct struct {
+	_234 string `json:"1234"`
 }
