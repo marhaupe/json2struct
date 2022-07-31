@@ -50,8 +50,7 @@ type Generator struct {
 	Tree        parse.Node
 	currentNode parse.Node
 
-	file        *jen.File
-	currentStmt *jen.Statement
+	file *jen.File
 }
 
 func (g Generator) start() (file *jen.File, err error) {
