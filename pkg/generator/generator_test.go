@@ -15,56 +15,60 @@ func Test_identifierIsValid(t *testing.T) {
 		varname string
 	}
 	tests := []struct {
-		name                  string
-		args                  args
-		wantIsValid           bool
-		wantCleanedIdentifier string
+		name                    string
+		args                    args
+		wantedCleanedIdentifier string
 	}{
 		{
-			name:        "floating",
-			args:        args{"1.1"},
-			wantIsValid: false,
+			name:                    "floating",
+			args:                    args{"1.1"},
+			wantedCleanedIdentifier: "__1",
 		},
 		{
-			name:        "negative floating",
-			args:        args{"-1.1"},
-			wantIsValid: false,
+			name:                    "negative floating",
+			args:                    args{"-1.1"},
+			wantedCleanedIdentifier: "_1_1",
 		},
 		{
-			name:        "int",
-			args:        args{"1"},
-			wantIsValid: false,
+			name:                    "int",
+			args:                    args{"1"},
+			wantedCleanedIdentifier: "_",
 		},
 		{
-			name:        "negative int",
-			args:        args{"-1"},
-			wantIsValid: false,
+			name:                    "negative int",
+			args:                    args{"-1"},
+			wantedCleanedIdentifier: "_1",
 		},
 		{
-			name:        "$",
-			args:        args{"$test"},
-			wantIsValid: false,
+			name:                    "leading $",
+			args:                    args{"$test"},
+			wantedCleanedIdentifier: "_test",
 		},
 		{
-			name:        "only letters",
-			args:        args{"xyz"},
-			wantIsValid: true,
+			name:                    "only letters",
+			args:                    args{"xyz"},
+			wantedCleanedIdentifier: "xyz",
 		},
 		{
-			name:        "underscore",
-			args:        args{"_test"},
-			wantIsValid: true,
+			name:                    "underscore",
+			args:                    args{"_test"},
+			wantedCleanedIdentifier: "_test",
 		},
 		{
-			name:        "invalid character in the middle",
-			args:        args{"_$test"},
-			wantIsValid: true,
+			name:                    "invalid character in the middle",
+			args:                    args{"__test"},
+			wantedCleanedIdentifier: "__test",
+		},
+		{
+			name:                    "-",
+			args:                    args{"content-type"},
+			wantedCleanedIdentifier: "content_type",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := identifierIsValid(tt.args.varname); got != tt.wantIsValid {
-				t.Errorf("identifierIsValid() = %v, want %v", got, tt.wantIsValid)
+			if got := stripInvalidCharacters(tt.args.varname); got != tt.wantedCleanedIdentifier {
+				t.Errorf("stripInvalidCharacters() = %v, want %v", got, tt.wantedCleanedIdentifier)
 			}
 		})
 	}

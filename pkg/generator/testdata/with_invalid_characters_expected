@@ -2,7 +2,7 @@ package generated
 
 type JSONToStruct struct {
 	Content struct {
-		_schema string `json:"$schema"`
+		_Schema string `json:"$schema"`
 		Body    []struct {
 			Text string `json:"text"`
 			Type string `json:"type"`
@@ -20,5 +20,5 @@ type JSONToStruct struct {
 		Type    string `json:"type"`
 		Version string `json:"version"`
 	} `json:"content"`
-	Contenttype string `json:"contentType"`
+	Content_Type string `json:"content-type"`
 }

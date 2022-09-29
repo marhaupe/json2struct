@@ -250,21 +250,20 @@ func mergeObjects(children []*parse.ObjectNode) *parse.ObjectNode {
 
 var caser = cases.Title(language.English)
 
-func makeVarname(varname string) *jen.Statement {
-	upperCaseVarname := caser.String(strings.ToLower(varname))
-
-	// Maybe we can find a shortcut? This is getting a bit computation heavy
-	if isValid, validIdentifier := identifierIsValid(varname); !isValid {
-		upperCaseVarname = validIdentifier
-		fmt.Println("Invalid identifier found. We cleaned that up for you, but you might want to double check if you're happy with our naming: ", validIdentifier)
+func makeVarname(key string) *jen.Statement {
+	varname := strings.ToLower(key)
+	varname = caser.String(varname)
+	validVarname := stripInvalidCharacters(varname)
+	if validVarname != varname {
+		fmt.Printf("invalid identifier %v, renamed to %s:\n", key, validVarname)
 	}
 
-	if identifierIsPredeclared(varname) {
-		upperCaseVarname = "_" + upperCaseVarname
-		fmt.Println("Predeclared identifier found. We cleaned that up for you, but you might want to double check if you're happy with our naming: ", upperCaseVarname)
+	if identifierIsPredeclared(validVarname) {
+		validVarname = "_" + validVarname
+		fmt.Printf("predeclared identifier %v, renamed to %s:\n", key, validVarname)
 	}
 
-	return jen.Id(upperCaseVarname)
+	return jen.Id(validVarname)
 }
 
 // Valid identifiers are specified here: https://go.dev/ref/spec#Identifiers.
@@ -273,18 +272,17 @@ func makeVarname(varname string) *jen.Statement {
 // letter         = unicode_letter | "_" .
 // unicode_letter = /* a Unicode code point classified as "Letter" */ .
 // unicode_digit  = /* a Unicode code point classified as "Number, decimal digit" */ .
-func identifierIsValid(identifier string) (bool, string) {
+func stripInvalidCharacters(identifier string) string {
 	characters := []rune(identifier)
 	if !isLetter(characters[0]) {
 		characters[0] = '_'
 	}
 	for i, char := range characters[1:] {
 		if !(isLetter(char) || unicode.IsDigit(char)) {
-			characters[i] = '_'
+			characters[i+1] = '_'
 		}
 	}
-	validIdentifier := string(characters)
-	return validIdentifier == identifier, validIdentifier
+	return string(characters)
 }
 
 func isLetter(letter rune) bool {
