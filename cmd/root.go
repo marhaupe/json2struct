@@ -11,13 +11,15 @@ import (
 	"github.com/marhaupe/json2struct/pkg/editor"
 	"github.com/marhaupe/json2struct/pkg/generator"
 	"github.com/spf13/cobra"
+	"golang.design/x/clipboard"
 )
 
 var (
-	inputString     string
-	inputFile       string
-	version         string
-	shouldBenchmark bool
+	inputString        string
+	inputFile          string
+	version            string
+	shouldBenchmark    bool
+	shouldUseClipboard bool
 
 	rootCmd = &cobra.Command{
 		Use:     "json2struct",
@@ -32,6 +34,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&inputString, "string", "s", "", "JSON string")
 	rootCmd.Flags().StringVarP(&inputFile, "file", "f", "", "path to JSON file")
 	rootCmd.Flags().BoolVarP(&shouldBenchmark, "benchmark", "b", false, "measure execution time")
+	rootCmd.Flags().BoolVarP(&shouldUseClipboard, "clipboard", "c", false, "read from and write types to clipboard")
 }
 
 func Execute() {
@@ -44,6 +47,12 @@ func Execute() {
 func rootFunc(cmd *cobra.Command, args []string) {
 	var userInput string
 	switch {
+	case shouldUseClipboard:
+		err := clipboard.Init()
+		if err != nil {
+			os.Exit(2)
+		}
+		userInput = string(clipboard.Read(clipboard.FmtText))
 	case inputFile != "":
 		userInput = readFromFile()
 	case inputString != "":
@@ -59,16 +68,25 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	output, err := generator.GenerateOutputFromString(userInput)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		os.Exit(3)
 	}
-	fmt.Println(output)
+	if shouldUseClipboard {
+		err := clipboard.Init()
+		if err != nil {
+			os.Exit(4)
+		}
+		clipboard.Write(clipboard.FmtText, []byte(output))
+		fmt.Println("saved output to clipboard")
+	} else {
+		fmt.Println(output)
+	}
 }
 
 func readFromFile() string {
 	data, err := ioutil.ReadFile(inputFile)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(4)
+		os.Exit(1)
 	}
 	return string(data)
 }
