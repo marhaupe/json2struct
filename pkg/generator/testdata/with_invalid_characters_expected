@@ -20,5 +20,5 @@ type JSONToStruct struct {
 		Type    string `json:"type"`
 		Version string `json:"version"`
 	} `json:"content"`
-	Content_Type string `json:"content-type"`
+	Content_type string `json:"content-type"`
 }

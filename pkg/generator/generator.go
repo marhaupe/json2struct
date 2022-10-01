@@ -5,12 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"sort"
-	"strings"
 	"unicode"
 
 	"github.com/marhaupe/json2struct/pkg/parse"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 
 	"github.com/dave/jennifer/jen"
 )
@@ -139,7 +136,7 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 				childArr := valueArray[0].(*parse.ArrayNode)
 				children = append(
 					children,
-					makeVarname(varname).
+					makeId(varname).
 						Add(makeArray(childArr)).
 						Add(makeJSONTag(varname)),
 				)
@@ -147,14 +144,14 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 				childObj := valueArray[0].(*parse.ObjectNode)
 				children = append(
 					children,
-					makeVarname(varname).
+					makeId(varname).
 						Add(makeStruct(childObj)).
 						Add(makeJSONTag(varname)),
 				)
 			default:
 				children = append(
 					children,
-					makeVarname(varname).
+					makeId(varname).
 						Add(makePrimTypedef(valueArray[0].Type())).
 						Add(makeJSONTag(varname)),
 				)
@@ -165,7 +162,7 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 			if typeCount > 1 {
 				children = append(
 					children,
-					makeVarname(varname).
+					makeId(varname).
 						Add(jen.Interface()).
 						Add(makeJSONTag(varname)),
 				)
@@ -177,7 +174,7 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 				case parse.NodeTypeObject:
 					compositeObj := mergeObjects(castToObjectArr(valueArray))
 					children = append(children,
-						makeVarname(varname).
+						makeId(varname).
 							Add(makeStruct(compositeObj)).
 							Add(makeJSONTag(varname)),
 					)
@@ -189,14 +186,14 @@ func makeStruct(obj *parse.ObjectNode) *jen.Statement {
 					fallthrough
 				case parse.NodeTypeInteger:
 					children = append(children,
-						makeVarname(varname).
+						makeId(varname).
 							Add(makePrimTypedef(typ)).
 							Add(makeJSONTag(varname)),
 					)
 				default:
 					children = append(
 						children,
-						makeVarname(varname).
+						makeId(varname).
 							Add(jen.Interface()).
 							Add(makeJSONTag(varname)),
 					)
@@ -248,22 +245,30 @@ func mergeObjects(children []*parse.ObjectNode) *parse.ObjectNode {
 	}
 }
 
-var caser = cases.Title(language.English)
+func makeId(key string) *jen.Statement {
+	return jen.Id(makeVarname(key))
+}
 
-func makeVarname(key string) *jen.Statement {
-	varname := strings.ToLower(key)
-	varname = caser.String(varname)
-	validVarname := stripInvalidCharacters(varname)
-	if validVarname != varname {
-		fmt.Printf("invalid identifier %v, renamed to %s:\n", key, validVarname)
+func makeVarname(key string) string {
+	varnameRunes := stripInvalidCharacters([]rune(key))
+	varnameRunes = []rune(upperCaseFirstLetter(varnameRunes))
+	varname := string(varnameRunes)
+	if identifierIsPredeclared(varname) {
+		varname = "_" + varname
 	}
+	return varname
+}
 
-	if identifierIsPredeclared(validVarname) {
-		validVarname = "_" + validVarname
-		fmt.Printf("predeclared identifier %v, renamed to %s:\n", key, validVarname)
+func upperCaseFirstLetter(characters []rune) []rune {
+	transformedCharacters := make([]rune, len(characters))
+	copy(transformedCharacters, characters)
+	for i, r := range []rune(transformedCharacters) {
+		if unicode.IsLetter(r) {
+			transformedCharacters[i] = unicode.ToUpper(r)
+			return transformedCharacters
+		}
 	}
-
-	return jen.Id(validVarname)
+	return transformedCharacters
 }
 
 // Valid identifiers are specified here: https://go.dev/ref/spec#Identifiers.
@@ -272,17 +277,19 @@ func makeVarname(key string) *jen.Statement {
 // letter         = unicode_letter | "_" .
 // unicode_letter = /* a Unicode code point classified as "Letter" */ .
 // unicode_digit  = /* a Unicode code point classified as "Number, decimal digit" */ .
-func stripInvalidCharacters(identifier string) string {
-	characters := []rune(identifier)
-	if !isLetter(characters[0]) {
-		characters[0] = '_'
+func stripInvalidCharacters(characters []rune) []rune {
+	cleanedCharacters := make([]rune, len(characters))
+	copy(cleanedCharacters, characters)
+
+	if !isLetter(cleanedCharacters[0]) {
+		cleanedCharacters[0] = '_'
 	}
-	for i, char := range characters[1:] {
+	for i, char := range cleanedCharacters[1:] {
 		if !(isLetter(char) || unicode.IsDigit(char)) {
-			characters[i+1] = '_'
+			cleanedCharacters[i+1] = '_'
 		}
 	}
-	return string(characters)
+	return cleanedCharacters
 }
 
 func isLetter(letter rune) bool {

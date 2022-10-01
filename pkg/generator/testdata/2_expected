@@ -2,9 +2,9 @@ package generated
 
 type JSONToStruct struct {
 	Alignment string `json:"alignment"`
-	Hoffset   int    `json:"hOffset"`
+	HOffset   int    `json:"hOffset"`
 	Name      string `json:"name"`
 	Src       string `json:"src"`
-	Voffset   int    `json:"vOffset"`
+	VOffset   int    `json:"vOffset"`
 	Visible   bool   `json:"visible"`
 }

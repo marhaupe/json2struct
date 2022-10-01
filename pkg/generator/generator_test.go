@@ -42,32 +42,42 @@ func Test_identifierIsValid(t *testing.T) {
 		{
 			name:                    "leading $",
 			args:                    args{"$test"},
-			wantedCleanedIdentifier: "_test",
+			wantedCleanedIdentifier: "_Test",
 		},
 		{
 			name:                    "only letters",
 			args:                    args{"xyz"},
-			wantedCleanedIdentifier: "xyz",
+			wantedCleanedIdentifier: "Xyz",
 		},
 		{
 			name:                    "underscore",
 			args:                    args{"_test"},
-			wantedCleanedIdentifier: "_test",
+			wantedCleanedIdentifier: "_Test",
 		},
 		{
 			name:                    "invalid character in the middle",
 			args:                    args{"__test"},
-			wantedCleanedIdentifier: "__test",
+			wantedCleanedIdentifier: "__Test",
 		},
 		{
 			name:                    "-",
 			args:                    args{"content-type"},
-			wantedCleanedIdentifier: "content_type",
+			wantedCleanedIdentifier: "Content_type",
+		},
+		{
+			name:                    "camelCase",
+			args:                    args{"camelCase"},
+			wantedCleanedIdentifier: "CamelCase",
+		},
+		{
+			name:                    "snake_case",
+			args:                    args{"snake_case"},
+			wantedCleanedIdentifier: "Snake_case",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := stripInvalidCharacters(tt.args.varname); got != tt.wantedCleanedIdentifier {
+			if got := makeVarname(tt.args.varname); got != tt.wantedCleanedIdentifier {
 				t.Errorf("stripInvalidCharacters() = %v, want %v", got, tt.wantedCleanedIdentifier)
 			}
 		})

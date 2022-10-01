@@ -1,7 +1,7 @@
 package generated
 
 type JSONToStruct struct {
-	Nestedobj struct {
+	NestedObj struct {
 		Testbool bool `json:"Testbool"`
 	} `json:"NestedObj"`
 }
