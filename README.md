@@ -58,6 +58,16 @@ This is useful if you have a JSON file stored in your filesystem and are too laz
 json2struct -f input.json
 ```
 
+### Generating a struct from the clipboard to the clipboard
+
+> -c, --clipboard: read from and write types to clipboard
+
+Reads JSON from clipboard, generates types and writes those types to the clipboard.
+
+```bash
+json2struct -c
+```
+
 ### Other options
 
 > -b, --benchmark: measure execution time
