@@ -5,20 +5,20 @@
 class Json2struct < Formula
   desc ""
   homepage ""
-  version "1.5.0"
+  version "1.8.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/marhaupe/json2struct/releases/download/v1.5.0/json2struct_1.5.0_macOS_arm64.tar.gz"
-      sha256 "56fbbd364797887c85b1675c8237945952179f323baf84db167a0910eae74133"
+      url "https://github.com/marhaupe/json2struct/releases/download/v1.8.0/json2struct_1.8.0_macOS_arm64.tar.gz"
+      sha256 "8c158134bf55c2e07c9b640bbacc96a9bb00eb55fc0873629d82cdb0f9b274df"
 
       def install
         bin.install "json2struct"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/marhaupe/json2struct/releases/download/v1.5.0/json2struct_1.5.0_macOS_64-bit.tar.gz"
-      sha256 "d6288404d4e53590bdeec6ed64435e3357efaf0d0613db41b79ea42d4d83ce45"
+      url "https://github.com/marhaupe/json2struct/releases/download/v1.8.0/json2struct_1.8.0_macOS_64-bit.tar.gz"
+      sha256 "5555182b29becb2d0b7723c2825a0c83d2a374611a08d0ca2a8f6865e63150c3"
 
       def install
         bin.install "json2struct"
@@ -28,16 +28,16 @@ class Json2struct < Formula
 
   on_linux do
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/marhaupe/json2struct/releases/download/v1.5.0/json2struct_1.5.0_linux_arm64.tar.gz"
-      sha256 "6d96f75657526964b10926255b4da0d5ecc11fa36a0644fb5dbb17a2a1ded217"
+      url "https://github.com/marhaupe/json2struct/releases/download/v1.8.0/json2struct_1.8.0_linux_arm64.tar.gz"
+      sha256 "435caf7ae0596a72a0cdeddd92774f95bcdb368405323db5acd05fab47af91a7"
 
       def install
         bin.install "json2struct"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/marhaupe/json2struct/releases/download/v1.5.0/json2struct_1.5.0_linux_64-bit.tar.gz"
-      sha256 "68e7ccbfb262c83ef56231dbe21db1a1ba34885fc90681ffa99ad1b22d451d43"
+      url "https://github.com/marhaupe/json2struct/releases/download/v1.8.0/json2struct_1.8.0_linux_64-bit.tar.gz"
+      sha256 "679d76e693c2647e01a146108fa5843a1984c43b481489c34b6d65287a5d75f1"
 
       def install
         bin.install "json2struct"
