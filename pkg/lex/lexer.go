@@ -39,10 +39,10 @@ type Lexer struct {
 	Pos   int
 	Start int
 	Width int
-	Items chan Item
+	Items chan *Item
 }
 
-func (l *Lexer) NextItem() Item {
+func (l *Lexer) NextItem() *Item {
 	return <-l.Items
 }
 
@@ -53,7 +53,7 @@ func Lex(name, json string) *Lexer {
 		Pos:   0,
 		Start: 0,
 		Width: 0,
-		Items: make(chan Item),
+		Items: make(chan *Item, 32),
 	}
 	go l.run()
 	return l
@@ -84,7 +84,7 @@ func (l *Lexer) backup() {
 }
 
 func (l *Lexer) emit(t ItemType) {
-	l.Items <- Item{
+	l.Items <- &Item{
 		Typ:   t,
 		Pos:   l.Pos,
 		Value: l.Input[l.Start:l.Pos],
@@ -93,7 +93,7 @@ func (l *Lexer) emit(t ItemType) {
 }
 
 func (l *Lexer) emitError(msg string) {
-	l.Items <- Item{
+	l.Items <- &Item{
 		Typ:   ItemError,
 		Pos:   l.Pos,
 		Value: msg,

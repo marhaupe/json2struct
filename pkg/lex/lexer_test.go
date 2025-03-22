@@ -7,11 +7,11 @@ import (
 type lexTest struct {
 	name  string
 	input string
-	items []Item
+	items []*Item
 }
 
-func mkItem(typ ItemType, text string) Item {
-	return Item{
+func mkItem(typ ItemType, text string) *Item {
+	return &Item{
 		Typ:   typ,
 		Value: text,
 	}
@@ -28,7 +28,7 @@ var (
 )
 
 // collect gathers the emitted items into a slice.
-func collect(t *lexTest) (items []Item) {
+func collect(t *lexTest) (items []*Item) {
 	l := Lex(t.name, t.input)
 	for {
 		item := l.NextItem()
@@ -40,7 +40,7 @@ func collect(t *lexTest) (items []Item) {
 	return items
 }
 
-func equal(i1, i2 []Item, checkPos bool) bool {
+func equal(i1, i2 []*Item, checkPos bool) bool {
 	if len(i1) != len(i2) {
 		return false
 	}
@@ -59,8 +59,8 @@ func equal(i1, i2 []Item, checkPos bool) bool {
 }
 
 var lexTests = []lexTest{
-	{"empty file", "", []Item{iEOF}},
-	{"empty object root", "{}", []Item{
+	{"empty file", "", []*Item{iEOF}},
+	{"empty object root", "{}", []*Item{
 		iLeftBrace,
 		iRightBrace,
 		iEOF,
@@ -68,7 +68,7 @@ var lexTests = []lexTest{
 	{"bools in object root", `{
 		"bool1": true, 
 		"bool2": false
-		}`, []Item{
+		}`, []*Item{
 		iLeftBrace,
 		mkItem(ItemString, "bool1"),
 		iColon,
@@ -85,7 +85,7 @@ var lexTests = []lexTest{
 		"number2": 1.0,
 		"number3": -1,
 		"number4": -1.0
-		}`, []Item{
+		}`, []*Item{
 		iLeftBrace,
 		mkItem(ItemString, "number1"),
 		iColon,
@@ -112,7 +112,7 @@ var lexTests = []lexTest{
 		"string4": "null",
 		"string5": "1",
 		"string6": "blabla \"xyz\""
-		}`, []Item{
+		}`, []*Item{
 		iLeftBrace,
 		mkItem(ItemString, "string1"),
 		iColon,
@@ -140,7 +140,7 @@ var lexTests = []lexTest{
 		iRightBrace,
 		iEOF,
 	}},
-	{"null in object root", `{ "null1": null }`, []Item{
+	{"null in object root", `{ "null1": null }`, []*Item{
 		iLeftBrace,
 		mkItem(ItemString, "null1"),
 		iColon,
@@ -154,7 +154,7 @@ var lexTests = []lexTest{
 		"null1": null,
 		"bool1": true
 		}
-	}`, []Item{
+	}`, []*Item{
 		iLeftBrace,
 		mkItem(ItemString, "obj1"),
 		iColon,
@@ -170,12 +170,12 @@ var lexTests = []lexTest{
 		iRightBrace,
 		iEOF,
 	}},
-	{"empty array root", "[]", []Item{
+	{"empty array root", "[]", []*Item{
 		iLeftSqrBrace,
 		iRightSqrBrace,
 		iEOF,
 	}},
-	{"bools in array root", `[ true, false, false, true ]`, []Item{
+	{"bools in array root", `[ true, false, false, true ]`, []*Item{
 		iLeftSqrBrace,
 		mkItem(ItemBool, "true"),
 		iComma,

@@ -9,8 +9,8 @@ import (
 
 type Parser struct {
 	Lexer    *lex.Lexer
-	Item     lex.Item
-	LastItem lex.Item
+	Item     *lex.Item
+	LastItem *lex.Item
 }
 
 type Node interface {
