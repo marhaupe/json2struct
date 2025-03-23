@@ -19,10 +19,9 @@ func mkArrayNode(children []Node) *ArrayNode {
 	}
 }
 
-func mkPrim(typ NodeType, value string) *PrimitiveNode {
+func mkPrim(typ NodeType) *PrimitiveNode {
 	return &PrimitiveNode{
 		NodeType: typ,
-		value:    value,
 	}
 }
 
@@ -50,9 +49,9 @@ func TestParseArrayFromString(t *testing.T) {
 			},
 			want: mkArrayNode(
 				[]Node{
-					mkPrim(NodeTypeString, "test"),
-					mkPrim(NodeTypeString, "1234"),
-					mkPrim(NodeTypeString, "true"),
+					mkPrim(NodeTypeString),
+					mkPrim(NodeTypeString),
+					mkPrim(NodeTypeString),
 				},
 			),
 		},
@@ -63,11 +62,11 @@ func TestParseArrayFromString(t *testing.T) {
 			},
 			want: mkArrayNode(
 				[]Node{
-					mkPrim(NodeTypeString, "test"),
-					mkPrim(NodeTypeInteger, "1234"),
-					mkPrim(NodeTypeFloat, "1.2"),
-					mkPrim(NodeTypeBool, "true"),
-					mkPrim(NodeTypeNil, "null"),
+					mkPrim(NodeTypeString),
+					mkPrim(NodeTypeInteger),
+					mkPrim(NodeTypeFloat),
+					mkPrim(NodeTypeBool),
+					mkPrim(NodeTypeNil),
 				},
 			),
 		},
@@ -80,7 +79,7 @@ func TestParseArrayFromString(t *testing.T) {
 				[]Node{
 					mkObjectNode(
 						map[string][]Node{
-							"teststring": []Node{mkPrim(NodeTypeString, "hi")},
+							"teststring": []Node{mkPrim(NodeTypeString)},
 						},
 					),
 				},
@@ -95,8 +94,8 @@ func TestParseArrayFromString(t *testing.T) {
 				[]Node{
 					mkArrayNode(
 						[]Node{
-							mkPrim(NodeTypeString, "hi"),
-							mkPrim(NodeTypeString, "ho"),
+							mkPrim(NodeTypeString),
+							mkPrim(NodeTypeString),
 						},
 					),
 				},
@@ -105,7 +104,7 @@ func TestParseArrayFromString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseFromString(tt.args.name, tt.args.json)
+			got, err := ParseFromString(tt.args.json)
 			if err != nil {
 				t.Errorf("ParseFromString(): got error %v", err)
 			}
@@ -146,11 +145,11 @@ func TestParseObjectFromString(t *testing.T) {
 			},
 			want: mkObjectNode(
 				map[string][]Node{
-					"teststring": []Node{mkPrim(NodeTypeString, "hi")},
-					"testbool":   []Node{mkPrim(NodeTypeBool, "true")},
-					"testfloat":  []Node{mkPrim(NodeTypeFloat, "5.4")},
-					"testint":    []Node{mkPrim(NodeTypeInteger, "5")},
-					"testnil":    []Node{mkPrim(NodeTypeNil, "null")},
+					"teststring": []Node{mkPrim(NodeTypeString)},
+					"testbool":   []Node{mkPrim(NodeTypeBool)},
+					"testfloat":  []Node{mkPrim(NodeTypeFloat)},
+					"testint":    []Node{mkPrim(NodeTypeInteger)},
+					"testnil":    []Node{mkPrim(NodeTypeNil)},
 				},
 			),
 		},
@@ -164,7 +163,7 @@ func TestParseObjectFromString(t *testing.T) {
 					"testobject": []Node{
 						mkObjectNode(
 							map[string][]Node{
-								"teststring": []Node{mkPrim(NodeTypeString, "hi")},
+								"teststring": []Node{mkPrim(NodeTypeString)},
 							},
 						),
 					},
@@ -181,8 +180,8 @@ func TestParseObjectFromString(t *testing.T) {
 					"testarray": []Node{
 						mkArrayNode(
 							[]Node{
-								mkPrim(NodeTypeString, "hi"),
-								mkPrim(NodeTypeString, "ho"),
+								mkPrim(NodeTypeString),
+								mkPrim(NodeTypeString),
 							},
 						),
 					},
@@ -192,7 +191,7 @@ func TestParseObjectFromString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseFromString(tt.args.name, tt.args.json)
+			got, err := ParseFromString(tt.args.json)
 			if err != nil {
 				t.Errorf("ParseFromString(): got error %v", err)
 			}
@@ -219,7 +218,7 @@ func TestParseInvalidJSON(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if _, err := ParseFromString("test", test.json); err == nil {
+		if _, err := ParseFromString(test.json); err == nil {
 			t.Errorf("TestParseInvalidJSON(): expected error, but received none. input: %v", test.json)
 		}
 	}

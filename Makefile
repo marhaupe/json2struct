@@ -19,6 +19,9 @@ testrace:
 clean:
 	rm -rf dist
 
+benchmark:
+	go test -cpuprofile cpu.prof -memprofile mem.prof -bench ^BenchmarkLargeFile github.com/marhaupe/json2struct/pkg/generator
+
 coverage: 
 	go test ./... -coverprofile cover.out
 	go tool cover -html=cover.out -o cover.html 

@@ -27,7 +27,7 @@ func GenerateOutputFromString(s string) (string, error) {
 }
 
 func GenerateFileFromString(s string) (*jen.File, error) {
-	node, err := parse.ParseFromString("json2struct", s)
+	node, err := parse.ParseFromString(s)
 	if err != nil {
 		return nil, err
 	}
@@ -211,12 +211,9 @@ func mergeObjects(children []*parse.ObjectNode) *parse.ObjectNode {
 
 	for _, object := range children {
 		for varname, valueArray := range object.Children {
-
 			if mergedChildren[varname] == nil {
 				mergedChildren[varname] = valueArray
-
 			} else {
-
 				typeCount := countNodeTypes(mergedChildren[varname])
 				// We want to merge nested objects aswell.
 				// For that, we need to check if
@@ -233,7 +230,6 @@ func mergeObjects(children []*parse.ObjectNode) *parse.ObjectNode {
 					mergedObj := mergeObjects(objectsToBeMerged)
 
 					mergedChildren[varname] = []parse.Node{mergedObj}
-
 				}
 			}
 		}
@@ -296,15 +292,18 @@ func isLetter(letter rune) bool {
 	return unicode.IsLetter(letter) || letter == '_'
 }
 
-var predeclaredIdentifiers = []string{"any", "bool", "byte", "comparable", "complex64", "complex128", "error", "float32", "float64", "int", "int8", "int16", "int32", "int64", "rune", "string", "uint", "uint8", "uint16", "uint32", "uint64", "uintptr", "true", "false", "iota", "nil", "append", "cap", "close", "complex", "copy", "delete", "imag", "len", "make", "new", "panic", "print", "println", "real", "recover"}
+var predeclaredIdentifiersMap = map[string]struct{}{
+	"any": {}, "bool": {}, "byte": {}, "comparable": {}, "complex64": {}, "complex128": {},
+	"error": {}, "float32": {}, "float64": {}, "int": {}, "int8": {}, "int16": {}, "int32": {},
+	"int64": {}, "rune": {}, "string": {}, "uint": {}, "uint8": {}, "uint16": {}, "uint32": {},
+	"uint64": {}, "uintptr": {}, "true": {}, "false": {}, "iota": {}, "nil": {}, "append": {},
+	"cap": {}, "close": {}, "complex": {}, "copy": {}, "delete": {}, "imag": {}, "len": {},
+	"make": {}, "new": {}, "panic": {}, "print": {}, "println": {}, "real": {}, "recover": {},
+}
 
 func identifierIsPredeclared(identifier string) bool {
-	for _, predeclared := range predeclaredIdentifiers {
-		if identifier == predeclared {
-			return true
-		}
-	}
-	return false
+	_, ok := predeclaredIdentifiersMap[identifier]
+	return ok
 }
 
 // addJSONTag adds the json-tag, e.g. `json:"title"`. This has to match the original varname from the json file
@@ -331,7 +330,7 @@ func makePrimTypedef(typ parse.NodeType) *jen.Statement {
 }
 
 func castToObjectArr(arr []parse.Node) []*parse.ObjectNode {
-	var objectArr []*parse.ObjectNode
+	objectArr := make([]*parse.ObjectNode, 0, len(arr))
 	for _, child := range arr {
 		obj, ok := child.(*parse.ObjectNode)
 		if !ok {
@@ -346,7 +345,7 @@ func countNodeTypes(children []parse.Node) int {
 	// If there are only zero or one children, then there are zero or one
 	// different types of children aswell.
 	childrenCount := len(children)
-	if childrenCount == 0 || childrenCount == 1 {
+	if childrenCount <= 1 {
 		return childrenCount
 	}
 

@@ -40,19 +40,26 @@ type ArrayNode struct {
 
 type ObjectNode struct {
 	NodeType
-
 	// The JSON spec allows different types of values for the same key. Because of that, a simple `map[string]Node` is not enough.
 	Children map[string][]Node
 }
 
 type PrimitiveNode struct {
 	NodeType
-	value string
 }
 
-func ParseFromString(name, j string) (Node, error) {
+// Singleton primitive nodes to avoid allocations
+var (
+	stringNode  = &PrimitiveNode{NodeType: NodeTypeString}
+	boolNode    = &PrimitiveNode{NodeType: NodeTypeBool}
+	nilNode     = &PrimitiveNode{NodeType: NodeTypeNil}
+	floatNode   = &PrimitiveNode{NodeType: NodeTypeFloat}
+	integerNode = &PrimitiveNode{NodeType: NodeTypeInteger}
+)
+
+func ParseFromString(j string) (Node, error) {
 	parser := &Parser{
-		Lexer: lex.Lex(name, j),
+		Lexer: lex.Lex(j),
 	}
 	return parser.parse()
 }
@@ -84,7 +91,7 @@ func (p *Parser) parseObject() *ObjectNode {
 
 	object := &ObjectNode{
 		NodeType: NodeTypeObject,
-		Children: make(map[string][]Node),
+		Children: make(map[string][]Node, 8),
 	}
 
 	var currentKey string
@@ -99,20 +106,20 @@ func (p *Parser) parseObject() *ObjectNode {
 			if p.LastItem.Typ == lex.ItemComma || p.LastItem.Typ == lex.ItemLeftBrace {
 				currentKey = p.Item.Value
 			} else {
-				object.Children[currentKey] = append(object.Children[currentKey], p.parseString())
+				object.Children[currentKey] = append(object.Children[currentKey], stringNode)
 			}
 		case lex.ItemLeftBrace:
 			object.Children[currentKey] = append(object.Children[currentKey], p.parseObject())
 		case lex.ItemLeftSqrBrace:
 			object.Children[currentKey] = append(object.Children[currentKey], p.parseArray())
 		case lex.ItemBool:
-			object.Children[currentKey] = append(object.Children[currentKey], p.parseBool())
+			object.Children[currentKey] = append(object.Children[currentKey], boolNode)
 		case lex.ItemNil:
-			object.Children[currentKey] = append(object.Children[currentKey], p.parseNil())
+			object.Children[currentKey] = append(object.Children[currentKey], nilNode)
 		case lex.ItemFloat:
-			object.Children[currentKey] = append(object.Children[currentKey], p.parseFloat())
+			object.Children[currentKey] = append(object.Children[currentKey], floatNode)
 		case lex.ItemInteger:
-			object.Children[currentKey] = append(object.Children[currentKey], p.parseInteger())
+			object.Children[currentKey] = append(object.Children[currentKey], integerNode)
 		case lex.ItemColon:
 			break
 		case lex.ItemComma:
@@ -136,7 +143,7 @@ func (p *Parser) parseArray() *ArrayNode {
 	p.LastItem = p.Item
 	array := &ArrayNode{
 		NodeType: NodeTypeArray,
-		Children: make([]Node, 0),
+		Children: make([]Node, 0, 8),
 	}
 
 	for p.Item = p.Lexer.NextItem(); p.Item.Typ != lex.ItemRightSqrBrace; p.Item = p.Lexer.NextItem() {
@@ -146,15 +153,15 @@ func (p *Parser) parseArray() *ArrayNode {
 		case lex.ItemLeftSqrBrace:
 			array.Children = append(array.Children, p.parseArray())
 		case lex.ItemNil:
-			array.Children = append(array.Children, p.parseNil())
+			array.Children = append(array.Children, nilNode)
 		case lex.ItemBool:
-			array.Children = append(array.Children, p.parseBool())
+			array.Children = append(array.Children, boolNode)
 		case lex.ItemString:
-			array.Children = append(array.Children, p.parseString())
+			array.Children = append(array.Children, stringNode)
 		case lex.ItemInteger:
-			array.Children = append(array.Children, p.parseInteger())
+			array.Children = append(array.Children, integerNode)
 		case lex.ItemFloat:
-			array.Children = append(array.Children, p.parseFloat())
+			array.Children = append(array.Children, floatNode)
 		case lex.ItemComma:
 			break
 		case lex.ItemError:
@@ -170,39 +177,4 @@ func (p *Parser) parseArray() *ArrayNode {
 	}
 
 	return array
-}
-
-func (p *Parser) parseBool() *PrimitiveNode {
-	return &PrimitiveNode{
-		NodeType: NodeTypeBool,
-		value:    p.Item.Value,
-	}
-}
-
-func (p *Parser) parseString() *PrimitiveNode {
-	return &PrimitiveNode{
-		NodeType: NodeTypeString,
-		value:    p.Item.Value,
-	}
-}
-
-func (p *Parser) parseNil() *PrimitiveNode {
-	return &PrimitiveNode{
-		NodeType: NodeTypeNil,
-		value:    p.Item.Value,
-	}
-}
-
-func (p *Parser) parseFloat() *PrimitiveNode {
-	return &PrimitiveNode{
-		NodeType: NodeTypeFloat,
-		value:    p.Item.Value,
-	}
-}
-
-func (p *Parser) parseInteger() *PrimitiveNode {
-	return &PrimitiveNode{
-		NodeType: NodeTypeInteger,
-		value:    p.Item.Value,
-	}
 }

@@ -114,6 +114,17 @@ func TestFiles(t *testing.T) {
 	}
 }
 
+func BenchmarkLargeFile(b *testing.B) {
+	largeFile := readFile("./testdata/big_reddit_response")
+
+	for i := 0; i < b.N; i++ {
+		_, err := GenerateOutputFromString(largeFile)
+		if err != nil {
+			b.Fatal("Error generating output", err)
+		}
+	}
+}
+
 func listValidInputFiles() ([]string, error) {
 	dirFiles, err := ioutil.ReadDir(dirName)
 	if err != nil {

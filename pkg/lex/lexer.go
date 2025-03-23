@@ -20,7 +20,6 @@ const (
 	ItemInteger
 	ItemFloat
 	ItemNil
-	ItemKey
 	ItemLeftBrace
 	ItemRightBrace
 	ItemLeftSqrBrace
@@ -31,42 +30,67 @@ const (
 	ItemError
 )
 
+const (
+	whitespace          = ' '
+	tab                 = '\t'
+	newline             = '\n'
+	comma               = ','
+	colon               = ':'
+	leftBrace           = '{'
+	rightBrace          = '}'
+	leftSqrBrace        = '['
+	rightSqrBrace       = ']'
+	quote               = '"'
+	plus                = '+'
+	minus               = '-'
+	zero                = '0'
+	nine                = '9'
+	n                   = 'n'
+	t                   = 't'
+	f                   = 'f'
+	backslash           = '\\'
+	validNumberPrefixes = "+-"
+	validNumberDigits   = "0123456789"
+	validNumberSuffixes = ".eE+-0123456789"
+	wordTrue            = "true"
+	wordFalse           = "false"
+	wordNullLength      = len("null")
+)
+
 const EOF = -1
 
 type Lexer struct {
-	Name  string
-	Input string
-	Pos   int
-	Start int
-	Width int
-	Items chan *Item
+	input string
+	pos   int
+	start int
+	width int
+	items chan *Item
 }
 
 func (l *Lexer) NextItem() *Item {
-	return <-l.Items
+	return <-l.items
 }
 
-func Lex(name, json string) *Lexer {
+func Lex(json string) *Lexer {
 	l := &Lexer{
-		Name:  name,
-		Input: json,
-		Pos:   0,
-		Start: 0,
-		Width: 0,
-		Items: make(chan *Item, 32),
+		input: json,
+		pos:   0,
+		start: 0,
+		width: 0,
+		items: make(chan *Item, 32),
 	}
 	go l.run()
 	return l
 }
 
 func (l *Lexer) next() rune {
-	if l.Pos >= len(l.Input) {
-		l.Width = 0
+	if l.pos >= len(l.input) {
+		l.width = 0
 		return EOF
 	}
-	rn, width := utf8.DecodeRuneInString(l.Input[l.Pos:])
-	l.Width = width
-	l.Pos += l.Width
+	rn, width := utf8.DecodeRuneInString(l.input[l.pos:])
+	l.width = width
+	l.pos += l.width
 	return rn
 }
 
@@ -80,29 +104,29 @@ func (l *Lexer) acceptRun(valid string) int {
 }
 
 func (l *Lexer) backup() {
-	l.Pos -= l.Width
+	l.pos -= l.width
 }
 
 func (l *Lexer) emit(t ItemType) {
-	l.Items <- &Item{
+	l.items <- &Item{
 		Typ:   t,
-		Pos:   l.Pos,
-		Value: l.Input[l.Start:l.Pos],
+		Pos:   l.pos,
+		Value: l.input[l.start:l.pos],
 	}
-	l.Start = l.Pos
+	l.start = l.pos
 }
 
 func (l *Lexer) emitError(msg string) {
-	l.Items <- &Item{
+	l.items <- &Item{
 		Typ:   ItemError,
-		Pos:   l.Pos,
+		Pos:   l.pos,
 		Value: msg,
 	}
-	l.Start = l.Pos
+	l.start = l.pos
 }
 
 func (l *Lexer) ignore() {
-	l.Start = l.Pos
+	l.start = l.pos
 }
 
 func (l *Lexer) run() {
@@ -115,13 +139,13 @@ func (l *Lexer) run() {
 	for state := lexWhitespace; state != nil; {
 		state = state(l)
 	}
-	defer close(l.Items)
+	defer close(l.items)
 }
 
 type stateFn func(l *Lexer) stateFn
 
 func lexWhitespace(l *Lexer) stateFn {
-	for r := l.next(); isSpace(r) || r == '\n'; r = l.next() {
+	for r := l.next(); isSpace(r) || r == newline; r = l.next() {
 	}
 	l.backup()
 	l.ignore()
@@ -130,19 +154,19 @@ func lexWhitespace(l *Lexer) stateFn {
 	case r == EOF:
 		l.emit(ItemEOF)
 		return nil
-	case r == '{':
+	case r == leftBrace:
 		return lexLeftBrace
-	case r == '[':
+	case r == leftSqrBrace:
 		return lexLeftSqrBrace
-	case r == '}':
+	case r == rightBrace:
 		return lexRightBrace
-	case r == ']':
+	case r == rightSqrBrace:
 		return lexRightSqrBrace
-	case r == ':':
+	case r == colon:
 		return lexColon
-	case r == ',':
+	case r == comma:
 		return lexComma
-	case r == '"':
+	case r == quote:
 		return lexString
 	case isNumber(r):
 		l.backup()
@@ -159,7 +183,7 @@ func lexWhitespace(l *Lexer) stateFn {
 }
 
 func lexNull(l *Lexer) stateFn {
-	l.Pos += len("null")
+	l.pos += wordNullLength
 	l.emit(ItemNil)
 	return lexWhitespace
 }
@@ -170,8 +194,8 @@ func lexBool(l *Lexer) stateFn {
 		if r == EOF {
 			panic("unexpected eof while lexing bool")
 		}
-		word := l.Input[l.Start:l.Pos]
-		if word == "true" || word == "false" {
+		word := l.input[l.start:l.pos]
+		if word == wordTrue || word == wordFalse {
 			l.emit(ItemBool)
 			break
 		}
@@ -180,10 +204,10 @@ func lexBool(l *Lexer) stateFn {
 }
 
 func lexNumber(l *Lexer) stateFn {
-	l.acceptRun("+-")
-	l.acceptRun("0123456789")
+	l.acceptRun(validNumberPrefixes)
+	l.acceptRun(validNumberDigits)
 
-	count := l.acceptRun(".eE+-0123456789")
+	count := l.acceptRun(validNumberSuffixes)
 	if count > 0 {
 		l.emit(ItemFloat)
 	} else {
@@ -197,8 +221,8 @@ func lexString(l *Lexer) stateFn {
 	// the current rune is known to be `"`. Throw it away in order to emit the raw string value
 	// e.g. example instead of "example".
 	l.ignore()
-	for r := l.next(); r != '"'; r = l.next() {
-		if r == '\\' {
+	for r := l.next(); r != quote; r = l.next() {
+		if r == backslash {
 			r = l.next()
 		}
 		if r == EOF {
@@ -207,9 +231,9 @@ func lexString(l *Lexer) stateFn {
 	}
 
 	// the current rune is the closing `"`. Throw this one away as well by decrementing the position. Reset the correct state after emitting the lexem.
-	l.Pos--
+	l.pos--
 	l.emit(ItemString)
-	l.Pos++
+	l.pos++
 	return lexWhitespace
 }
 
@@ -243,18 +267,20 @@ func lexRightSqrBrace(l *Lexer) stateFn {
 	return lexWhitespace
 }
 
+const ()
+
 func isSpace(r rune) bool {
-	return r == ' ' || r == '\t'
+	return r == whitespace || r == tab
 }
 
 func isNumber(r rune) bool {
-	return r == '+' || r == '-' || ('0' <= r && r <= '9')
+	return r == plus || r == minus || (zero <= r && r <= nine)
 }
 
 func isNull(r rune) bool {
-	return r == 'n'
+	return r == n
 }
 
 func isBool(r rune) bool {
-	return r == 't' || r == 'f'
+	return r == t || r == f
 }

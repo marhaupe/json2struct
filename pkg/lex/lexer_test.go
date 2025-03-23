@@ -29,7 +29,7 @@ var (
 
 // collect gathers the emitted items into a slice.
 func collect(t *lexTest) (items []*Item) {
-	l := Lex(t.name, t.input)
+	l := Lex(t.input)
 	for {
 		item := l.NextItem()
 		items = append(items, item)
