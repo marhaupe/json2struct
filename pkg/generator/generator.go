@@ -13,7 +13,7 @@ import (
 )
 
 func GenerateOutputFromString(s string) (string, error) {
-	generatedFile, err := GenerateFileFromString(s)
+	generatedFile, err := generateFileFromString(s)
 	if err != nil {
 		return "", err
 	}
@@ -26,15 +26,15 @@ func GenerateOutputFromString(s string) (string, error) {
 	return buf.String(), nil
 }
 
-func GenerateFileFromString(s string) (*jen.File, error) {
+func generateFileFromString(s string) (*jen.File, error) {
 	node, err := parse.ParseFromString(s)
 	if err != nil {
 		return nil, err
 	}
-	return GenerateFileFromAST(node)
+	return generateFileFromAST(node)
 }
 
-func GenerateFileFromAST(tree parse.Node) (*jen.File, error) {
+func generateFileFromAST(tree parse.Node) (*jen.File, error) {
 	g := Generator{
 		Tree:        tree,
 		currentNode: tree,

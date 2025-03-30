@@ -64,11 +64,17 @@ type Lexer struct {
 	pos   int
 	start int
 	width int
-	items chan *Item
+	state stateFn
 }
 
 func (l *Lexer) NextItem() *Item {
-	return <-l.items
+	for {
+		newState, item := l.state(l)
+		l.state = newState
+		if item != nil {
+			return item
+		}
+	}
 }
 
 func Lex(json string) *Lexer {
@@ -77,9 +83,8 @@ func Lex(json string) *Lexer {
 		pos:   0,
 		start: 0,
 		width: 0,
-		items: make(chan *Item, 32),
+		state: lexWhitespace,
 	}
-	go l.run()
 	return l
 }
 
@@ -107,44 +112,46 @@ func (l *Lexer) backup() {
 	l.pos -= l.width
 }
 
-func (l *Lexer) emit(t ItemType) {
-	l.items <- &Item{
+func (l *Lexer) emit(t ItemType) *Item {
+	item := &Item{
 		Typ:   t,
 		Pos:   l.pos,
 		Value: l.input[l.start:l.pos],
 	}
 	l.start = l.pos
+	return item
 }
 
-func (l *Lexer) emitError(msg string) {
-	l.items <- &Item{
+func (l *Lexer) emitError(msg string) *Item {
+	item := &Item{
 		Typ:   ItemError,
 		Pos:   l.pos,
 		Value: msg,
 	}
 	l.start = l.pos
+	return item
 }
 
 func (l *Lexer) ignore() {
 	l.start = l.pos
 }
 
-func (l *Lexer) run() {
-	defer func() {
-		if r := recover(); r != nil {
-			l.emitError(fmt.Sprint(r))
-		}
-	}()
+// func (l *Lexer) run() {
+// 	defer func() {
+// 		if r := recover(); r != nil {
+// 			l.emitError(fmt.Sprint(r))
+// 		}
+// 	}()
 
-	for state := lexWhitespace; state != nil; {
-		state = state(l)
-	}
-	defer close(l.items)
-}
+// 	for state := lexWhitespace; state != nil; {
+// 		state = state(l)
+// 	}
+// 	defer close(l.items)
+// }
 
-type stateFn func(l *Lexer) stateFn
+type stateFn func(l *Lexer) (stateFn, *Item)
 
-func lexWhitespace(l *Lexer) stateFn {
+func lexWhitespace(l *Lexer) (stateFn, *Item) {
 	for r := l.next(); isSpace(r) || r == newline; r = l.next() {
 	}
 	l.backup()
@@ -152,43 +159,44 @@ func lexWhitespace(l *Lexer) stateFn {
 
 	switch r := l.next(); {
 	case r == EOF:
-		l.emit(ItemEOF)
-		return nil
+		item := l.emit(ItemEOF)
+		return nil, item
 	case r == leftBrace:
-		return lexLeftBrace
+		return lexLeftBrace, nil
 	case r == leftSqrBrace:
-		return lexLeftSqrBrace
+		return lexLeftSqrBrace, nil
 	case r == rightBrace:
-		return lexRightBrace
+		return lexRightBrace, nil
 	case r == rightSqrBrace:
-		return lexRightSqrBrace
+		return lexRightSqrBrace, nil
 	case r == colon:
-		return lexColon
+		return lexColon, nil
 	case r == comma:
-		return lexComma
+		return lexComma, nil
 	case r == quote:
-		return lexString
+		return lexString, nil
 	case isNumber(r):
 		l.backup()
-		return lexNumber
+		return lexNumber, nil
 	case isNull(r):
 		l.backup()
-		return lexNull
+		return lexNull, nil
 	case isBool(r):
 		l.backup()
-		return lexBool
+		return lexBool, nil
 	default:
 		panic(fmt.Sprintf("unexpected character %v", string(r)))
 	}
 }
 
-func lexNull(l *Lexer) stateFn {
+func lexNull(l *Lexer) (stateFn, *Item) {
 	l.pos += wordNullLength
-	l.emit(ItemNil)
-	return lexWhitespace
+	item := l.emit(ItemNil)
+	return lexWhitespace, item
 }
 
-func lexBool(l *Lexer) stateFn {
+func lexBool(l *Lexer) (stateFn, *Item) {
+	var item *Item
 	for {
 		r := l.next()
 		if r == EOF {
@@ -196,28 +204,29 @@ func lexBool(l *Lexer) stateFn {
 		}
 		word := l.input[l.start:l.pos]
 		if word == wordTrue || word == wordFalse {
-			l.emit(ItemBool)
+			item = l.emit(ItemBool)
 			break
 		}
 	}
-	return lexWhitespace
+	return lexWhitespace, item
 }
 
-func lexNumber(l *Lexer) stateFn {
+func lexNumber(l *Lexer) (stateFn, *Item) {
 	l.acceptRun(validNumberPrefixes)
 	l.acceptRun(validNumberDigits)
 
 	count := l.acceptRun(validNumberSuffixes)
+	var item *Item
 	if count > 0 {
-		l.emit(ItemFloat)
+		item = l.emit(ItemFloat)
 	} else {
-		l.emit(ItemInteger)
+		item = l.emit(ItemInteger)
 	}
 
-	return lexWhitespace
+	return lexWhitespace, item
 }
 
-func lexString(l *Lexer) stateFn {
+func lexString(l *Lexer) (stateFn, *Item) {
 	// the current rune is known to be `"`. Throw it away in order to emit the raw string value
 	// e.g. example instead of "example".
 	l.ignore()
@@ -232,39 +241,39 @@ func lexString(l *Lexer) stateFn {
 
 	// the current rune is the closing `"`. Throw this one away as well by decrementing the position. Reset the correct state after emitting the lexem.
 	l.pos--
-	l.emit(ItemString)
+	item := l.emit(ItemString)
 	l.pos++
-	return lexWhitespace
+	return lexWhitespace, item
 }
 
-func lexComma(l *Lexer) stateFn {
-	l.emit(ItemComma)
-	return lexWhitespace
+func lexComma(l *Lexer) (stateFn, *Item) {
+	item := l.emit(ItemComma)
+	return lexWhitespace, item
 }
 
-func lexColon(l *Lexer) stateFn {
-	l.emit(ItemColon)
-	return lexWhitespace
+func lexColon(l *Lexer) (stateFn, *Item) {
+	item := l.emit(ItemColon)
+	return lexWhitespace, item
 }
 
-func lexLeftBrace(l *Lexer) stateFn {
-	l.emit(ItemLeftBrace)
-	return lexWhitespace
+func lexLeftBrace(l *Lexer) (stateFn, *Item) {
+	item := l.emit(ItemLeftBrace)
+	return lexWhitespace, item
 }
 
-func lexRightBrace(l *Lexer) stateFn {
-	l.emit(ItemRightBrace)
-	return lexWhitespace
+func lexRightBrace(l *Lexer) (stateFn, *Item) {
+	item := l.emit(ItemRightBrace)
+	return lexWhitespace, item
 }
 
-func lexLeftSqrBrace(l *Lexer) stateFn {
-	l.emit(ItemLeftSqrBrace)
-	return lexWhitespace
+func lexLeftSqrBrace(l *Lexer) (stateFn, *Item) {
+	item := l.emit(ItemLeftSqrBrace)
+	return lexWhitespace, item
 }
 
-func lexRightSqrBrace(l *Lexer) stateFn {
-	l.emit(ItemRightSqrBrace)
-	return lexWhitespace
+func lexRightSqrBrace(l *Lexer) (stateFn, *Item) {
+	item := l.emit(ItemRightSqrBrace)
+	return lexWhitespace, item
 }
 
 const ()
