@@ -5,20 +5,22 @@
 class Json2struct < Formula
   desc ""
   homepage ""
-  version "1.8.0"
+  version "1.9.0"
+
+  depends_on "git"
 
   on_macos do
-    if Hardware::CPU.arm?
-      url "https://github.com/marhaupe/json2struct/releases/download/v1.8.0/json2struct_1.8.0_macOS_arm64.tar.gz"
-      sha256 "8c158134bf55c2e07c9b640bbacc96a9bb00eb55fc0873629d82cdb0f9b274df"
+    if Hardware::CPU.intel?
+      url "https://github.com/marhaupe/json2struct/releases/download/v1.9.0/json2struct_Darwin_x86_64.tar.gz"
+      sha256 "49b7942d899b12a937eccf8eefd75e537242cd77b62c3ea9440cb1b90a3a3910"
 
       def install
         bin.install "json2struct"
       end
     end
-    if Hardware::CPU.intel?
-      url "https://github.com/marhaupe/json2struct/releases/download/v1.8.0/json2struct_1.8.0_macOS_64-bit.tar.gz"
-      sha256 "5555182b29becb2d0b7723c2825a0c83d2a374611a08d0ca2a8f6865e63150c3"
+    if Hardware::CPU.arm?
+      url "https://github.com/marhaupe/json2struct/releases/download/v1.9.0/json2struct_Darwin_arm64.tar.gz"
+      sha256 "ffab3e21e237b91a7bf554e2f0862f01de49b3f7dc88ca2f116ac3839772ab63"
 
       def install
         bin.install "json2struct"
@@ -27,23 +29,25 @@ class Json2struct < Formula
   end
 
   on_linux do
-    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/marhaupe/json2struct/releases/download/v1.8.0/json2struct_1.8.0_linux_arm64.tar.gz"
-      sha256 "435caf7ae0596a72a0cdeddd92774f95bcdb368405323db5acd05fab47af91a7"
+    if Hardware::CPU.intel?
+      if Hardware::CPU.is_64_bit?
+        url "https://github.com/marhaupe/json2struct/releases/download/v1.9.0/json2struct_Linux_x86_64.tar.gz"
+        sha256 "1c43bf5f0f946c7c56744b6e7e1e9552defe01d776ac6afe9dad92cee9ad0d84"
 
-      def install
-        bin.install "json2struct"
+        def install
+          bin.install "json2struct"
+        end
       end
     end
-    if Hardware::CPU.intel?
-      url "https://github.com/marhaupe/json2struct/releases/download/v1.8.0/json2struct_1.8.0_linux_64-bit.tar.gz"
-      sha256 "679d76e693c2647e01a146108fa5843a1984c43b481489c34b6d65287a5d75f1"
+    if Hardware::CPU.arm?
+      if Hardware::CPU.is_64_bit?
+        url "https://github.com/marhaupe/json2struct/releases/download/v1.9.0/json2struct_Linux_arm64.tar.gz"
+        sha256 "a3bb44fb60469635d041ed0f92f4ec14992a57f193049a4dbbac05f079743dc5"
 
-      def install
-        bin.install "json2struct"
+        def install
+          bin.install "json2struct"
+        end
       end
     end
   end
-
-  depends_on "git"
 end
