@@ -9,7 +9,7 @@
 
 At some point when dealing with JSONs in Go, you will have to write struct types to `json.Unmarshal` your JSONs into. Doing this by hand is not only repetitive and time consuming, but also error prone. `json2struct` saves you this work by automatically parsing the JSON and generating you the matching struct type definitions ready to be used.
 
-Unlike other tools, `json2struct` tries to avoid generating `interface{}` and `map[string]interface{}` as much as possible. Nonetheless it's very fast 🚀.
+Unlike other tools, `json2struct` tries to avoid generating `interface{}` and `map[string]interface{}` as much as possible. Nonetheless it's very [fast](#benchmarks) 🚀.
 
 ## Installation
 
@@ -74,6 +74,17 @@ json2struct -c
 > -h, --help: help for json2struct
 
 > --version: version for json2struct
+
+
+
+## Benchmarks
+
+| Command | Mean [ms] | Min [ms] | Max [ms] | Relative |
+|:---|---:|---:|---:|---:|
+| `json2struct -f big_reddit_response` | 8.1 ± 0.6 | 7.3 | 11.3 | 1.00 |
+| `gojson -input big_reddit_response` | 9.0 ± 0.5 | 8.1 | 10.8 | 1.12 ± 0.10 |
+| `cat big_reddit_response \| gojsonstruct` | 71.7 ± 1.3 | 69.9 | 76.9 | 8.87 ± 0.64 |
+| `quicktype -l go -o output.go big_reddit_response` | 329.5 ± 2.2 | 326.7 | 333.5 | 40.75 ± 2.86 |
 
 ## Specifics
 
