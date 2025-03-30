@@ -93,6 +93,14 @@ func (l *Lexer) next() rune {
 		l.width = 0
 		return EOF
 	}
+	// ASCII fast path
+	r := l.input[l.pos]
+	if r < utf8.RuneSelf {
+		l.width = 1
+		l.pos++
+		return rune(r)
+	}
+	// Slow path for multi-byte runes
 	rn, width := utf8.DecodeRuneInString(l.input[l.pos:])
 	l.width = width
 	l.pos += l.width
