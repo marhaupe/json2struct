@@ -1,3 +1,4 @@
+version: 2
 before:
   hooks:
     - make clean
@@ -15,64 +16,23 @@ builds:
       - CGO_ENABLED=0
 
 archives:
-  - replacements:
-      amd64: 64-bit
-      386: 32-bit
-      darwin: macOS
+  - name_template: >-
+      {{- .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end -}}
     format_overrides:
       - goos: windows
-        format: zip
-
+        formats: [zip]
 brews:
-  - tap:
+  - repository:
       owner: marhaupe
       name: json2struct
     commit_author:
       name: Marcel Haupenthal
       email: marhaupe97@gmail.com
-    folder: formula
+    directory: formula
     dependencies:
       - git
-# snapcrafts:
-#   -
-#     # Replacements for GOOS and GOARCH in the package name.
-#     # Keys should be valid GOOSs or GOARCHs.
-#     # Values are the respective replacements.
-#     # Default is empty.
-#     replacements:
-#       amd64: 64-bit
-#       386: 32-bit
-#       darwin: macOS
-
-#     # Wether to publish the snap to the snapcraft store.
-#     # Remember you need to `snapcraft login` first.
-#     # Defaults to false.
-#     publish: false
-
-#     # Single-line elevator pitch for your amazing snap.
-#     # 79 char long at most.
-#     summary: CLI tool to convert JSON to Go type definitions.
-
-#     # This the description of your snap. You have a paragraph or two to tell the
-#     # most important story about your snap. Keep it under 100 words though,
-#     # we live in tweetspace and your description wants to look good in the snap
-#     # store.
-#     description: >
-#       At some point when dealing with JSONs in Go, you will have to write types to json.Unmarshal your JSONs into.
-#       Doing this by hand is not only repetitive and time consuming, but also error prone. json2struct saves you this work by
-#       automatically parsing the JSON and generating you the matching type definitions ready to be used.
-
-#       Different to other tools, json2struct tries to avoid generating interface{} and map[string]interface{} as much as possible.
-#       Nonetheless it's very fast 🚀.
-
-#     # A guardrail to prevent you from releasing a snap to all your users before
-#     # it is ready.
-#     # `devel` will let you release only to the `edge` and `beta` channels in the
-#     # store. `stable` will let you release also to the `candidate` and `stable`
-#     # channels. More info about channels here:
-#     # https://snapcraft.io/docs/reference/channels
-#     grade: stable
-
-#     # Your app's license, based on SPDX license expressions: https://spdx.org/licenses
-#     # Default is empty.
-#     license: GPL-3.0
