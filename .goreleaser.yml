@@ -33,6 +33,6 @@ brews:
     commit_author:
       name: Marcel Haupenthal
       email: marhaupe97@gmail.com
-    directory: formula
+    directory: Formula
     dependencies:
       - git
