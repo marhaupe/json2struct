@@ -5,22 +5,22 @@
 class Json2struct < Formula
   desc ""
   homepage ""
-  version "1.9.2"
+  version "1.9.3"
 
   depends_on "git"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/marhaupe/json2struct/releases/download/v1.9.2/json2struct_Darwin_x86_64.tar.gz"
-      sha256 "a576360bf68fcd6f83916ab7c6533bbaeeb0b9a97ccbf531ac6555259940e7f0"
+      url "https://github.com/marhaupe/json2struct/releases/download/v1.9.3/json2struct_Darwin_x86_64.tar.gz"
+      sha256 "2e774b5fce22a1b496f5344312b9a171ef0bfcf7f84ce60e83028ac9555a64af"
 
       def install
         bin.install "json2struct"
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/marhaupe/json2struct/releases/download/v1.9.2/json2struct_Darwin_arm64.tar.gz"
-      sha256 "433d7fc57bfcf0318e4e6d92c878fca5f89fffc500d591732ac65b117b680468"
+      url "https://github.com/marhaupe/json2struct/releases/download/v1.9.3/json2struct_Darwin_arm64.tar.gz"
+      sha256 "45cf33254a5ae8e08f9c6535b73b10df273392bcc95c33a6690bd1def61a904e"
 
       def install
         bin.install "json2struct"
@@ -31,8 +31,8 @@ class Json2struct < Formula
   on_linux do
     if Hardware::CPU.intel?
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/marhaupe/json2struct/releases/download/v1.9.2/json2struct_Linux_x86_64.tar.gz"
-        sha256 "6253c24dfe07e6409d14f24838d59d8e8f15c13faee841b5f11726b47a92c7b9"
+        url "https://github.com/marhaupe/json2struct/releases/download/v1.9.3/json2struct_Linux_x86_64.tar.gz"
+        sha256 "ff16b2ed3ba7d0b741c1ceb021390897d04646cb9aea281925a3d9decadec3e1"
 
         def install
           bin.install "json2struct"
@@ -41,8 +41,8 @@ class Json2struct < Formula
     end
     if Hardware::CPU.arm?
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/marhaupe/json2struct/releases/download/v1.9.2/json2struct_Linux_arm64.tar.gz"
-        sha256 "65b8ab9e0226863df644f39df92a1d9fc50956634d3f9dbbcb0bfd4b2036fac9"
+        url "https://github.com/marhaupe/json2struct/releases/download/v1.9.3/json2struct_Linux_arm64.tar.gz"
+        sha256 "79c0f0689ed5635c3765469c01954d9b10ccc9f2736f9c27f8c5334fef344372"
 
         def install
           bin.install "json2struct"
