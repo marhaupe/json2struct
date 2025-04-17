@@ -17,9 +17,20 @@ func GenerateOutputFromString(s string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	return generateOutput(generatedFile)
+}
 
+func GenerateOutputFromAST(tree parse.Node) (string, error) {
+	generatedFile, err := generateFileFromAST(tree)
+	if err != nil {
+		return "", err
+	}
+	return generateOutput(generatedFile)
+}
+
+func generateOutput(generatedFile *jen.File) (string, error) {
 	buf := &bytes.Buffer{}
-	err = generatedFile.Render(buf)
+	err := generatedFile.Render(buf)
 	if err != nil {
 		return "", fmt.Errorf("error rendering file: %v", err)
 	}

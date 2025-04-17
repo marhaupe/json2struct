@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/atotto/clipboard"
 	"github.com/marhaupe/json2struct/pkg/editor"
 	"github.com/marhaupe/json2struct/pkg/generator"
+	"github.com/marhaupe/json2struct/pkg/parse"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +27,9 @@ var (
 		Short:   "json2struct generates Go type definitions for a JSON",
 		Version: version,
 		Args:    cobra.ExactArgs(0),
-		Run:     rootFunc,
+		Run: func(cmd *cobra.Command, args []string) {
+			Run(inputString, inputFile, shouldBenchmark, shouldUseClipboard)
+		},
 	}
 )
 
@@ -44,51 +47,62 @@ func Execute() {
 	}
 }
 
-func rootFunc(cmd *cobra.Command, args []string) {
-	var userInput string
+func Run(inputString, inputFile string, shouldBenchmark, shouldUseClipboard bool) {
+	if shouldBenchmark {
+		defer benchmark()()
+	}
+
+	var userInputNode parse.Node
+	var err error
+
 	switch {
 	case shouldUseClipboard:
-		var err error
+		var userInput string
 		userInput, err = clipboard.ReadAll()
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(2)
 		}
+		userInputNode, err = parse.ParseFromString(userInput)
 	case inputFile != "":
-		userInput = readFromFile()
+		userInput := readFromFile()
+		userInputNode, err = parse.ParseFromString(userInput)
 	case inputString != "":
-		userInput = inputString
+		userInput := inputString
+		userInputNode, err = parse.ParseFromString(userInput)
 	default:
-		userInput = readFromEditor()
+		userInputNode, err = readFromEditor()
 	}
 
-	if shouldBenchmark {
-		defer benchmark()()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	if userInput == "" {
+	if userInputNode == nil {
 		return
 	}
 
-	output, err := generator.GenerateOutputFromString(userInput)
+	output, err := generator.GenerateOutputFromAST(userInputNode)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(3)
 	}
+
+	fmt.Println(output)
+
 	if shouldUseClipboard {
 		err = clipboard.WriteAll(output)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(4)
 		}
-		fmt.Printf("%s\n\nSaved output to clipboard\n", output)
-	} else {
-		fmt.Println(output)
+		fmt.Println("\nSaved output to clipboard")
 	}
 }
 
 func readFromFile() string {
-	data, err := ioutil.ReadFile(inputFile)
+	data, err := os.ReadFile(inputFile)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -96,31 +110,33 @@ func readFromFile() string {
 	return string(data)
 }
 
-func readFromEditor() string {
+func readFromEditor() (parse.Node, error) {
 	edit := editor.New()
 	defer edit.Delete()
 	edit.Display()
 
 	userInput, _ := edit.Read()
 
-	isValid := json.Valid([]byte(userInput))
-	if isValid {
-		return userInput
+	userInputNode, err := parse.ParseFromString(userInput)
+	if err == nil {
+		return userInputNode, nil
 	}
 
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Print("You supplied an invalid JSON. Do you want to fix it (y/n)?\t")
+		fmt.Print("You supplied invalid JSON. Continue editing? (Y/n) ")
 		userAnswer, _ := reader.ReadString('\n')
-		userWantsFix := string(userAnswer[0]) == "y"
+		userAnswer = strings.TrimSpace(userAnswer)
+		userWantsFix := len(userAnswer) == 0 || userAnswer[0] == 'y'
 		if !userWantsFix {
-			return ""
+			return nil, nil
 		}
+		fmt.Print("\033[1A\033[2K")
 		edit.Display()
 		userInput, _ = edit.Read()
 		isValid := json.Valid([]byte(userInput))
 		if isValid {
-			return userInput
+			return userInputNode, nil
 		}
 	}
 }
