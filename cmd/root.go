@@ -8,10 +8,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/atotto/clipboard"
 	"github.com/marhaupe/json2struct/pkg/editor"
 	"github.com/marhaupe/json2struct/pkg/generator"
 	"github.com/spf13/cobra"
-	"golang.design/x/clipboard"
 )
 
 var (
@@ -48,11 +48,12 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	var userInput string
 	switch {
 	case shouldUseClipboard:
-		err := clipboard.Init()
+		var err error
+		userInput, err = clipboard.ReadAll()
 		if err != nil {
+			fmt.Println(err)
 			os.Exit(2)
 		}
-		userInput = string(clipboard.Read(clipboard.FmtText))
 	case inputFile != "":
 		userInput = readFromFile()
 	case inputString != "":
@@ -71,11 +72,11 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		os.Exit(3)
 	}
 	if shouldUseClipboard {
-		err := clipboard.Init()
+		err = clipboard.WriteAll(output)
 		if err != nil {
+			fmt.Println(err)
 			os.Exit(4)
 		}
-		clipboard.Write(clipboard.FmtText, []byte(output))
 		fmt.Println("saved output to clipboard")
 	} else {
 		fmt.Println(output)

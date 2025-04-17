@@ -5,10 +5,10 @@ LDFLAGS="-X github.com/marhaupe/json2struct/cmd.version=$(VERSION)"
 .PHONY: build install test testrace clean coverage 
 
 build:
-	go build -o $(OUTPUT) -ldflags=$(LDFLAGS)
+	CGO_ENABLED=0 go build -o $(OUTPUT) -ldflags=$(LDFLAGS)
 
 install: 
-	go install -ldflags=$(LDFLAGS)
+	CGO_ENABLED=0 go install -ldflags=$(LDFLAGS)
 
 test:
 	go test ./...
@@ -26,3 +26,4 @@ coverage:
 	go test ./... -coverprofile cover.out
 	go tool cover -html=cover.out -o cover.html 
 	rm cover.out
+	
