@@ -66,6 +66,10 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		defer benchmark()()
 	}
 
+	if userInput == "" {
+		return
+	}
+
 	output, err := generator.GenerateOutputFromString(userInput)
 	if err != nil {
 		fmt.Println(err)
@@ -77,7 +81,7 @@ func rootFunc(cmd *cobra.Command, args []string) {
 			fmt.Println(err)
 			os.Exit(4)
 		}
-		fmt.Println("saved output to clipboard")
+		fmt.Printf("%s\n\nSaved output to clipboard\n", output)
 	} else {
 		fmt.Println(output)
 	}
@@ -97,13 +101,13 @@ func readFromEditor() string {
 	defer edit.Delete()
 	edit.Display()
 
-	var userInput string
-	userInput, _ = edit.Read()
+	userInput, _ := edit.Read()
 
 	isValid := json.Valid([]byte(userInput))
 	if isValid {
 		return userInput
 	}
+
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		fmt.Print("You supplied an invalid JSON. Do you want to fix it (y/n)?\t")
